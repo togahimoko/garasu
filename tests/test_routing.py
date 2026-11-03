@@ -101,6 +101,42 @@ class GarasuTests(unittest.TestCase):
         happ = json.loads(base64.b64decode(encoded, validate=True))
         self.assertEqual(happ, json.loads((ROOT / "clients/happ.json").read_text()))
 
+    def test_srr_preserves_existing_rules(self):
+        spec = importlib.util.spec_from_file_location("garasu_srr", ROOT / "scripts/build_srr.py")
+        plugin = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(plugin)
+        base = {
+            "version": "1",
+            "settings": {"disableSubscriptionAccessByPath": False},
+            "rules": [
+                {"name": "Browser", "responseType": "BROWSER", "conditions": [1]},
+                {"name": "Mihomo Clients", "responseType": "MIHOMO", "conditions": [2]},
+                {"name": "Singbox Clients", "responseType": "SINGBOX", "conditions": [3]},
+                {"name": "Fallback", "responseType": "XRAY_BASE64", "conditions": []},
+            ],
+        }
+        before = json.dumps(base, sort_keys=True)
+        links = {
+            "incy": "incy://autorouting/onadd/https://example.com/incy.json",
+            "happ": "happ://routing/onadd/" + "a" * 2000,
+        }
+        result = plugin.patch(base, links)
+        self.assertEqual(json.dumps(base, sort_keys=True), before)
+        self.assertEqual(len(result["rules"]), 6)
+        self.assertEqual(result["rules"][0], base["rules"][0])
+        self.assertEqual(result["rules"][3], base["rules"][1])
+        self.assertEqual(result["rules"][4], base["rules"][2])
+        self.assertEqual(result["rules"][5], base["rules"][3])
+        self.assertEqual(result["rules"][1]["responseModifications"]["headers"][0]["key"], "autorouting")
+        self.assertEqual(result["rules"][2]["responseModifications"]["headers"][0]["key"], "routing")
+        self.assertEqual(result["rules"][1]["responseType"], "XRAY_BASE64")
+        self.assertEqual(result["rules"][2]["responseType"], "XRAY_BASE64")
+        self.assertEqual(plugin.patch(result, links), result)
+        with self.assertRaises(ValueError):
+            plugin.patch({**base, "rules": base["rules"][:-1]}, links)
+        with self.assertRaises(ValueError):
+            plugin.patch(base, {**links, "happ": "happ://routing/onadd/" + "b" * 5000})
+
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():
             content = path.read_text()

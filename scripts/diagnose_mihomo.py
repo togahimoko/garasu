@@ -51,6 +51,16 @@ def analyze(config, groups):
     }
 
 
+def choose_port(configured, explicit, observed):
+    """Never guess when multiple possible proxy listeners are open."""
+    if isinstance(explicit, int) and 0 < explicit <= 65535:
+        return explicit
+    if isinstance(configured, int) and 0 < configured <= 65535:
+        return configured
+    open_ports = [int(port) for port, available in observed.items() if available]
+    return open_ports[0] if len(open_ports) == 1 else None
+
+
 def read_json_local(port, path, secret=""):
     if not isinstance(port, int) or port < 1 or port > 65535:
         raise ValueError("Invalid port")
@@ -129,7 +139,7 @@ def main():
     else:
         report["issues"] = ["CONTROLLER_NOT_ACCESSIBLE"]
         report["mixed_port"] = None
-    port = args.mixed_port or report.get("mixed_port") or 0
+    port = choose_port(report.get("mixed_port"), args.mixed_port, report["local_ports"])
     if port:
         report["chosen_proxy_port"] = port
         report["listener_open"] = probe_socket(port)

@@ -1,0 +1,176 @@
+# Garasu Unified v1 CANDIDATE — not activated in Remnawave.
+# RU bypass is disabled until complete blocked-registry startup is
+# verified on the native client (no fail-open on cold cache).
+# Garasu MAX | Remnawave Mihomo template (not a standalone subscription).
+# Import as MIHOMO TEMPLATE in Remnawave; Remnawave injects each user's nodes.
+# No Moscow proxy chain. Geo/RKN lists auto-update from Garasu GitHub.
+mode: rule
+# Clash Verge Rev default local HTTP/SOCKS listener. The GUI system proxy
+# must point to this same port; change it there if already occupied.
+mixed-port: 7897
+log-level: warning
+allow-lan: false
+ipv6: false
+unified-delay: true
+tcp-concurrent: true
+profile:
+  store-selected: false
+  store-fake-ip: true
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  default-nameserver:
+    - 1.1.1.1
+    - 8.8.8.8
+  nameserver:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+  # Resolve Remnawave-provided node endpoints without depending on proxy DoH bootstrap.
+  # This is a canary fallback to the local system resolver; test on real ISPs.
+  proxy-server-nameserver:
+    - system
+  # DIRECT destinations should resolve using the local network resolver.
+  direct-nameserver:
+    - system
+  fake-ip-filter:
+    # Resolve local network names normally, never use fake-ip here.
+    - 'localhost'
+    - '*.localhost'
+    - 'home.arpa'
+    - '*.home.arpa'
+    - 'lan'
+    - '*.lan'
+    - 'local'
+    - '*.local'
+    - '+.msftconnecttest.com'
+    - '+.msftncsi.com'
+    - 'time.*.com'
+    - 'ntp.*.com'
+# Remnawave inserts the subscriber's permitted nodes here.
+proxies: # LEAVE THIS LINE!
+
+proxy-groups:
+  - name: Garasu
+    type: select
+    proxies:
+      - Garasu Auto
+    remnawave:
+      include-proxies: false
+  - name: Garasu Auto
+    type: url-test
+    # All subscriber nodes, irrespective of their country or name.
+    # Switch to another healthy node when the current node fails.
+    url: https://cp.cloudflare.com/generate_204
+    interval: 180
+    tolerance: 150
+    lazy: false
+    timeout: 8000
+    max-failed-times: 2
+    expected-status: 204
+    # Do not resolve an empty subscriber pool as implicit DIRECT.
+    empty-fallback: REJECT
+    include-all: true
+    remnawave:
+      include-proxies: false
+    proxies: # LEAVE THIS LINE!
+      # Personal nodes are selected automatically by include-all.
+rule-providers:
+  rkn-domains-full:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/eae553c8eea684d96b83de964c949104ee9acc23/rules/unified/refilter-domain-full.list
+    proxy: Garasu Auto
+    path: ./garasu-unified/rkn-domains-full.txt
+    interval: 21600
+  rkn-ips-full:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/eae553c8eea684d96b83de964c949104ee9acc23/rules/unified/refilter-ip-full.cidr
+    proxy: Garasu Auto
+    path: ./garasu-unified/rkn-ips-full.txt
+    interval: 21600
+  youtube:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/youtube.list
+    proxy: Garasu Auto
+    path: ./garasu-unified/youtube.txt
+    interval: 21600
+  discord:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/discord.list
+    proxy: Garasu Auto
+    path: ./garasu-unified/discord.txt
+    interval: 21600
+  ai:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/ai.list
+    proxy: Garasu Auto
+    path: ./garasu-unified/ai.txt
+    interval: 21600
+  crypto:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/crypto.list
+    proxy: Garasu Auto
+    path: ./garasu-unified/crypto.txt
+    interval: 21600
+  proxy:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/proxy.list
+    proxy: Garasu Auto
+    path: ./garasu-unified/proxy.txt
+    interval: 21600
+  proxy-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/proxy-ips.cidr
+    proxy: Garasu Auto
+    path: ./garasu-unified/proxy-ips.txt
+    interval: 21600
+  ads:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/ads.list
+    proxy: Garasu Auto
+    path: ./garasu-unified/ads.txt
+    interval: 21600
+rules:
+  # Private destinations must not fall through to the Czech proxy, even
+  # before DNS or remote rule providers become available.
+  - DOMAIN-SUFFIX,localhost,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,lan,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR6,::1/128,DIRECT,no-resolve
+  - IP-CIDR6,fc00::/7,DIRECT,no-resolve
+  - IP-CIDR6,fe80::/10,DIRECT,no-resolve
+  - RULE-SET,rkn-domains-full,Garasu
+  - RULE-SET,rkn-ips-full,Garasu,no-resolve
+  - RULE-SET,youtube,Garasu
+  - RULE-SET,discord,Garasu
+  - RULE-SET,ai,Garasu
+  - RULE-SET,crypto,Garasu
+  - RULE-SET,proxy,Garasu
+  - RULE-SET,proxy-ips,Garasu,no-resolve
+  - RULE-SET,ads,REJECT
+  - MATCH,Garasu

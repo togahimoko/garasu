@@ -16,16 +16,24 @@ jobs:
           python-version: "3.12"
       - name: Install test dependencies
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.2
-      - name: Build full Garasu release with quality reports (no publish)
-        run: python scripts/refresh.py
-      - name: Test Garasu data analyzer and existing routing
-        run: python -m unittest discover -s tests -v
-      - name: Check deterministic report and tracked version when present
+      - name: Check committed snapshot quality and exact tracked reports
         run: |
           python scripts/audit_rules.py --root . --check
           if git ls-files --error-unmatch reports/quality.json >/dev/null 2>&1; then
             git diff --exit-code -- reports/quality.json reports/quality.md
           fi
+      - name: Build full Garasu release with quality reports (no publish)
+        run: python scripts/refresh.py
+      - name: Test Garasu data analyzer and existing routing
+        env:
+          GARASU_ALLOW_REFRESHED_CANDIDATE_SKIP: '1'
+        run: python -m unittest discover -s tests -v
+      - name: Check freshly fetched snapshot quality without comparing to older revision
+        run: |
+          # External upstream can legitimately advance after the PR base commit.
+          # Audit the new complete snapshot without failing on expected differences
+          # in reports, which are published separately by the refresh workflow.
+          python scripts/audit_rules.py --root . --check
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: garasu-rule-quality

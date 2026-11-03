@@ -1,0 +1,111 @@
+name: Garasu - unified policy candidate engines
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'policy/**'
+      - 'rules/unified/**'
+      - 'clients/unified/**'
+      - 'scripts/unified_policy.py'
+      - 'scripts/smoke_cores.py'
+      - 'tests/test_unified*.py'
+      - '.github/workflows/unified-candidate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unified-engines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12'
+      - name: Install strict YAML parser
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.2
+      - name: Check every pinned release asset against exact Git blob integrity
+        run: python scripts/unified_policy.py --verify-assets
+      - name: Verify full source parity and generate candidate fixtures
+        env:
+          OUT: ${{ runner.temp }}/garasu-unified
+        run: |
+          python -m unittest discover -s tests -p 'test_unified*.py' -v
+          mkdir -p "$OUT"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts.smoke_cores import prepare_mihomo, prepare_singbox, prepare_xray
+          out = Path(os.environ["OUT"])
+          for name in ("mihomo-remnawave.yaml", "stash-remnawave.yaml"):
+              prepare_mihomo("clients/unified/" + name, out, node_count=5)
+          prepare_singbox("clients/unified/singbox-remnawave-1.14.json", out, node_count=5)
+          prepare_xray("clients/unified/xray-advanced-remnawave.json", out)
+          PY
+      - name: Mihomo 1.19.32 parses unified full-registry candidate
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RUNNER_TEMP/garasu-unified:$RUNNER_TEMP/garasu-unified" \
+            metacubex/mihomo:v1.19.32 -t \
+            -f "$RUNNER_TEMP/garasu-unified/mihomo-remnawave.ci.yaml" \
+            -d "$RUNNER_TEMP/garasu-unified"
+      - name: Stash-compatible candidate checked by Mihomo parser only
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RUNNER_TEMP/garasu-unified:$RUNNER_TEMP/garasu-unified" \
+            metacubex/mihomo:v1.19.32 -t \
+            -f "$RUNNER_TEMP/garasu-unified/stash-remnawave.ci.yaml" \
+            -d "$RUNNER_TEMP/garasu-unified"
+      - name: sing-box 1.14.2 checks candidate with real full source rules
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RUNNER_TEMP/garasu-unified:$RUNNER_TEMP/garasu-unified" \
+            ghcr.io/sagernet/sing-box:v1.14.2 check \
+            -c "$RUNNER_TEMP/garasu-unified/singbox-remnawave-1.14.ci.json"
+      - name: Xray 26.10.21 parses candidate with existing pinned geodata
+        run: |
+          docker run --rm -e "XRAY_LOCATION_ASSET=$GITHUB_WORKSPACE/geo" \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RUNNER_TEMP/garasu-unified:$RUNNER_TEMP/garasu-unified" \
+            ghcr.io/xtls/xray-core:26.10.21@sha256:447ffc750a0b87d6e4f2c38425f68105bfc8c789e59c22d83b94eb7e1e648c50 run -test \
+            -config "$RUNNER_TEMP/garasu-unified/xray-advanced-remnawave.ci.json"
+      - name: Real Mihomo loopback HTTP and HTTPS CONNECT through synthetic node
+        run: python scripts/probe_mihomo_runtime.py --template clients/unified/mihomo-remnawave.yaml
+      - name: Real Mihomo 1.19.32 parses embedded full-blocker RU TLD candidate
+        env:
+          RU_OUT: ${{ runner.temp }}/garasu-ru-inline
+        run: |
+          mkdir -p "$RU_OUT"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts import unified_policy
+          from scripts.smoke_cores import prepare_mihomo
+          root = Path(os.environ["GITHUB_WORKSPACE"])
+          policy = unified_policy.load_policy(root / "policy/unified-v1.json")
+          profile = root / "clients/unified/mihomo-ru-tld-verified.yaml"
+          profile.write_text(
+              unified_policy.build_ru_tld_mihomo_candidate(root, policy),
+              encoding="utf-8")
+          fixture = prepare_mihomo(
+              "clients/unified/mihomo-ru-tld-verified.yaml",
+              Path(os.environ["RU_OUT"]), node_count=5)
+          print("Candidate compiled for real Mihomo syntax check:", fixture)
+          PY
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RU_OUT:$RU_OUT" \
+            metacubex/mihomo:v1.19.32 -t \
+            -f "$RU_OUT/mihomo-ru-tld-verified.ci.yaml" -d "$RU_OUT"
+      - name: Produce verified offline ZIP with native Shadowrocket candidate
+        run: |
+          python -m scripts.package_unified_release --publish --output-dir "$RUNNER_TEMP/garasu-unified-bundle"
+          python -m scripts.package_unified_release --verify --output-dir "$RUNNER_TEMP/garasu-unified-bundle"
+          python scripts/unified_policy.py --write
+          python scripts/unified_policy.py --check
+      - name: Upload immutable offline candidate (not a live VPN subscription)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: garasu-unified-offline-candidate
+          path: ${{ runner.temp }}/garasu-unified-bundle/
+          retention-days: 7
+          if-no-files-found: error

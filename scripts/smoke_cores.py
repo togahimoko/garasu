@@ -45,6 +45,14 @@ def prepare_mihomo(template, out, node_count=1):
                for x in doc["proxy-groups"])
     # Use committed local providers to test parsing without network fluctuations.
     for name, provider in doc["rule-providers"].items():
+        if provider.get("type") == "inline":
+            # Preserve embedded immutable registries. A missing/empty inline
+            # payload is a fatal candidate fixture error, not a remote fallback.
+            if (provider.get("behavior") not in ("domain", "ipcidr")
+                    or not isinstance(provider.get("payload"), list)
+                    or not provider["payload"]):
+                raise ValueError("Missing full inline rule payload: " + name)
+            continue
         remote = provider["url"].split("/rules/", 1)[-1]
         source = ROOT / "rules" / remote
         if not source.exists():
@@ -91,10 +99,18 @@ def prepare_singbox(template, out, node_count=1):
             "server_port": 1080 + i,
         })
     for provider in doc["route"]["rule_set"]:
-        source = ROOT / "rules" / "singbox" / (
-            provider["tag"].removeprefix("garasu-") + ".json"
-        )
-        if not source.exists():
+        # Candidate rule sets are compiled from one full Refilter snapshot.
+        # Resolve the exact repository asset declared by the remote provider,
+        # rather than inventing a path from a tag (which misses pinned data).
+        url = provider.get("url", "")
+        prefix = "https://raw.githubusercontent.com/togahimoko/garasu/"
+        if not url.startswith(prefix) or "/rules/" not in url:
+            raise ValueError("Untrusted synthetic rule-set URL")
+        relative = url.split("/rules/", 1)[1]
+        if any(part in ("..", ".") for part in Path(relative).parts):
+            raise ValueError("Unsafe synthetic rule-set path")
+        source = ROOT / "rules" / relative
+        if not source.is_file():
             raise ValueError("Missing remote source rule set: " + str(source))
         provider["type"] = "local"
         provider["path"] = str(source)

@@ -80,7 +80,7 @@ rule-providers:
     type: http
     behavior: domain
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/feature/unified-routing-astra-2026-11-03/rules/unified/refilter-domain-full.list
+    url: https://raw.githubusercontent.com/togahimoko/garasu/eae553c8eea684d96b83de964c949104ee9acc23/rules/unified/refilter-domain-full.list
     proxy: Garasu Auto
     path: ./garasu-unified/rkn-domains-full.txt
     interval: 21600
@@ -88,7 +88,7 @@ rule-providers:
     type: http
     behavior: ipcidr
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/feature/unified-routing-astra-2026-11-03/rules/unified/refilter-ip-full.cidr
+    url: https://raw.githubusercontent.com/togahimoko/garasu/eae553c8eea684d96b83de964c949104ee9acc23/rules/unified/refilter-ip-full.cidr
     proxy: Garasu Auto
     path: ./garasu-unified/rkn-ips-full.txt
     interval: 21600
@@ -96,7 +96,7 @@ rule-providers:
     type: http
     behavior: domain
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/youtube.list
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/youtube.list
     proxy: Garasu Auto
     path: ./garasu-unified/youtube.txt
     interval: 21600
@@ -104,7 +104,7 @@ rule-providers:
     type: http
     behavior: domain
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/discord.list
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/discord.list
     proxy: Garasu Auto
     path: ./garasu-unified/discord.txt
     interval: 21600
@@ -112,7 +112,7 @@ rule-providers:
     type: http
     behavior: domain
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ai.list
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/ai.list
     proxy: Garasu Auto
     path: ./garasu-unified/ai.txt
     interval: 21600
@@ -120,7 +120,7 @@ rule-providers:
     type: http
     behavior: domain
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/crypto.list
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/crypto.list
     proxy: Garasu Auto
     path: ./garasu-unified/crypto.txt
     interval: 21600
@@ -128,7 +128,7 @@ rule-providers:
     type: http
     behavior: domain
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy.list
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/proxy.list
     proxy: Garasu Auto
     path: ./garasu-unified/proxy.txt
     interval: 21600
@@ -136,7 +136,7 @@ rule-providers:
     type: http
     behavior: ipcidr
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy-ips.cidr
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/proxy-ips.cidr
     proxy: Garasu Auto
     path: ./garasu-unified/proxy-ips.txt
     interval: 21600
@@ -144,7 +144,7 @@ rule-providers:
     type: http
     behavior: domain
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ads.list
+    url: https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/ads.list
     proxy: Garasu Auto
     path: ./garasu-unified/ads.txt
     interval: 21600

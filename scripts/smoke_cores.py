@@ -78,6 +78,21 @@ def prepare_singbox(template, out):
     return output
 
 
+def prepare_xray(template, out):
+    """Simulate documented Remnawave proxy-outbound injection for core parsing."""
+    doc = json.loads((ROOT / template).read_text(encoding="utf-8"))
+    remnawave = doc.pop("remnawave", None)
+    if not remnawave or not remnawave.get("addVirtualHostAsOutbound"):
+        raise ValueError("Xray template is not configured for virtual host injection")
+    if any(item.get("tag") == "proxy" for item in doc.get("outbounds", [])):
+        raise ValueError("Xray core fixture would shadow existing proxy outbound")
+    # A no-network freedom outbound replaces an actual user node for -test.
+    doc["outbounds"].append({"tag": "proxy", "protocol": "freedom"})
+    output = out / (Path(template).stem + ".ci.json")
+    output.write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
+    return output
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--output-dir", required=True)
@@ -89,6 +104,7 @@ def main():
         prepare_mihomo("clients/stash-remnawave.yaml", out),
         prepare_singbox("clients/singbox-remnawave.json", out),
         prepare_singbox("clients/singbox-remnawave-1.14.json", out),
+        prepare_xray("clients/xray-advanced-remnawave.json", out),
     ]
     for file in outputs:
         print(file)

@@ -189,7 +189,9 @@ def _render_xray(root, policy):
     rules = config["routing"]["rules"]
     # Existing geodata is pinned to the same upstream revision, but its
     # banned-ru category is NOT a full-refilter substitute. No RU DIRECT here.
-    config["routing"]["rules"] = rules[:5] + [rules[-1]]
+    # Service PROXY must win over optional advertisement REJECT.
+    config["routing"]["rules"] = [rules[0], rules[1], rules[3], rules[4],
+                                   rules[2], rules[-1]]
     return json.dumps(config, ensure_ascii=False, indent=2) + "\n"
 
 
@@ -201,6 +203,10 @@ def _render_mobile_xray(root, policy):
     config.pop("LastUpdated", None)
     config["DirectSites"] = ["geosite:private"]
     config["DirectIp"] = ["geoip:private"]
+    # RouteOrder=block-proxy-direct cannot guarantee service priority.
+    # Keep native ad filtering off until the proprietary client is tested.
+    config["BlockSites"] = []
+    config["BlockIp"] = []
     return json.dumps(config, ensure_ascii=False, indent=2) + "\n"
 
 

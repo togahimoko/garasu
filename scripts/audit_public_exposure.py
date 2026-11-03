@@ -54,8 +54,13 @@ def find_exposures(path, content):
         if path.endswith(".json"):
             try:
                 payload = json.loads(content)
-                if isinstance(payload, dict) and _has_sensitive_node_config(payload):
-                    findings.add("static proxy server in JSON template")
+                if isinstance(payload, dict):
+                    # DNS resolvers and loopback inbound listeners are not
+                    # personal VPN exit nodes. Only inspect published outbounds.
+                    node_lists = [payload.get(key, []) for key in
+                                  ("outbounds", "proxies", "nodes")]
+                    if any(_has_sensitive_node_config(nodes) for nodes in node_lists):
+                        findings.add("static proxy server in JSON template")
             except json.JSONDecodeError:
                 findings.add("malformed JSON client template")
         if path.endswith(".conf") and re.search(

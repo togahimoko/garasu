@@ -23,6 +23,26 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Generate synthetic node-injected configs
         run: python scripts/smoke_cores.py --output-dir "$RUNNER_TEMP/garasu-ci"
+      - name: Verify empty subscriber pool parses without DIRECT fallback
+        env:
+          OUT: ${{ runner.temp }}/garasu-empty
+        run: |
+          mkdir -p "$OUT"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts.smoke_cores import prepare_mihomo
+          out = Path(os.environ["OUT"])
+          for name in ("mihomo-remnawave.yaml", "stash-remnawave.yaml"):
+              prepare_mihomo("clients/canary/" + name, out, node_count=0)
+          PY
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -v "$OUT:$OUT" \
+            metacubex/mihomo:v1.19.32 -t \
+            -f "$OUT/mihomo-remnawave.ci.yaml" -d "$OUT"
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -v "$OUT:$OUT" \
+            metacubex/mihomo:v1.19.32 -t \
+            -f "$OUT/stash-remnawave.ci.yaml" -d "$OUT"
+
       - name: 'Stash compatible YAML: Mihomo parser smoke check'
         run: |
           docker run --rm \

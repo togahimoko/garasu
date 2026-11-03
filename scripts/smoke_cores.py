@@ -16,8 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def prepare_mihomo(template, out, node_count=1):
     """Emulate 1..32 Remnawave subscribers' nodes without real credentials."""
-    if not isinstance(node_count, int) or not 1 <= node_count <= 32:
-        raise ValueError("node_count must be in 1..32")
+    if not isinstance(node_count, int) or not 0 <= node_count <= 32:
+        raise ValueError("node_count must be in 0..32")
     doc = yaml.safe_load((ROOT / template).read_text(encoding="utf-8"))
     if "proxies" not in doc or doc["proxies"] is not None:
         raise ValueError("Missing Remnawave top-level injection marker")
@@ -68,9 +68,11 @@ def prepare_singbox(template, out, node_count=1):
     The default stable selector is manual. The opt-in urltest candidate is
     tested for parser correctness only until live Remnawave confirms injection.
     """
-    if not isinstance(node_count, int) or not 1 <= node_count <= 32:
-        raise ValueError("node_count must be in 1..32")
+    if not isinstance(node_count, int) or not 0 <= node_count <= 32:
+        raise ValueError("node_count must be in 0..32")
     doc = json.loads((ROOT / template).read_text(encoding="utf-8"))
+    if node_count == 0:
+        raise ValueError("no subscriber nodes: sing-box cannot start an empty proxy group")
     groups = [x for x in doc["outbounds"]
               if x.get("type") in ("selector", "urltest")
               and x.get("outbounds") is None]

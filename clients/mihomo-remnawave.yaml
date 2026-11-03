@@ -133,6 +133,13 @@ rule-providers:
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct-ips.cidr
     path: ./rule-providers/garasu-direct-ips.cidr
     interval: 21600
+  ru-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.cidr
+    path: ./rule-providers/garasu-ru-ips.cidr
+    interval: 21600
 rules:
   - RULE-SET,rkn-domains,Garasu
   - RULE-SET,rkn-ips,Garasu,no-resolve
@@ -147,5 +154,15 @@ rules:
   - RULE-SET,direct,DIRECT
   - RULE-SET,direct-ips,DIRECT,no-resolve
   - GEOIP,LAN,DIRECT,no-resolve
-  - GEOIP,RU,DIRECT
+  - DOMAIN-SUFFIX,ru,DIRECT
+  - DOMAIN-SUFFIX,su,DIRECT
+  - DOMAIN-SUFFIX,moscow,DIRECT
+  - DOMAIN-SUFFIX,xn--p1ai,DIRECT
+  - DOMAIN-SUFFIX,xn--p1acf,DIRECT
+  - DOMAIN-SUFFIX,xn--80asehdb,DIRECT
+  - DOMAIN-SUFFIX,xn--c1avg,DIRECT
+  - DOMAIN-SUFFIX,xn--80aswg,DIRECT
+  - DOMAIN-SUFFIX,xn--80adxhks,DIRECT
+  - DOMAIN-SUFFIX,xn--d1acj3b,DIRECT
+  - RULE-SET,ru-ips,DIRECT,no-resolve
   - MATCH,Garasu

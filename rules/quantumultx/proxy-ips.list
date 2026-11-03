@@ -1,0 +1,7 @@
+# Garasu MAX | Quantumult X IP filters
+ip-cidr, 31.12.75.0/24, proxy
+ip-cidr, 45.142.120.0/24, proxy
+ip-cidr, 77.232.140.0/24, proxy
+ip-cidr, 185.148.104.0/22, proxy
+ip-cidr, 193.9.49.0/24, proxy
+ip-cidr, 213.241.198.0/24, proxy

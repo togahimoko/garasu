@@ -33,6 +33,12 @@ jobs:
       - name: Download and validate full routing datasets
         run: python scripts/refresh.py
       - name: Verify generated output
+        # A successful rolling refresh legitimately changes geo/ and rules/.
+        # The entire suite runs above on the immutable clean checkout; only
+        # its snapshot-specific tests skip here after the external data update.
+        # Rule quality and all non-pinned routing tests still run below.
+        env:
+          GARASU_ALLOW_REFRESHED_CANDIDATE_SKIP: '1'
         run: |
           test -s geo/geoip.dat
           test -s geo/geosite.dat

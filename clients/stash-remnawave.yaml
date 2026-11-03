@@ -14,8 +14,17 @@ dns:
 proxies: # LEAVE THIS LINE!
 proxy-groups:
   - name: Garasu
-    type: select
+    # Remnawave injects every subscriber node at this anchor.
+    # Native Stash url-test automatically selects a healthy server.
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 180
+    tolerance: 150
+    lazy: false
     proxies: # LEAVE THIS LINE!
+      # An empty Stash group otherwise behaves as DIRECT.
+      # Explicit reject protects VPN-only destinations when no nodes exist.
+      - REJECT
 rule-providers:
   rkn-domains:
     type: http
@@ -101,7 +110,21 @@ rule-providers:
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct-ips.cidr
     path: ./garasu/direct-ips.txt
     interval: 21600
+  ru-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.cidr
+    path: ./garasu/ru-ips.txt
+    interval: 21600
 rules:
+  # Local device/network domains must bypass the VPN at first match.
+  - DOMAIN-SUFFIX,localhost,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,lan,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
   - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
   - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
   - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
@@ -115,9 +138,16 @@ rules:
   - RULE-SET,proxy,Garasu
   - RULE-SET,proxy-ips,Garasu,no-resolve
   - RULE-SET,ads,REJECT
-  - RULE-SET,games,DIRECT
-  - RULE-SET,direct,DIRECT
-  - RULE-SET,direct-ips,DIRECT,no-resolve
   - GEOIP,LAN,DIRECT,no-resolve
-  - GEOIP,RU,DIRECT
+  - DOMAIN-SUFFIX,ru,DIRECT
+  - DOMAIN-SUFFIX,su,DIRECT
+  - DOMAIN-SUFFIX,moscow,DIRECT
+  - DOMAIN-SUFFIX,xn--p1ai,DIRECT
+  - DOMAIN-SUFFIX,xn--p1acf,DIRECT
+  - DOMAIN-SUFFIX,xn--80asehdb,DIRECT
+  - DOMAIN-SUFFIX,xn--c1avg,DIRECT
+  - DOMAIN-SUFFIX,xn--80aswg,DIRECT
+  - DOMAIN-SUFFIX,xn--80adxhks,DIRECT
+  - DOMAIN-SUFFIX,xn--d1acj3b,DIRECT
+  - RULE-SET,ru-ips,DIRECT,no-resolve
   - MATCH,Garasu

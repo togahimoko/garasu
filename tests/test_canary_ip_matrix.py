@@ -86,6 +86,9 @@ class CanaryIpMatrix(unittest.TestCase):
     @classmethod
     def singbox_route(cls, ip):
         for r in cls.singbox["route"]["rules"]:
+            if r.get("ip_cidr") and cls.belongs(
+                    ip, tuple(ipaddress.ip_network(x) for x in r["ip_cidr"])):
+                return DIR if r["outbound"] == "direct" else CZR
             if r.get("ip_is_private") and ip.is_private:
                 return DIR if r["outbound"] == "direct" else CZR
             for ref in r.get("rule_set", []):

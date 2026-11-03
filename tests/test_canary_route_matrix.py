@@ -28,7 +28,7 @@ GOLDEN = {
     "www.4pda.ru": PROXY,
     "blaper.artstation.com": PROXY,  # specific RKN entry overrides games
     "ads.twitch.tv": PROXY,          # explicit proxy overrides general ads
-    "steampowered.com": DIRECT,      # known CURRENT exception; review later
+    "steampowered.com": PROXY,       # foreign games have no blanket DIRECT exception
     "unknown.example.org": PROXY,
 }
 

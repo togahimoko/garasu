@@ -13,11 +13,12 @@ C=ROOT/"clients"/"canary"
 
 
 class CanaryRoutingTests(unittest.TestCase):
-    def test_existing_published_templates_untouched(self):
-        self.assertIn("GEOIP,RU,DIRECT",
-                      (ROOT/"clients/mihomo-remnawave.yaml").read_text())
-        self.assertIn("GEOIP,RU,DIRECT",
-                      (ROOT/"clients/shadowrocket.conf").read_text())
+    def test_stable_mihomo_uses_full_blocked_before_ru_direct(self):
+        rules = yaml.safe_load((ROOT/"clients/mihomo-remnawave.yaml").read_text())["rules"]
+        self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
+                        rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
+        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+                        rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
 
     def test_mihomo_and_stash_have_same_russian_ip_override(self):
         for name in ("mihomo-remnawave.yaml","stash-remnawave.yaml"):

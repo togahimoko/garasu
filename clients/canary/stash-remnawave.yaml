@@ -138,9 +138,6 @@ rules:
   - RULE-SET,proxy,Garasu
   - RULE-SET,proxy-ips,Garasu,no-resolve
   - RULE-SET,ads,REJECT
-  - RULE-SET,games,DIRECT
-  - RULE-SET,direct,DIRECT
-  - RULE-SET,direct-ips,DIRECT,no-resolve
   - GEOIP,LAN,DIRECT,no-resolve
   - DOMAIN-SUFFIX,ru,DIRECT
   - DOMAIN-SUFFIX,su,DIRECT

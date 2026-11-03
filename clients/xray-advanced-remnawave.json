@@ -9,25 +9,10 @@
     "rules": [
       {
         "type": "field",
-        "ip": [
-          "geoip:private"
-        ],
-        "outboundTag": "direct"
-      },
-      {
-        "type": "field",
         "domain": [
           "geosite:private"
         ],
         "outboundTag": "direct"
-      },
-      {
-        "type": "field",
-        "domain": [
-          "geosite:category-ads",
-          "geosite:win-spy"
-        ],
-        "outboundTag": "block"
       },
       {
         "type": "field",
@@ -56,13 +41,22 @@
       {
         "type": "field",
         "domain": [
-          "geosite:category-ru",
-          "geosite:apple",
-          "geosite:microsoft",
-          "geosite:steam",
-          "geosite:epicgames",
-          "geosite:riot",
-          "geosite:roblox"
+          "geosite:category-ads",
+          "geosite:win-spy"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "regexp:(?i)\\.(?:ru|su|moscow|xn--p1ai|xn--p1acf|xn--80asehdb|xn--c1avg|xn--80aswg|xn--80adxhks|xn--d1acj3b)$"
         ],
         "outboundTag": "direct"
       },
@@ -79,7 +73,7 @@
         "outboundTag": "proxy"
       }
     ],
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "IpOnDemand",
     "domainMatcher": "hybrid"
   },
   "inbounds": [

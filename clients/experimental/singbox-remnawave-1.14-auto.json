@@ -63,6 +63,14 @@
         "outbound": "direct"
       },
       {
+        "ip_cidr": [
+          "100.64.0.0/10",
+          "169.254.0.0/16"
+        ],
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
         "ip_is_private": true,
         "action": "route",
         "outbound": "direct"
@@ -106,9 +114,6 @@
       },
       {
         "rule_set": [
-          "garasu-games",
-          "garasu-direct",
-          "garasu-direct-ips",
           "garasu-ru-ips"
         ],
         "action": "route",

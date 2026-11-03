@@ -2,6 +2,16 @@
   "dns": {
     "rules": [
       {
+        "domain_suffix": [
+          "localhost",
+          "local",
+          "lan",
+          "home.arpa"
+        ],
+        "action": "route",
+        "server": "local"
+      },
+      {
         "server": "remote",
         "query_type": [
           "A",
@@ -17,8 +27,7 @@
       },
       {
         "tag": "local",
-        "type": "udp",
-        "server": "1.1.1.1"
+        "type": "local"
       },
       {
         "tag": "remote",
@@ -42,6 +51,24 @@
       {
         "protocol": "dns",
         "action": "hijack-dns"
+      },
+      {
+        "domain_suffix": [
+          "localhost",
+          "local",
+          "lan",
+          "home.arpa"
+        ],
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "ip_cidr": [
+          "100.64.0.0/10",
+          "169.254.0.0/16"
+        ],
+        "action": "route",
+        "outbound": "direct"
       },
       {
         "ip_is_private": true,
@@ -87,9 +114,6 @@
       },
       {
         "rule_set": [
-          "garasu-games",
-          "garasu-direct",
-          "garasu-direct-ips",
           "garasu-ru-ips"
         ],
         "action": "route",

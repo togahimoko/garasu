@@ -40,12 +40,15 @@ jobs:
           test -s rules/rkn-ips.list
           test -s rules/rkn-ips.cidr
           test -s install/links.json
+          test -s reports/quality.json
+          test -s reports/quality.md
+          python scripts/audit_rules.py --root . --check
           python -m unittest discover -s tests -v
       - name: Publish only complete validated build
         run: |
           git config user.name 'garasu-routing-bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add rules/ geo/ clients/ install/
+          git add rules/ geo/ clients/ install/ reports/
           if git diff --cached --quiet; then
             echo "No changes: keeping last validated release."
           else

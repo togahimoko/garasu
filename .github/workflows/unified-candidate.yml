@@ -71,6 +71,31 @@ jobs:
             -config "$RUNNER_TEMP/garasu-unified/xray-advanced-remnawave.ci.json"
       - name: Real Mihomo loopback HTTP and HTTPS CONNECT through synthetic node
         run: python scripts/probe_mihomo_runtime.py --template clients/unified/mihomo-remnawave.yaml
+      - name: Real Mihomo 1.19.32 parses embedded full-blocker RU TLD candidate
+        env:
+          RU_OUT: ${{ runner.temp }}/garasu-ru-inline
+        run: |
+          mkdir -p "$RU_OUT"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts import unified_policy
+          from scripts.smoke_cores import prepare_mihomo
+          root = Path(os.environ["GITHUB_WORKSPACE"])
+          policy = unified_policy.load_policy(root / "policy/unified-v1.json")
+          profile = root / "clients/unified/mihomo-ru-tld-verified.yaml"
+          profile.write_text(
+              unified_policy.build_ru_tld_mihomo_candidate(root, policy),
+              encoding="utf-8")
+          fixture = prepare_mihomo(
+              "clients/unified/mihomo-ru-tld-verified.yaml",
+              Path(os.environ["RU_OUT"]), node_count=5)
+          print("Candidate compiled for real Mihomo syntax check:", fixture)
+          PY
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RU_OUT:$RU_OUT" \
+            metacubex/mihomo:v1.19.32 -t \
+            -f "$RU_OUT/mihomo-ru-tld-verified.ci.yaml" -d "$RU_OUT"
       - name: Produce verified offline ZIP with native Shadowrocket candidate
         run: |
           python -m scripts.package_unified_release --publish --output-dir "$RUNNER_TEMP/garasu-unified-bundle"

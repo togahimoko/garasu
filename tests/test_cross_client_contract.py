@@ -1,4 +1,4 @@
-"""Cross-client static contract for one Czech Remnawave node.
+"""Cross-client static contract for any number of Remnawave nodes.
 
 These checks validate template wiring and priorities, not physical node uptime,
 real mobile app import, TLS, DNS reachability or Russian ISP behaviour.
@@ -41,7 +41,7 @@ def assert_public_asset(case, url):
     case.assertTrue((ROOT / relative).is_file(), "Referenced but not published: " + relative)
 
 
-class CrossClientOneNodeContract(unittest.TestCase):
+class CrossClientMultiNodeContract(unittest.TestCase):
     def test_mihomo_and_stash_use_only_remnawave_injected_nodes(self):
         mihomo = yaml_client("mihomo-remnawave.yaml")
         stash = yaml_client("stash-remnawave.yaml")
@@ -59,7 +59,7 @@ class CrossClientOneNodeContract(unittest.TestCase):
         self.assertFalse(groups["Garasu Auto"]["remnawave"]["include-proxies"])
         self.assertIsNone(groups["Garasu Auto"]["proxies"])
         self.assertFalse(mihomo["profile"]["store-selected"])
-        self.assertIsNone(stash["proxy-groups"][0]["proxies"])
+        self.assertEqual(stash["proxy-groups"][0]["proxies"], ["REJECT"])
         self.assertEqual(stash["proxy-groups"][0]["type"], "url-test")
         self.assertFalse(stash["proxy-groups"][0].get("lazy", True))
 

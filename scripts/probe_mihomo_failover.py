@@ -21,6 +21,7 @@ from probe_mihomo_runtime import (
 )
 
 TEST_URL = "http://garasu-probe.invalid/generate_204"
+DIRECT_PORT = 18888
 
 
 def group_health():
@@ -45,6 +46,39 @@ def proxy_http_body():
             return response.status, response.read()
         finally:
             con.close()
+    except (OSError, TimeoutError, http.client.HTTPException):
+        return 0, b""
+
+
+def assert_all_proxies_down(samples=3):
+    """Prove no proxy traffic succeeds while the injected pool is offline."""
+    if samples < 1:
+        raise ValueError("samples must be positive")
+    for _ in range(samples):
+        state = groups()
+        if state["Garasu"].get("now") != "Garasu Auto":
+            raise AssertionError("Garasu must remain on Garasu Auto")
+        auto = state["Garasu Auto"]
+        if "DIRECT" in auto.get("all", []) or auto.get("now") == "DIRECT":
+            raise AssertionError("DIRECT must not appear in PROXY-only failover")
+        code, body = proxy_http_body()
+        if 200 <= code < 500 or body.startswith(b"garasu-ci-node"):
+            raise AssertionError("unexpected outbound during complete pool outage: "
+                                 + repr((code, body[:100])))
+        time.sleep(.15)
+
+
+def direct_http_body(port):
+    """Use the same Mihomo mixed listener to verify loopback survives outages."""
+    try:
+        client = http.client.HTTPConnection("127.0.0.1", LISTENER_PORT, timeout=3)
+        try:
+            client.request("GET", "http://127.0.0.1:" + str(port) + "/lan-check",
+                           headers={"Connection": "close"})
+            response = client.getresponse()
+            return response.status, response.read()
+        finally:
+            client.close()
     except (OSError, TimeoutError, http.client.HTTPException):
         return 0, b""
 
@@ -84,12 +118,14 @@ def run():
 
         # One intentionally unreachable node is a negative test.
         with (ThreadedTCPServer(("127.0.0.1", 1080), MockProxy) as primary,
-              ThreadedTCPServer(("127.0.0.1", 1081), MockProxy) as standby):
+              ThreadedTCPServer(("127.0.0.1", 1081), MockProxy) as standby,
+              ThreadedTCPServer(("127.0.0.1", DIRECT_PORT), MockProxy) as local):
             primary.health_delay = 0.04
             standby.health_delay = 0.14
             primary.ok_body = nodes[0].encode()
             standby.ok_body = nodes[1].encode()
-            for server in (primary, standby):
+            local.ok_body = b"GARASU_DIRECT_OK"
+            for server in (primary, standby, local):
                 server.seen = []
                 threading.Thread(target=server.serve_forever, daemon=True).start()
             proc = subprocess.Popen(
@@ -131,6 +167,37 @@ def run():
                     raise AssertionError("Garasu selected a non-auto group")
                 if "DIRECT" in status["Garasu Auto"]["all"]:
                     raise AssertionError("Automatic fallback silently allows DIRECT")
+
+                # Remove every usable outbound. An unhealthy group may still
+                # display its last selected node, but must not emit a working
+                # proxy response or silently change to DIRECT.
+                standby.shutdown()
+                standby.server_close()
+                assert_all_proxies_down(samples=6)
+                print("PASS: full proxy-pool outage fails closed", flush=True)
+
+                # The local network must work even when no proxy does.
+                local_code, local_body = direct_http_body(DIRECT_PORT)
+                if (local_code, local_body) != (200, b"GARASU_DIRECT_OK"):
+                    raise AssertionError(
+                        "LAN DIRECT failed during proxy outage: "
+                        + repr((local_code, local_body[:120])))
+                print("PASS: LAN DIRECT survives complete proxy outage", flush=True)
+
+                # Restore a previously failed outbound and wait for periodic
+                # health probes to select it without API selection commands.
+                with ThreadedTCPServer(("127.0.0.1", 1081), MockProxy) as recovered:
+                    recovered.health_delay = .08
+                    recovered.ok_body = nodes[1].encode()
+                    recovered.seen = []
+                    threading.Thread(target=recovered.serve_forever,
+                                     daemon=True).start()
+                    try:
+                        await_route(nodes[1], max_wait=22)
+                        print("PASS: outbound recovered without manual selection",
+                              flush=True)
+                    finally:
+                        recovered.shutdown()
             finally:
                 proc.terminate()
                 try:

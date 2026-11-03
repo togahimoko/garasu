@@ -1,5 +1,6 @@
 """RU-only direct candidate must embed full immutable blocker lists."""
 from pathlib import Path
+import os
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -10,6 +11,22 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class VerifiedInlineRussianTLD(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # The legacy data/core CI workflows refresh moving upstream files
+        # before running the shared tests. This immutable candidate is tested
+        # on the clean snapshot by the unified-candidate workflow.
+        policy = unified_policy.load_policy(ROOT / "policy/unified-v1.json")
+        lock = unified_policy.load_release_lock(
+            ROOT / "policy/unified-release-lock.json", policy)
+        try:
+            unified_policy.verify_release_assets(ROOT, lock)
+        except ValueError:
+            if os.environ.get("GARASU_ALLOW_REFRESHED_CANDIDATE_SKIP") == "1":
+                raise unittest.SkipTest("moving data refresh; clean snapshot "
+                                        "validated by unified-candidate workflow")
+            raise
+
     def setUp(self):
         self.policy = unified_policy.load_policy(ROOT / "policy/unified-v1.json")
 

@@ -20,6 +20,9 @@ dns:
   nameserver:
     - https://dns.google/dns-query
     - https://cloudflare-dns.com/dns-query
+  # DIRECT destinations should resolve using the local network resolver.
+  direct-nameserver:
+    - system
   fake-ip-filter:
     - '*.lan'
     - '*.local'
@@ -54,6 +57,7 @@ rule-providers:
     behavior: domain
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-domains.list
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-rkn-domains.list
     interval: 21600
   youtube:
@@ -61,6 +65,7 @@ rule-providers:
     behavior: domain
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/youtube.list
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-youtube.list
     interval: 21600
   discord:
@@ -68,6 +73,7 @@ rule-providers:
     behavior: domain
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/discord.list
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-discord.list
     interval: 21600
   ai:
@@ -75,6 +81,7 @@ rule-providers:
     behavior: domain
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ai.list
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-ai.list
     interval: 21600
   crypto:
@@ -82,6 +89,7 @@ rule-providers:
     behavior: domain
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/crypto.list
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-crypto.list
     interval: 21600
   proxy:
@@ -89,6 +97,7 @@ rule-providers:
     behavior: domain
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy.list
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-proxy.list
     interval: 21600
   ads:
@@ -96,6 +105,7 @@ rule-providers:
     behavior: domain
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ads.list
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-ads.list
     interval: 21600
   games:
@@ -103,6 +113,7 @@ rule-providers:
     behavior: domain
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/games.list
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-games.list
     interval: 21600
   direct:
@@ -110,6 +121,7 @@ rule-providers:
     behavior: domain
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct.list
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-direct.list
     interval: 21600
   rkn-ips:
@@ -117,6 +129,7 @@ rule-providers:
     behavior: ipcidr
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-ips.cidr
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-rkn-ips.cidr
     interval: 21600
   proxy-ips:
@@ -124,6 +137,7 @@ rule-providers:
     behavior: ipcidr
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy-ips.cidr
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-proxy-ips.cidr
     interval: 21600
   direct-ips:
@@ -131,6 +145,7 @@ rule-providers:
     behavior: ipcidr
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct-ips.cidr
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-direct-ips.cidr
     interval: 21600
   ru-ips:
@@ -138,6 +153,7 @@ rule-providers:
     behavior: ipcidr
     format: text
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.cidr
+    proxy: Garasu Auto
     path: ./rule-providers/garasu-ru-ips.cidr
     interval: 21600
 rules:

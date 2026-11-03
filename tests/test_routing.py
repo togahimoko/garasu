@@ -184,7 +184,7 @@ class GarasuTests(unittest.TestCase):
         self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
                         rules.index("RULE-SET,direct,DIRECT"))
         self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
-                        rules.index("GEOIP,RU,DIRECT"))
+                        rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
 
     def test_singbox_remnawave_template(self):
         config = json.loads((ROOT / "clients/singbox-remnawave.json").read_text())

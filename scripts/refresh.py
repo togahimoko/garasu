@@ -96,6 +96,23 @@ def fetch(path, revision):
                 time.sleep(2 ** retry)
     raise RuntimeError("Failed source " + path + ": " + str(error))
 
+def _safe_domain_set_entry(value):
+    """Accept only canonical multi-label domain suffixes from our upstream feed.
+
+    Broad TLD or wildcard entries can unintentionally route an entire country
+    or internet zone to an attacker-controlled destination.
+    """
+    if not value.startswith("+.") or len(value) > 255:
+        return False
+    host = value[2:]
+    labels = host.split(".")
+    if len(labels) < 2 or len(host) > 253:
+        return False
+    return all(len(label) <= 63 and
+               re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?", label)
+               for label in labels)
+
+
 def domains(blob, minimum):
     lines = blob.decode("utf-8-sig").splitlines()
     found = []
@@ -104,8 +121,8 @@ def domains(blob, minimum):
         value = row.strip()
         if not value or value.startswith("#"):
             continue
-        if not re.fullmatch(r"[+.]?[a-zA-Z0-9_*.-]+", value):
-            raise ValueError("Invalid domain entry " + value[:100])
+        if not _safe_domain_set_entry(value):
+            raise ValueError("Unsafe domain entry " + repr(value[:100]))
         if value not in seen:
             found.append(value)
             seen.add(value)
@@ -114,7 +131,8 @@ def domains(blob, minimum):
     return ("# Garasu MAX | Source DigneZzZ/routing; see SOURCES.md\n"
             + "\n".join(found) + "\n").encode(), len(found)
 
-def ip_data(blob, minimum):
+
+def ip_data(blob, minimum, name=""):
     raw = []
     seen = set()
     for row in blob.decode("utf-8-sig").splitlines():
@@ -122,6 +140,10 @@ def ip_data(blob, minimum):
         if not value or value.startswith("#"):
             continue
         net = ipaddress.ip_network(value, strict=False)
+        if name in ("rkn-ips", "proxy-ips"):
+            limit = 12 if net.version == 4 else 32
+            if net.prefixlen < limit:
+                raise ValueError("Unsafe broad " + name + " network " + str(net))
         value = str(net)
         if value not in seen:
             raw.append(value)
@@ -132,6 +154,7 @@ def ip_data(blob, minimum):
     sr = prefix + "\n".join(("IP-CIDR6" if ":" in x else "IP-CIDR") + "," + x for x in raw) + "\n"
     mihomo = prefix + "\n".join(raw) + "\n"
     return sr.encode(), mihomo.encode(), len(raw)
+
 
 def singbox_domains(blob):
     """Convert canonical +.domain provider lines to sing-box source rule sets."""
@@ -222,6 +245,120 @@ def policy_for(name):
     return "reject" if name == "ads" else ("direct" if name in ("games", "direct", "direct-ips", "ru-ips") else "proxy")
 
 
+def _protobuf_varint(data, index):
+    result = 0
+    for shift in range(0, 70, 7):
+        if index >= len(data):
+            raise ValueError("Truncated GeoIP/GeoSite protobuf")
+        octet = data[index]
+        index += 1
+        result |= (octet & 127) << shift
+        if not (octet & 128):
+            return result, index
+    raise ValueError("Invalid protobuf varint")
+
+
+def _protobuf_fields(data):
+    """Read protobuf wire fields without depending on non-standard packages."""
+    pos = 0
+    while pos < len(data):
+        tag, pos = _protobuf_varint(data, pos)
+        number, wire = tag >> 3, tag & 7
+        if not number:
+            raise ValueError("Invalid protobuf field 0")
+        if wire == 0:
+            _, pos = _protobuf_varint(data, pos)
+        elif wire == 1:
+            pos += 8
+        elif wire == 2:
+            length, pos = _protobuf_varint(data, pos)
+            if length > len(data) - pos:
+                raise ValueError("Truncated protobuf payload")
+            yield number, data[pos:pos + length]
+            pos += length
+        elif wire == 5:
+            pos += 4
+        else:
+            raise ValueError("Invalid protobuf wire type " + str(wire))
+        if pos > len(data):
+            raise ValueError("Truncated protobuf scalar")
+
+
+GEODATA_REQUIRED = {
+    "geosite.dat": {"category-geoblock-ru": 10000, "category-ru": 500,
+                    "youtube": 70, "ai": 70, "banned-ru": 20,
+                    "telegram": 5, "private": 20},
+    "geoip.dat": {"ru": 10000, "blocked-ru": 500,
+                  "telegram": 5, "private": 10},
+}
+
+
+def validate_geodata(name, data, requirements=None):
+    """Validate GeoIPList/GeoSiteList data and presence of required categories.
+
+    Schema: v2fly/v2ray-core app/router/routercommon/common.proto.
+    Both top-level lists have repeated 'entry' in field 1.
+    Each entry has country_code (field 1) and repeated domain/CIDR (field 2).
+    """
+    requirements = GEODATA_REQUIRED[name] if requirements is None else requirements
+    categories = {}
+    for number, entry in _protobuf_fields(data):
+        if number != 1:
+            continue
+        code = None
+        count = 0
+        for field, value in _protobuf_fields(entry):
+            if field == 1:
+                code = value.decode("utf-8").lower()
+            elif field == 2:
+                count += 1
+        if code:
+            if code in categories:
+                raise ValueError(name + ": duplicate geodata category " + code)
+            categories[code] = count
+    for code, minimum in requirements.items():
+        if categories.get(code, 0) < minimum:
+            raise ValueError(name + ": " + code + " is missing or too small: "
+                             + str(categories.get(code, 0)))
+    return categories
+
+
+def validate_update_budget(records, previous):
+    """Fail closed on unusually large upstream revisions; require manual review."""
+    old = previous.get("files", {})
+    for path, now in records.items():
+        then = old.get(path)
+        if not then:
+            continue
+        before, after = then.get("entries"), now.get("entries")
+        if isinstance(before, int) and before > 0 and isinstance(after, int):
+            # Allow routine RKN churn, reject an abrupt 45% shrink or >2.5x growth.
+            # The workflow must NOT publish partially trusted data automatically.
+            if after < before * 0.55 or after > before * 2.5:
+                raise ValueError("Source drift requires review: " + path
+                                 + " before=" + str(before) + " after=" + str(after))
+
+
+def validate_source_churn(path, previous_blob, current_blob, max_churn=0.5):
+    """Reject high-volume source replacement even when entry counts match."""
+    if previous_blob is None:
+        return
+    def entries(blob):
+        return {line.strip() for line in blob.decode("utf-8-sig").splitlines()
+                if line.strip() and not line.lstrip().startswith("#")}
+    before = entries(previous_blob)
+    after = entries(current_blob)
+    if not before or not after:
+        raise ValueError("Missing rule data in " + path)
+    if not 0 <= max_churn <= 1:
+        raise ValueError("Invalid source churn threshold")
+    unchanged = len(before.intersection(after))
+    churn = 1.0 - unchanged / max(len(before), len(after))
+    if churn > max_churn:
+        raise ValueError("Unsafe source replacement: " + path + " changed fraction "
+                         + format(churn, ".1%") + "; manual review required")
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -235,6 +372,11 @@ def run():
         records = {}
         generated = {}
         def add(path, data, source=None, count=None):
+            if path.startswith("rules/") and path.count("/") == 1:
+                current = ROOT / path
+                previous_blob = current.read_bytes() if current.is_file() else None
+                threshold = 0.60 if "rkn-" in path else 0.50
+                validate_source_churn(path, previous_blob, data, max_churn=threshold)
             generated[path] = data
             if source is not None:
                 entry = {"source": upstream_raw_url(revision, source), "sha256": digest(data), "bytes": len(data)}
@@ -250,7 +392,7 @@ def run():
                 quantumultx_domains(blob, policy_for(name)), source, count)
         for name, (source, minimum) in IP.items():
             original = fetch(source, revision)
-            sr, mihomo, count = ip_data(original, minimum)
+            sr, mihomo, count = ip_data(original, minimum, name=name)
             add("rules/" + name + ".list", sr, source, count)
             add("rules/" + name + ".cidr", mihomo, source, count)
             add("rules/singbox/" + name + ".json", singbox_ips(mihomo), source, count)
@@ -261,9 +403,11 @@ def run():
             blob = fetch(source, revision)
             if len(blob) < minimum or blob.startswith(b"<html"):
                 raise ValueError("Invalid geodata " + name)
+            validate_geodata(name, blob)
             add("geo/" + name, blob, source)
         previous_path = ROOT / "install/manifest.json"
         previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
+        validate_update_budget(records, previous)
         changed = previous.get("files") != records
         manifest = {"name": "Garasu MAX", "upstream": upstream_origin,
                     "upstream_revision": revision, "files": records}

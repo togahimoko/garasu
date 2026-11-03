@@ -57,6 +57,23 @@ def fetch(path):
                 time.sleep(2 ** retry)
     raise RuntimeError("Failed source " + path + ": " + str(error))
 
+def _safe_domain_set_entry(value):
+    """Accept only canonical multi-label domain suffixes from our upstream feed.
+
+    Broad TLD or wildcard entries can unintentionally route an entire country
+    or internet zone to an attacker-controlled destination.
+    """
+    if not value.startswith("+.") or len(value) > 255:
+        return False
+    host = value[2:]
+    labels = host.split(".")
+    if len(labels) < 2 or len(host) > 253:
+        return False
+    return all(len(label) <= 63 and
+               re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?", label)
+               for label in labels)
+
+
 def domains(blob, minimum):
     lines = blob.decode("utf-8-sig").splitlines()
     found = []
@@ -65,8 +82,8 @@ def domains(blob, minimum):
         value = row.strip()
         if not value or value.startswith("#"):
             continue
-        if not re.fullmatch(r"[+.]?[a-zA-Z0-9_*.-]+", value):
-            raise ValueError("Invalid domain entry " + value[:100])
+        if not _safe_domain_set_entry(value):
+            raise ValueError("Unsafe domain entry " + repr(value[:100]))
         if value not in seen:
             found.append(value)
             seen.add(value)
@@ -75,7 +92,8 @@ def domains(blob, minimum):
     return ("# Garasu MAX | Source DigneZzZ/routing; see SOURCES.md\n"
             + "\n".join(found) + "\n").encode(), len(found)
 
-def ip_data(blob, minimum):
+
+def ip_data(blob, minimum, name=""):
     raw = []
     seen = set()
     for row in blob.decode("utf-8-sig").splitlines():
@@ -83,6 +101,10 @@ def ip_data(blob, minimum):
         if not value or value.startswith("#"):
             continue
         net = ipaddress.ip_network(value, strict=False)
+        if name in ("rkn-ips", "proxy-ips"):
+            limit = 12 if net.version == 4 else 32
+            if net.prefixlen < limit:
+                raise ValueError("Unsafe broad " + name + " network " + str(net))
         value = str(net)
         if value not in seen:
             raw.append(value)
@@ -93,6 +115,7 @@ def ip_data(blob, minimum):
     sr = prefix + "\n".join(("IP-CIDR6" if ":" in x else "IP-CIDR") + "," + x for x in raw) + "\n"
     mihomo = prefix + "\n".join(raw) + "\n"
     return sr.encode(), mihomo.encode(), len(raw)
+
 
 def singbox_domains(blob):
     """Convert canonical +.domain provider lines to sing-box source rule sets."""
@@ -303,7 +326,7 @@ def run():
                 quantumultx_domains(blob, policy_for(name)), source, count)
         for name, (source, minimum) in IP.items():
             original = fetch(source)
-            sr, mihomo, count = ip_data(original, minimum)
+            sr, mihomo, count = ip_data(original, minimum, name=name)
             add("rules/" + name + ".list", sr, source, count)
             add("rules/" + name + ".cidr", mihomo, source, count)
             add("rules/singbox/" + name + ".json", singbox_ips(mihomo), source, count)

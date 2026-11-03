@@ -55,9 +55,14 @@ class UnifiedDeliveryLock(unittest.TestCase):
 
     def test_integrity_verifies_actual_bytes_and_detects_tampering(self):
         from tempfile import TemporaryDirectory
-        lock = unified_policy.load_release_lock(LOCK, self.policy)
+        import hashlib
         category = "rules/ai.list"
-        original = (ROOT / category).read_bytes()
+        original = b"+.example.org\\n"
+        blob = (b"blob " + str(len(original)).encode("ascii") +
+                b"\\x00" + original)
+        lock = {"assets": {category: {
+            "source": "base", "git_blob": hashlib.sha1(blob).hexdigest(),
+            "bytes": len(original)}}}
         with TemporaryDirectory() as folder:
             relative = Path(folder) / category
             relative.parent.mkdir(parents=True)

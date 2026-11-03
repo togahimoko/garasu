@@ -261,6 +261,22 @@ def validate_geodata(name, data, requirements=None):
     return categories
 
 
+def validate_update_budget(records, previous):
+    """Fail closed on unusually large upstream revisions; require manual review."""
+    old = previous.get("files", {})
+    for path, now in records.items():
+        then = old.get(path)
+        if not then:
+            continue
+        before, after = then.get("entries"), now.get("entries")
+        if isinstance(before, int) and before > 0 and isinstance(after, int):
+            # Allow routine RKN churn, reject an abrupt 45% shrink or >2.5x growth.
+            # The workflow must NOT publish partially trusted data automatically.
+            if after < before * 0.55 or after > before * 2.5:
+                raise ValueError("Source drift requires review: " + path
+                                 + " before=" + str(before) + " after=" + str(after))
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -302,6 +318,7 @@ def run():
             add("geo/" + name, blob, source)
         previous_path = ROOT / "install/manifest.json"
         previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
+        validate_update_budget(records, previous)
         changed = previous.get("files") != records
         manifest = {"name": "Garasu MAX", "upstream": UPSTREAM, "files": records}
         add("install/manifest.json", (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode())

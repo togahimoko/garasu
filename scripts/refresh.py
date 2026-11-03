@@ -300,6 +300,26 @@ def validate_update_budget(records, previous):
                                  + " before=" + str(before) + " after=" + str(after))
 
 
+def validate_source_churn(path, previous_blob, current_blob, max_churn=0.5):
+    """Reject high-volume source replacement even when entry counts match."""
+    if previous_blob is None:
+        return
+    def entries(blob):
+        return {line.strip() for line in blob.decode("utf-8-sig").splitlines()
+                if line.strip() and not line.lstrip().startswith("#")}
+    before = entries(previous_blob)
+    after = entries(current_blob)
+    if not before or not after:
+        raise ValueError("Missing rule data in " + path)
+    if not 0 <= max_churn <= 1:
+        raise ValueError("Invalid source churn threshold")
+    unchanged = len(before.intersection(after))
+    churn = 1.0 - unchanged / max(len(before), len(after))
+    if churn > max_churn:
+        raise ValueError("Unsafe source replacement: " + path + " changed fraction "
+                         + format(churn, ".1%") + "; manual review required")
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -311,6 +331,12 @@ def run():
         records = {}
         generated = {}
         def add(path, data, source=None, count=None):
+            # Derived rule formats inherit verification from their canonical source.
+            if path.startswith("rules/") and path.count("/") == 1:
+                previous_file = ROOT / path
+                old_data = previous_file.read_bytes() if previous_file.exists() else None
+                limit = 0.60 if ("rkn-" in path) else 0.50
+                validate_source_churn(path, old_data, data, max_churn=limit)
             generated[path] = data
             if source is not None:
                 entry = {"source": UPSTREAM + "/" + source, "sha256": digest(data), "bytes": len(data)}

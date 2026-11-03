@@ -53,6 +53,10 @@ exceptions and build matching cross-client fixtures.
 - Stash candidate: equivalent high-priority local-domain and CGNAT bypass.
 - sing-box 1.14 candidate: explicit local-domain routing and `local`
   system DNS server instead of hard-coded UDP/53 to public 1.1.1.1.
+- `tests/test_canary_route_matrix.py`: evaluates a stable set of real hostname
+  examples against the committed policy order for Mihomo, Stash,
+  Shadowrocket and sing-box. Includes RKN-over-games and proxy-over-ads
+  priority. This is an offline oracle, not a native app network test.
 - `tests/test_cross_client_contract.py`: validates injection markers,
   private-network priorities, RKN exceptions before RU DIRECT, fallback to
   proxy, provider coverage and published asset references across app

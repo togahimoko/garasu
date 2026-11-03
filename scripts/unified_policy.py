@@ -215,11 +215,15 @@ def build_candidates(root, policy):
     return result
 
 
-def check_candidates(root, policy):
+def candidate_drift(root, policy):
     expected = build_candidates(root, policy)
-    return all((Path(root) / path).is_file()
-               and (Path(root) / path).read_text(encoding="utf-8") == content
-               for path, content in expected.items())
+    return sorted(path for path, contents in expected.items()
+                  if not (Path(root) / path).is_file()
+                  or (Path(root) / path).read_text(encoding="utf-8") != contents)
+
+
+def check_candidates(root, policy):
+    return not candidate_drift(root, policy)
 
 
 def main():

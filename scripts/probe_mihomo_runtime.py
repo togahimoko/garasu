@@ -17,6 +17,7 @@ import threading
 import time
 import urllib.parse
 import urllib.request
+import urllib.error
 
 import yaml
 from smoke_cores import prepare_mihomo
@@ -58,8 +59,12 @@ class ThreadedTCPServer(socketserver.ThreadingTCPServer):
 
 def local_json(url, timeout=4):
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
-    with opener.open(url, timeout=timeout) as response:
-        return json.loads(response.read(300000))
+    try:
+        with opener.open(url, timeout=timeout) as response:
+            return json.loads(response.read(300000))
+    except urllib.error.HTTPError as err:
+        raise AssertionError("Mihomo API status " + str(err.code) + " body="
+                             + err.read(1500).decode("utf-8", "replace")) from err
 
 
 def assert_port(port):
@@ -156,8 +161,8 @@ def test_runtime(template_path):
                 except subprocess.TimeoutExpired:
                     proc.kill()
                     stdout, _ = proc.communicate(timeout=5)
-                if proc.returncode not in (0, -15, 143):
-                    print("Mihomo runtime output:", stdout[-6000:], flush=True)
+                print("Mock outbound requests:", mock.seen[-10:], flush=True)
+                print("Mihomo runtime output:", stdout[-5500:], flush=True)
                 mock.shutdown()
 
 

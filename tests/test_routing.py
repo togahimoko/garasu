@@ -82,7 +82,7 @@ class GarasuTests(unittest.TestCase):
             return  # first repo bootstrap before initial scheduled build
         manifest = json.loads(path.read_text())
         self.assertEqual(manifest["name"], "Garasu MAX")
-        self.assertEqual(len(manifest["files"]), 17)
+        self.assertIn(len(manifest["files"]), (17, 32))  # migration-safe before generation
         for filename, record in manifest["files"].items():
             data = (ROOT / filename).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"], filename)
@@ -136,6 +136,56 @@ class GarasuTests(unittest.TestCase):
             plugin.patch({**base, "rules": base["rules"][:-1]}, links)
         with self.assertRaises(ValueError):
             plugin.patch(base, {**links, "happ": "happ://routing/onadd/" + "b" * 5000})
+
+    def test_singbox_source_conversion(self):
+        source = mod.singbox_domains(
+            b"# source\n+.youtube.com\n+.github.com\nexample.org\n")
+        rule_set = json.loads(source)
+        self.assertEqual(rule_set["version"], 3)
+        self.assertEqual(rule_set["rules"][0]["domain_suffix"],
+                         ["youtube.com", "github.com"])
+        self.assertEqual(rule_set["rules"][0]["domain"], ["example.org"])
+        ip_set = json.loads(mod.singbox_ips(
+            b"# source\n1.2.3.4/32\n2001:db8::/32\n"))
+        self.assertEqual(ip_set["rules"][0]["ip_cidr"],
+                         ["1.2.3.4/32", "2001:db8::/32"])
+
+    def test_stash_template(self):
+        conf = (ROOT / "clients/stash-remnawave.yaml").read_text()
+        self.assertEqual(conf.count("proxies: # LEAVE THIS LINE!"), 2)
+        data = yaml.safe_load(conf)
+        self.assertIsNone(data["proxies"])
+        self.assertEqual(data["proxy-groups"][0]["name"], "Garasu")
+        self.assertIsNone(data["proxy-groups"][0]["proxies"])
+        self.assertEqual(data["rules"][-1], "MATCH,Garasu")
+        for name in ("rkn-domains", "rkn-ips", "ads", "direct"):
+            self.assertIn(name, data["rule-providers"])
+        rules = data["rules"]
+        self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
+                        rules.index("RULE-SET,direct,DIRECT"))
+        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+                        rules.index("GEOIP,RU,DIRECT"))
+
+    def test_singbox_remnawave_template(self):
+        config = json.loads((ROOT / "clients/singbox-remnawave.json").read_text())
+        self.assertEqual(config["outbounds"][0]["tag"], "→ Remnawave")
+        self.assertIsNone(config["outbounds"][0]["outbounds"])
+        self.assertEqual(config["route"]["final"], "→ Remnawave")
+        self.assertTrue(config["experimental"]["cache_file"]["enabled"])
+        all_tags = {r["tag"] for r in config["route"]["rule_set"]}
+        self.assertEqual(len(all_tags), 13)
+        self.assertIn("garasu-ru-ips", all_tags)
+        for provider in config["route"]["rule_set"]:
+            self.assertEqual(provider["format"], "source")
+            self.assertIn("/garasu/main/rules/singbox/", provider["url"])
+        rules = config["route"]["rules"]
+        proxi = next(i for i, r in enumerate(rules) if
+                     "garasu-rkn-domains" in r.get("rule_set", []))
+        direct = next(i for i, r in enumerate(rules) if
+                      "garasu-direct" in r.get("rule_set", []))
+        self.assertLess(proxi, direct)
+        self.assertEqual(rules[proxi]["outbound"], "→ Remnawave")
+        self.assertEqual(rules[direct]["outbound"], "direct")
 
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():

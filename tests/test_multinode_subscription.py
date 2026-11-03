@@ -79,6 +79,29 @@ class MultiNodeInjectionContract(unittest.TestCase):
                         self.assertGreater(group["tolerance"], 0)
                         self.assertEqual(group["url"], "https://cp.cloudflare.com/generate_204")
 
+    def test_zero_node_mihomo_and_stash_remain_fail_closed(self):
+        # User entitlements can legitimately become empty during renewal.
+        for template in (MIHOMO, STASH):
+            with self.subTest(template=template), tempfile.TemporaryDirectory() as tmp:
+                output = prepare_mihomo(template, Path(tmp), node_count=0)
+                doc = yaml.safe_load(output.read_text())
+                self.assertEqual(doc["proxies"], [])
+                groups = {g["name"]: g for g in doc["proxy-groups"]}
+                if template == MIHOMO:
+                    self.assertEqual(groups["Garasu Auto"]["proxies"], [])
+                    self.assertEqual(groups["Garasu Auto"]["empty-fallback"], "REJECT")
+                    self.assertEqual(groups["Garasu"]["proxies"], ["Garasu Auto"])
+                else:
+                    self.assertEqual(groups["Garasu"]["proxies"], ["REJECT"])
+                self.assertEqual(doc["rules"][-1], "MATCH,Garasu")
+
+    def test_singbox_zero_nodes_cannot_be_treated_as_direct(self):
+        # URLTest requires at least one outbound; a zero-node subscription must
+        # be rejected explicitly rather than emitted as a broken policy.
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaisesRegex(ValueError, "no subscriber nodes"):
+                prepare_singbox(SINGBOX_AUTO, Path(tmp), node_count=0)
+
     def test_uninjected_empty_pool_is_never_configured_as_direct(self):
         mihomo = yaml.safe_load((ROOT / MIHOMO).read_text())
         stash = yaml.safe_load((ROOT / STASH).read_text())

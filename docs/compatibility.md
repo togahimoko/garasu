@@ -1,6 +1,6 @@
 # Garasu — Compatibility
 
-Garasu maintains one MAX routing policy and exports engine-specific rule sets. **Publication and CI checks do not prove that a particular device's VPN connection works.**
+Garasu maintains one MAX routing policy and exports engine-specific rule sets for **any number of Remnawave subscriber nodes**. **Publication and CI checks do not prove that a particular device's VPN connection works.**
 
 | Engine / client | Main resource | Integration |
 | --- | --- | --- |
@@ -14,6 +14,8 @@ Garasu maintains one MAX routing policy and exports engine-specific rule sets. *
 | Surge and Loon | `rules/surge/*.list` | Rule-set URLs; append them to an existing profile with the correct policy group |
 | Quantumult X | `rules/quantumultx/*.list` | Remote filter resources; optional add-resource URL from `install/links.json` |
 | Legacy Clash / old sing-box | Not claimed compatible | Use supported modern engine or create a version-specific adapter |
+
+Automatic node selection varies by client: Mihomo canary uses URLTest, Stash canary uses URLTest, sing-box stable uses a manual selector. For supported and unverified failover behavior see [multi-node reliability](multi-node-reliability.md).
 
 ## MAX routing order
 

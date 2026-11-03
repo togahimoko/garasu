@@ -30,6 +30,22 @@ class MihomoLocalReportTests(unittest.TestCase):
         self.assertNotIn("AUTO_GROUP_EMPTY",report["issues"])
         self.assertEqual(report["auto_member_count"],1)
 
+    def test_finds_single_open_local_proxy_without_controller_access(self):
+        self.assertEqual(
+            diagnose_mihomo.choose_port(None, 0, {"7897": True, "7890": False}),
+            7897,
+        )
+        self.assertEqual(
+            diagnose_mihomo.choose_port(None, 7890, {"7897": True, "7890": False}),
+            7890,
+        )
+        self.assertIsNone(
+            diagnose_mihomo.choose_port(None, 0, {"7897": True, "7890": True}),
+        )
+        self.assertIsNone(
+            diagnose_mihomo.choose_port(None, 0, {"7897": False, "7890": False}),
+        )
+
     def test_report_does_not_expose_proxy_names_or_credentials(self):
         config = {"mixed-port":7897,"mode":"rule","tun":{"enable":True}}
         groups = {"proxies":{

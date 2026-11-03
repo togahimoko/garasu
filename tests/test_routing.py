@@ -490,6 +490,16 @@ class GarasuTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     delivery.validate_base_url(insecure)
 
+    def test_approved_node24_github_actions_revisions(self):
+        approved = (
+            "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10",
+            "actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405",
+        )
+        for path in (ROOT / ".github/workflows").glob("*.yml"):
+            body = path.read_text(encoding="utf-8")
+            for action in approved:
+                self.assertIn(action, body, path.name)
+
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():
             content = path.read_text()

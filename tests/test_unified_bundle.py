@@ -1,6 +1,7 @@
 """Offline release must fail closed and never mutate active Remnawave templates."""
 import hashlib
 import json
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -13,6 +14,25 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ImmutableUnifiedBundle(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # Two older CI workflows intentionally run the rolling external
+        # refresh before their common unit suite, mutating base assets. This
+        # immutable-release test instead runs in the clean unified CI job.
+        # Do NOT skip on a normal clean checkout: integrity failure is fatal.
+        from scripts import unified_policy
+        policy = unified_policy.load_policy(ROOT / "policy/unified-v1.json")
+        lock = unified_policy.load_release_lock(
+            ROOT / "policy/unified-release-lock.json", policy)
+        try:
+            unified_policy.verify_release_assets(ROOT, lock)
+        except ValueError:
+            if os.environ.get("GARASU_ALLOW_REFRESHED_CANDIDATE_SKIP") == "1":
+                raise unittest.SkipTest(
+                    "rolling refresh changed assets; immutable bundle tested "
+                    "on untouched checkout in unified-candidate workflow")
+            raise
+
     def test_complete_deterministic_release_contains_shadowrocket_and_pinned_assets(self):
         with TemporaryDirectory() as tmp:
             out = Path(tmp)

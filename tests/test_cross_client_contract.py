@@ -60,6 +60,8 @@ class CrossClientOneNodeContract(unittest.TestCase):
         self.assertIsNone(groups["Garasu Auto"]["proxies"])
         self.assertFalse(mihomo["profile"]["store-selected"])
         self.assertIsNone(stash["proxy-groups"][0]["proxies"])
+        self.assertEqual(stash["proxy-groups"][0]["type"], "url-test")
+        self.assertFalse(stash["proxy-groups"][0].get("lazy", True))
 
     def test_private_network_first_on_all_canaries(self):
         private = ("DOMAIN-SUFFIX,localhost,DIRECT", "DOMAIN-SUFFIX,local,DIRECT",

@@ -8,10 +8,22 @@
       "bytes": 27040,
       "entries": 1221
     },
+    "rules/singbox/ads.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/reject.list",
+      "sha256": "e314fdc81819beaa2ef54a13f10e9d4fc273e29de14c0b7abfa0450555e89c06",
+      "bytes": 27029,
+      "entries": 1221
+    },
     "rules/ai.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/ai.list",
       "sha256": "cd252e4365bd6538f1757b7ec8f6ea126c8baf25f4381a29cf637bcfcdb74155",
       "bytes": 4037,
+      "entries": 215
+    },
+    "rules/singbox/ai.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/ai.list",
+      "sha256": "03671db731433ca19c7bda9d54b6a0a9093fff66c1b537d46c43fefe2443f69f",
+      "bytes": 4026,
       "entries": 215
     },
     "rules/crypto.list": {
@@ -20,10 +32,22 @@
       "bytes": 1398,
       "entries": 96
     },
+    "rules/singbox/crypto.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/crypto.list",
+      "sha256": "aa5634cb7f65fa08627f36d347182b87c87b276d9c845298f4e2f7404b628e10",
+      "bytes": 1387,
+      "entries": 96
+    },
     "rules/direct.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/direct.list",
       "sha256": "12a02b90d7afd2f651ddb67bda92280896e9dd6f4e4f2d1931510f77e204443f",
       "bytes": 60384,
+      "entries": 3282
+    },
+    "rules/singbox/direct.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/direct.list",
+      "sha256": "0b2e49e3768bcde86666babbca3a7668fb96c275c6cb5256eaa4df1a8993a096",
+      "bytes": 60373,
       "entries": 3282
     },
     "rules/discord.list": {
@@ -32,10 +56,22 @@
       "bytes": 602,
       "entries": 28
     },
+    "rules/singbox/discord.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/discord.list",
+      "sha256": "28312ba7d54638b873f19b5702ea0a9fd40902230bf0e0d99797a0481cd54553",
+      "bytes": 591,
+      "entries": 28
+    },
     "rules/games.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/games.list",
       "sha256": "6f6b6266990b0e0dccfbd64211ed7e4d2fd30f0421bd42caf19c363cc44bfc43",
       "bytes": 2422,
+      "entries": 117
+    },
+    "rules/singbox/games.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/games.list",
+      "sha256": "be19cac98945f8eb87dd919bc9f835218a07e48cc3f50fde1c4b3b63a3bdb4fa",
+      "bytes": 2411,
       "entries": 117
     },
     "rules/proxy.list": {
@@ -44,16 +80,34 @@
       "bytes": 3222,
       "entries": 154
     },
+    "rules/singbox/proxy.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/proxy.list",
+      "sha256": "bb224d8f6ea596d37a1834a87326dd746dce99bcc1419d3a9b92e314e7311d8c",
+      "bytes": 3211,
+      "entries": 154
+    },
     "rules/rkn-domains.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/refilter-domain.list",
       "sha256": "e38521e98264c75c23b1bef8ffee75627e3ceb516cae31785bf1280b8511cda5",
       "bytes": 393752,
       "entries": 21989
     },
+    "rules/singbox/rkn-domains.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/refilter-domain.list",
+      "sha256": "8247565f7d987731650fec18ffd1a45013e19512a18a28d89c6ae7183f69e4d2",
+      "bytes": 393741,
+      "entries": 21989
+    },
     "rules/youtube.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/youtube.list",
       "sha256": "34f6109308f88ac2122d32e40ecde54b5ed8ef24f5530bf1ca900dd8578cec7b",
       "bytes": 2773,
+      "entries": 176
+    },
+    "rules/singbox/youtube.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/youtube.list",
+      "sha256": "8cc91aba4ed0bfc8d37192df2e5c2e4317f71f5518c397a3a9b513817323a68a",
+      "bytes": 2762,
       "entries": 176
     },
     "rules/rkn-ips.list": {
@@ -68,6 +122,12 @@
       "bytes": 19436,
       "entries": 1141
     },
+    "rules/singbox/rkn-ips.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/refilter-ip.list",
+      "sha256": "c8f3544e72faa8db0d994200add69e5b7a7468cb7033b34ec5eb2a627265d1f2",
+      "bytes": 21701,
+      "entries": 1141
+    },
     "rules/proxy-ips.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/proxy-ip.list",
       "sha256": "c9d7fc443317ddd5548f92ce304c5b8804d2ab45bb365ea163489e6ebbe0f3b4",
@@ -78,6 +138,12 @@
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/proxy-ip.list",
       "sha256": "c3175fd1a9a83b2e6e32328eb62cd3d83c0766a18088b5b1dcb487dbe920b638",
       "bytes": 149,
+      "entries": 6
+    },
+    "rules/singbox/proxy-ips.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/proxy-ip.list",
+      "sha256": "5a5bc2338204a928e4d5f0bca6a910c0448f91c470541c07ca25b07fbcbe91b6",
+      "bytes": 144,
       "entries": 6
     },
     "rules/direct-ips.list": {
@@ -91,6 +157,30 @@
       "sha256": "8fa0a16c1c934d5c71400a82494bf67006476347543c20a9d2fd0508f4a34590",
       "bytes": 410,
       "entries": 28
+    },
+    "rules/singbox/direct-ips.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/direct-ip.list",
+      "sha256": "7bf03825961a45eb17ea73d65af761302eae11bc62a9ea19fa2eb63ad656f7dd",
+      "bytes": 449,
+      "entries": 28
+    },
+    "rules/ru-ips.list": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/ru-ip.list",
+      "sha256": "e21dc9958eb6d9a2d10b5f5fefb6c4456ec27c356669eb8b0accdbc82203d754",
+      "bytes": 660379,
+      "entries": 25157
+    },
+    "rules/ru-ips.cidr": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/ru-ip.list",
+      "sha256": "d80be0627cf91ddc986ed8442fd0ff547d59810e2a5a7cebc418ba52d020e59d",
+      "bytes": 446953,
+      "entries": 25157
+    },
+    "rules/singbox/ru-ips.json": {
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/ru-ip.list",
+      "sha256": "16c631a7b5b6a430b994cc0658e8117c0fccc1938a257c72fdfb8749903d4a63",
+      "bytes": 497250,
+      "entries": 25157
     },
     "geo/geoip.dat": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/main/v2ray/geoip.dat",

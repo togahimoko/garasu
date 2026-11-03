@@ -75,6 +75,24 @@ class GarasuDataQualityTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             audit_rules.analyze(data, meta)
 
+    def test_upstream_revision_urls_are_immutable(self):
+        revision = "a" * 40
+        raw = json.dumps({"sha": revision}).encode()
+        self.assertEqual(refresh.parse_upstream_revision(raw), revision)
+        self.assertEqual(
+            refresh.upstream_raw_url(revision, "release/youtube.list"),
+            "https://raw.githubusercontent.com/DigneZzZ/routing/" + revision
+            + "/release/youtube.list",
+        )
+        for invalid in (
+            b'{"sha":"main"}', b'{"sha":"not-a-commit"}',
+            b'{"sha":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/"}',
+            b'{"message":"rate limit"}',
+        ):
+            with self.subTest(raw=invalid):
+                with self.assertRaises((ValueError, KeyError)):
+                    refresh.parse_upstream_revision(invalid)
+
     def test_no_customer_credentials_or_machine_specific_paths(self):
         data, meta = fixture()
         body = audit_rules.to_json(audit_rules.analyze(data, meta))

@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "product": "Garasu MAX",
-  "snapshot_sha256": "8dc5ae93c4d3d6fbdfbd68f84772bd6fa95e922bc05d7099db1cf16aa5521968",
+  "snapshot_sha256": "e093541b58a87fb48dab4de6fa53ef9ce2997045b61c7c76335fef499e93a243",
   "manifest_asset_count": 58,
   "domain_counts": {
-    "rkn-domains": 21989,
+    "rkn-domains": 75306,
     "youtube": 176,
     "discord": 28,
     "ai": 215,
@@ -12,12 +12,12 @@
     "proxy": 154,
     "ads": 1221,
     "games": 117,
-    "direct": 3282
+    "direct": 3283
   },
   "ip_counts": {
     "rkn-ips": {
-      "total": 1141,
-      "ipv4": 1141,
+      "total": 25391,
+      "ipv4": 25391,
       "ipv6": 0
     },
     "proxy-ips": {
@@ -65,11 +65,19 @@
           "direct_suffix": "artstation.com"
         },
         {
-          "proxied": "tr.rbxcdn.com",
+          "proxied": "rbxcdn.com",
           "direct_suffix": "rbxcdn.com"
+        },
+        {
+          "proxied": "roblox.com",
+          "direct_suffix": "roblox.com"
+        },
+        {
+          "proxied": "valorant.com",
+          "direct_suffix": "valorant.com"
         }
       ],
-      "count": 3
+      "count": 5
     },
     {
       "higher_priority": "rkn-domains",
@@ -96,6 +104,14 @@
           "direct_suffix": "ucoz.net"
         },
         {
+          "proxied": "cdn-apple.com",
+          "direct_suffix": "cdn-apple.com"
+        },
+        {
+          "proxied": "copilot.microsoft.com",
+          "direct_suffix": "microsoft.com"
+        },
+        {
           "proxied": "cxema.at.ua",
           "direct_suffix": "at.ua"
         },
@@ -106,17 +122,9 @@
         {
           "proxied": "domodedovo-alko.at.ua",
           "direct_suffix": "at.ua"
-        },
-        {
-          "proxied": "edgeservices.bing.com",
-          "direct_suffix": "bing.com"
-        },
-        {
-          "proxied": "fangames.at.ua",
-          "direct_suffix": "at.ua"
         }
       ],
-      "count": 58
+      "count": 76
     },
     {
       "higher_priority": "ai",
@@ -201,7 +209,40 @@
       "count": 25
     }
   ],
-  "exact_policy_conflicts": [],
+  "exact_policy_conflicts": [
+    {
+      "first": "rkn-domains",
+      "second": "ads",
+      "count": 4,
+      "examples": [
+        "doubleclick.net",
+        "googleadservices.com",
+        "googletagmanager.com",
+        "sentry.io"
+      ]
+    },
+    {
+      "first": "rkn-domains",
+      "second": "games",
+      "count": 3,
+      "examples": [
+        "rbxcdn.com",
+        "roblox.com",
+        "valorant.com"
+      ]
+    },
+    {
+      "first": "rkn-domains",
+      "second": "direct",
+      "count": 4,
+      "examples": [
+        "cdn-apple.com",
+        "msn.com",
+        "play.google.com",
+        "yandexwebcache.net"
+      ]
+    }
+  ],
   "ip_overrides": {
     "rkn-ips -> direct-ips": {
       "count": 0,

@@ -13,6 +13,8 @@ Metadata records for the policy use keys `blocked_domains` and `blocked_ips`, ea
 
 These fields establish provenance and integrity of the repository snapshot. They do not prove current blocking status at any Russian provider, service availability, or the reachability of a VPN node. The policy oracle's RU fallback presumes the builder has passed the complete-source gate; it does not perform a live RKN lookup.
 
+The refresh builder records the original full-source digests in `install/manifest.json` under `sources`. It derives the `rkn-domains` and `rkn-ips` text, sing-box, Surge and Quantumult X sets from those inputs, and replaces the `BANNED-RU` GeoSite and `BLOCKED-RU` GeoIP categories with the same validated entries. Other GeoSite/GeoIP categories still come from the pinned upstream binary files; their alignment with the canonical client policy requires separate review.
+
 The scheduled build downloads, normalizes and republishes data. A source URL, SHA-256 digest and entry count / byte length are recorded in `install/manifest.json`. An update is rejected if a file is empty, malformed or unexpectedly small.
 
 **Provenance and licensing:** Naming a Garasu profile does not make Garasu the author of upstream datasets. Upstream repositories and individual sources may have distinct licenses, database rights and redistribution requirements. Before commercial distribution of the full mirrored datasets, verify those terms. Remove any source that does not permit redistribution.

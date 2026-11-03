@@ -4,11 +4,11 @@
 Пересечения не удаляются: конкретные PROXY-правила имеют приоритет
 перед общими DIRECT-суффиксами. Это диагностические показатели.
 
-Идентификатор снимка: 8dc5ae93c4d3d6fbdfbd68f84772bd6fa95e922bc05d7099db1cf16aa5521968
+Идентификатор снимка: e093541b58a87fb48dab4de6fa53ef9ce2997045b61c7c76335fef499e93a243
 
 | Доменные категории | Записей |
 |---|---:|
-| rkn-domains | 21989 |
+| rkn-domains | 75306 |
 | youtube | 176 |
 | discord | 28 |
 | ai | 215 |
@@ -16,11 +16,11 @@
 | proxy | 154 |
 | ads | 1221 |
 | games | 117 |
-| direct | 3282 |
+| direct | 3283 |
 
 | IP-категории | Всего | IPv4 | IPv6 |
 |---|---:|---:|---:|
-| rkn-ips | 1141 | 1141 | 0 |
+| rkn-ips | 25391 | 25391 | 0 |
 | proxy-ips | 6 | 6 | 0 |
 | direct-ips | 28 | 16 | 12 |
 | ru-ips | 25157 | 12987 | 12170 |
@@ -29,8 +29,8 @@
 
 | PROXY | Общий DIRECT | Количество | Примеры |
 |---|---|---:|---|
-| rkn-domains | games | 3 | blaper.artstation.com / artstation.com, digitalfly.artstation.com / artstation.com, tr.rbxcdn.com / rbxcdn.com |
-| rkn-domains | direct | 58 | alko-scherbinka.at.ua / at.ua, antago.at.ua / at.ua, anwap.ru.com / ru.com |
+| rkn-domains | games | 5 | blaper.artstation.com / artstation.com, digitalfly.artstation.com / artstation.com, rbxcdn.com / rbxcdn.com |
+| rkn-domains | direct | 76 | alko-scherbinka.at.ua / at.ua, antago.at.ua / at.ua, anwap.ru.com / ru.com |
 | ai | direct | 7 | coderabbit.gallery.vsassets.io / vsassets.io, copilot.microsoft.com / microsoft.com, openaiapi-site.azureedge.net / azureedge.net |
 | proxy | direct | 25 | ads.twitch.tv / twitch.tv, copilotprodattachments.blob.core.windows.net / windows.net, gql.twitch.tv / twitch.tv |
 
@@ -45,6 +45,8 @@
 
 ## Точные конфликты доменов
 
-Точных совпадений между категориями с разными действиями нет.
+- rkn-domains / ads: 4
+- rkn-domains / games: 3
+- rkn-domains / direct: 4
 
 Расширенный машинный отчёт: quality.json.

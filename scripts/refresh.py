@@ -16,6 +16,9 @@ import urllib.request
 from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
+if not __package__:
+    sys.path.insert(0, str(ROOT))
+from scripts.routing_policy import validate_source_metadata
 UPSTREAM = "https://raw.githubusercontent.com/DigneZzZ/routing/main"
 REPO = os.environ.get("GITHUB_REPOSITORY", "togahimoko/garasu")
 DOMAIN = {
@@ -26,11 +29,11 @@ DOMAIN = {
     "discord": ("release/discord.list", 15),
     "games": ("release/games.list", 60),
     "proxy": ("release/proxy.list", 80),
-    "rkn-domains": ("release/refilter-domain.list", 10000),
+    "rkn-domains": ("release/refilter-domain-full.list", 70000),
     "youtube": ("release/youtube.list", 60),
 }
 IP = {
-    "rkn-ips": ("release/refilter-ip.list", 600),
+    "rkn-ips": ("release/refilter-ip-full.list", 20000),
     "proxy-ips": ("release/proxy-ip.list", 4),
     "direct-ips": ("release/direct-ip.list", 15),
     "ru-ips": ("release/ru-ip.list", 15000),
@@ -54,6 +57,17 @@ def parse_upstream_revision(blob):
     return revision
 
 
+def parse_git_revision(blob):
+    """Parse exactly the main ref returned by git ls-remote."""
+    lines = blob.decode("ascii").splitlines()
+    if len(lines) != 1:
+        raise ValueError("Unexpected upstream Git ref response")
+    match = re.fullmatch(r"([0-9a-f]{40})\trefs/heads/main", lines[0])
+    if not match:
+        raise ValueError("Invalid upstream Git ref response")
+    return match.group(1)
+
+
 def upstream_raw_url(revision, path):
     if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Invalid upstream revision")
@@ -63,18 +77,13 @@ def upstream_raw_url(revision, path):
 
 
 def resolve_upstream_revision():
-    req = urllib.request.Request(
-        "https://api.github.com/repos/DigneZzZ/routing/git/ref/heads/main",
-        headers={"User-Agent": "Garasu-Routing/1.0",
-                 "Accept": "application/vnd.github+json"},
+    result = subprocess.run(
+        ["git", "ls-remote", "https://github.com/DigneZzZ/routing.git",
+         "refs/heads/main"], capture_output=True, check=True, timeout=30,
     )
-    with urllib.request.urlopen(req, timeout=20) as response:
-        if response.status != 200:
-            raise ValueError("GitHub upstream revision lookup failed")
-        content = response.read(16385)
-    if len(content) > 16384:
-        raise ValueError("Unexpectedly large GitHub revision response")
-    return parse_upstream_revision(content)
+    if len(result.stdout) > 1024:
+        raise ValueError("Unexpectedly large upstream Git ref response")
+    return parse_git_revision(result.stdout)
 
 
 def fetch(path, revision):
@@ -284,6 +293,59 @@ def _protobuf_fields(data):
             raise ValueError("Truncated protobuf scalar")
 
 
+def _protobuf_number(value):
+    result = bytearray()
+    while value >= 128:
+        result.append((value & 127) | 128)
+        value >>= 7
+    result.append(value)
+    return bytes(result)
+
+
+def _protobuf_bytes(number, payload):
+    return _protobuf_number(number << 3 | 2) + _protobuf_number(len(payload)) + payload
+
+
+def replace_geodata_category(name, geodata, category, canonical):
+    """Replace a binary category with the exact validated canonical rule set."""
+    wanted = category.upper().encode("ascii")
+    if name == "geosite.dat":
+        values = [line[2:] for line in canonical.decode("utf-8").splitlines()
+                  if line and not line.startswith("#")]
+        if not values or any(not _safe_domain_set_entry("+." + value) for value in values):
+            raise ValueError("Invalid canonical GeoSite source")
+        # v2ray Domain.Type=2 means suffix, which includes the root domain.
+        items = [b"\x08\x02" + _protobuf_bytes(2, value.encode("ascii"))
+                 for value in values]
+    elif name == "geoip.dat":
+        values = [line for line in canonical.decode("utf-8").splitlines()
+                  if line and not line.startswith("#")]
+        networks = [ipaddress.ip_network(value, strict=True) for value in values]
+        if not networks:
+            raise ValueError("Empty canonical GeoIP source")
+        items = [_protobuf_bytes(1, network.network_address.packed)
+                 + _protobuf_number(2 << 3) + _protobuf_number(network.prefixlen)
+                 for network in networks]
+    else:
+        raise ValueError("Unknown geodata file " + name)
+    replacement = _protobuf_bytes(1, wanted) + b"".join(_protobuf_bytes(2, item) for item in items)
+    output = bytearray()
+    replaced = False
+    for number, entry in _protobuf_fields(geodata):
+        if number != 1:
+            raise ValueError("Unexpected top-level geodata field")
+        code = next((value for field, value in _protobuf_fields(entry) if field == 1), None)
+        if code == wanted:
+            if replaced:
+                raise ValueError("Duplicate geodata category " + category)
+            entry = replacement
+            replaced = True
+        output.extend(_protobuf_bytes(1, entry))
+    if not replaced:
+        raise ValueError("Missing geodata category " + category)
+    return bytes(output)
+
+
 GEODATA_REQUIRED = {
     "geosite.dat": {"category-geoblock-ru": 10000, "category-ru": 500,
                     "youtube": 70, "ai": 70, "banned-ru": 20,
@@ -330,6 +392,8 @@ def validate_update_budget(records, previous):
         then = old.get(path)
         if not then:
             continue
+        if is_complete_source_migration(path, then, now):
+            continue
         before, after = then.get("entries"), now.get("entries")
         if isinstance(before, int) and before > 0 and isinstance(after, int):
             # Allow routine RKN churn, reject an abrupt 45% shrink or >2.5x growth.
@@ -337,6 +401,16 @@ def validate_update_budget(records, previous):
             if after < before * 0.55 or after > before * 2.5:
                 raise ValueError("Source drift requires review: " + path
                                  + " before=" + str(before) + " after=" + str(after))
+
+
+def is_complete_source_migration(path, previous, current):
+    filename = path.rsplit("/", 1)[-1]
+    stem = ("refilter-domain" if path.startswith("rules/") and filename in
+            ("rkn-domains.list", "rkn-domains.json") else
+            "refilter-ip" if path.startswith("rules/") and filename in
+            ("rkn-ips.list", "rkn-ips.json", "rkn-ips.cidr") else None)
+    return bool(stem and previous.get("source", "").endswith("/release/" + stem + ".list")
+                and current.get("source", "").endswith("/release/" + stem + "-full.list"))
 
 
 def validate_source_churn(path, previous_blob, current_blob, max_churn=0.5):
@@ -367,16 +441,22 @@ def run():
         raise ValueError("Invalid GITHUB_REPOSITORY")
     revision = resolve_upstream_revision()
     upstream_origin = "https://raw.githubusercontent.com/DigneZzZ/routing/" + revision
+    previous_path = ROOT / "install/manifest.json"
+    previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
     with tempfile.TemporaryDirectory(prefix="garasu-") as tmp:
         temp = Path(tmp)
         records = {}
         generated = {}
+        source_metadata = {}
+        source_bytes = {}
         def add(path, data, source=None, count=None):
             if path.startswith("rules/") and path.count("/") == 1:
                 current = ROOT / path
                 previous_blob = current.read_bytes() if current.is_file() else None
                 threshold = 0.60 if "rkn-" in path else 0.50
-                validate_source_churn(path, previous_blob, data, max_churn=threshold)
+                candidate = {"source": upstream_raw_url(revision, source)} if source else {}
+                if not is_complete_source_migration(path, previous.get("files", {}).get(path, {}), candidate):
+                    validate_source_churn(path, previous_blob, data, max_churn=threshold)
             generated[path] = data
             if source is not None:
                 entry = {"source": upstream_raw_url(revision, source), "sha256": digest(data), "bytes": len(data)}
@@ -384,7 +464,14 @@ def run():
                     entry["entries"] = count
                 records[path] = entry
         for name, (source, minimum) in DOMAIN.items():
-            blob, count = domains(fetch(source, revision), minimum)
+            original = fetch(source, revision)
+            blob, count = domains(original, minimum)
+            if name == "rkn-domains":
+                source_bytes["blocked_domains"] = original
+                source_metadata["blocked_domains"] = {
+                    "dataset": "refilter-domain-full", "url": upstream_raw_url(revision, source),
+                    "revision": revision, "sha256": digest(original),
+                    "bytes": len(original), "entries": count}
             add("rules/" + name + ".list", blob, source, count)
             add("rules/singbox/" + name + ".json", singbox_domains(blob), source, count)
             add("rules/surge/" + name + ".list", surge_domains(blob), source, count)
@@ -393,24 +480,45 @@ def run():
         for name, (source, minimum) in IP.items():
             original = fetch(source, revision)
             sr, mihomo, count = ip_data(original, minimum, name=name)
+            if name == "rkn-ips":
+                source_bytes["blocked_ips"] = original
+                source_metadata["blocked_ips"] = {
+                    "dataset": "refilter-ip-full", "url": upstream_raw_url(revision, source),
+                    "revision": revision, "sha256": digest(original),
+                    "bytes": len(original), "entries": count}
             add("rules/" + name + ".list", sr, source, count)
             add("rules/" + name + ".cidr", mihomo, source, count)
             add("rules/singbox/" + name + ".json", singbox_ips(mihomo), source, count)
             add("rules/surge/" + name + ".list", surge_ips(mihomo), source, count)
             add("rules/quantumultx/" + name + ".list",
                 quantumultx_ips(mihomo, policy_for(name)), source, count)
+        validate_source_metadata(source_metadata)
+        for key, info in source_metadata.items():
+            if len(source_bytes[key]) != info["bytes"] or digest(source_bytes[key]) != info["sha256"]:
+                raise ValueError("Blocked input integrity mismatch: " + key)
         for name, (source, minimum) in GEO.items():
             blob = fetch(source, revision)
             if len(blob) < minimum or blob.startswith(b"<html"):
                 raise ValueError("Invalid geodata " + name)
             validate_geodata(name, blob)
+            if name == "geosite.dat":
+                blob = replace_geodata_category(name, blob, "banned-ru",
+                                                generated["rules/rkn-domains.list"])
+                required_category = "banned-ru"
+                required_count = source_metadata["blocked_domains"]["entries"]
+            else:
+                blob = replace_geodata_category(name, blob, "blocked-ru",
+                                                generated["rules/rkn-ips.cidr"])
+                required_category = "blocked-ru"
+                required_count = source_metadata["blocked_ips"]["entries"]
+            if validate_geodata(name, blob)[required_category] != required_count:
+                raise ValueError("Geodata blocked category differs from complete source")
             add("geo/" + name, blob, source)
-        previous_path = ROOT / "install/manifest.json"
-        previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
         validate_update_budget(records, previous)
         changed = previous.get("files") != records
         manifest = {"name": "Garasu MAX", "upstream": upstream_origin,
-                    "upstream_revision": revision, "files": records}
+                    "upstream_revision": revision, "sources": source_metadata,
+                    "files": records}
         add("install/manifest.json", (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode())
         base = "https://raw.githubusercontent.com/" + REPO + "/main"
         last_updated = str(int(time.time())) if changed else None

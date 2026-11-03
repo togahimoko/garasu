@@ -73,6 +73,8 @@ class GarasuTests(unittest.TestCase):
             ), key)
             self.assertEqual(provider["format"], "text")
             self.assertEqual(provider["type"], "http")
+            self.assertEqual(provider["proxy"], "Garasu Auto")
+        self.assertEqual(data["dns"]["direct-nameserver"], ["system"])
         self.assertEqual(data["rule-providers"]["rkn-ips"]["behavior"], "ipcidr")
         self.assertEqual(data["rule-providers"]["rkn-domains"]["behavior"], "domain")
 

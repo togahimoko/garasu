@@ -119,9 +119,18 @@ def _replace_header(rule, key, value):
     mod["ignoreServeJsonAtBaseSubscription"] = True
 
 
-def prepare(source, ref, *, mode="preview", root=ROOT):
+def prepare(source, ref, *, mode="preview", root=ROOT, template_names=None):
     if mode not in ("preview", "full"):
         raise ValueError("Select preview or full")
+    if template_names is not None:
+        if (not isinstance(template_names, dict) or
+                set(template_names) != {"mihomo", "stash", "singbox"} or
+                any(not isinstance(name, str) or
+                    not name.strip() or len(name) > 128 or
+                    any(ch in name for ch in "\\r\\n")
+                    for name in template_names.values()) or
+                len(set(template_names.values())) != 3):
+            raise ValueError("All three distinct, installed template names required")
     clean = _validate(source)
     links = _make_links(root, ref)
     candidate = copy.deepcopy(clean)
@@ -129,6 +138,9 @@ def prepare(source, ref, *, mode="preview", root=ROOT):
     _replace_header(rules[1], "autorouting", links["incy"])
     _replace_header(rules[2], "routing", links["happ"])
     rules[5]["conditions"][0]["value"] = SINGBOX_UA
+    if template_names is not None:
+        for key, i in (("mihomo", 3), ("stash", 4), ("singbox", 5)):
+            rules[i]["responseModifications"]["subscriptionTemplate"] = template_names[key]
     if mode == "full":
         return candidate
     previews = []
@@ -154,12 +166,20 @@ def main():
     p.add_argument("destination", help="New candidate output JSON (exclusive create)")
     p.add_argument("--ref", required=True, help="Pinned Git main commit (40 hex)")
     p.add_argument("--mode", choices=["preview", "full"], default="preview")
+    p.add_argument("--mihomo-template")
+    p.add_argument("--stash-template")
+    p.add_argument("--singbox-template")
     args = p.parse_args()
+    supplied = [args.mihomo_template, args.stash_template, args.singbox_template]
+    if any(v is not None for v in supplied) and not all(v is not None for v in supplied):
+        p.error("Pass all three --*-template names or none")
+    names = (dict(zip(("mihomo", "stash", "singbox"), supplied))
+             if all(v is not None for v in supplied) else None)
     source, target = Path(args.source), Path(args.destination)
     if source.resolve() == target.resolve():
         p.error("Cannot overwrite SRR input")
     current = json.loads(source.read_text(encoding="utf-8"))
-    result = prepare(current, args.ref, mode=args.mode)
+    result = prepare(current, args.ref, mode=args.mode, template_names=names)
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("x", encoding="utf-8") as output:
         output.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")

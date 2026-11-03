@@ -21,7 +21,7 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Generate synthetic node-injected configs
         run: python scripts/smoke_cores.py --output-dir "$RUNNER_TEMP/garasu-ci"
-      - name: Real Mihomo core v1.19.32: parse and validate
+      - name: 'Real Mihomo core v1.19.32: parse and validate'
         run: |
           docker run --rm \
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
@@ -29,14 +29,14 @@ jobs:
             metacubex/mihomo:v1.19.32 -t \
             -f "$RUNNER_TEMP/garasu-ci/mihomo-remnawave.ci.yaml" \
             -d "$RUNNER_TEMP/garasu-ci"
-      - name: Real sing-box core v1.14.2: parse and validate
+      - name: 'Real sing-box core v1.14.2: parse and validate'
         run: |
           docker run --rm \
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
             -v "$RUNNER_TEMP/garasu-ci:$RUNNER_TEMP/garasu-ci" \
             ghcr.io/sagernet/sing-box:v1.14.2 check \
             -c "$RUNNER_TEMP/garasu-ci/singbox-remnawave-1.14.ci.json"
-      - name: Real sing-box core v1.14.2: legacy-compatible template
+      - name: 'Real sing-box core v1.14.2: legacy-compatible template'
         run: |
           docker run --rm \
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \

@@ -88,6 +88,21 @@ class GarasuPublicExposureTests(unittest.TestCase):
             audit_public_exposure.find_exposures(
                 "clients/singbox-remnawave.json", json.dumps(data)))
 
+    def test_nested_canary_files_are_scanned_for_secrets(self):
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            private = root / "clients" / "canary"
+            private.mkdir(parents=True)
+            (private / "unsafe.yaml").write_text(
+                "proxies:\n  - name: Example\n"
+                "    type: vless\n    server: secret.example.net\n    port: 443\n",
+                encoding="utf-8",
+            )
+            self.assertTrue(audit_public_exposure.scan_release(root),
+                            "Recursive canary scans must detect embedded nodes")
+
     def test_no_full_subscription_urls_in_install_links(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

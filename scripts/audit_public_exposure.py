@@ -112,8 +112,8 @@ def check_happ_link(value):
 def scan_release(root=ROOT):
     """Scan only artifacts distributed publicly (not test fixtures)."""
     root = Path(root)
-    items = list((root / "clients").glob("*")) if (root / "clients").exists() else []
-    items += list((root / "install").glob("*")) if (root / "install").exists() else []
+    items = list((root / "clients").rglob("*")) if (root / "clients").exists() else []
+    items += list((root / "install").rglob("*")) if (root / "install").exists() else []
     findings = []
     for file in sorted(items):
         if not file.is_file():

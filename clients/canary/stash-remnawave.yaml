@@ -1,0 +1,140 @@
+# Garasu MAX — Stash template for Remnawave, not a direct subscription URL.
+# User nodes are inserted at the two Remnawave anchors below.
+mode: rule
+log-level: warning
+allow-lan: false
+ipv6: false
+dns:
+  default-nameserver:
+    - 1.1.1.1
+    - 8.8.8.8
+  nameserver:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+proxies: # LEAVE THIS LINE!
+proxy-groups:
+  - name: Garasu
+    type: select
+    proxies: # LEAVE THIS LINE!
+rule-providers:
+  rkn-domains:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-domains.list
+    path: ./garasu/rkn-domains.txt
+    interval: 21600
+  youtube:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/youtube.list
+    path: ./garasu/youtube.txt
+    interval: 21600
+  discord:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/discord.list
+    path: ./garasu/discord.txt
+    interval: 21600
+  ai:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ai.list
+    path: ./garasu/ai.txt
+    interval: 21600
+  crypto:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/crypto.list
+    path: ./garasu/crypto.txt
+    interval: 21600
+  proxy:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy.list
+    path: ./garasu/proxy.txt
+    interval: 21600
+  ads:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ads.list
+    path: ./garasu/ads.txt
+    interval: 21600
+  games:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/games.list
+    path: ./garasu/games.txt
+    interval: 21600
+  direct:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct.list
+    path: ./garasu/direct.txt
+    interval: 21600
+  rkn-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-ips.cidr
+    path: ./garasu/rkn-ips.txt
+    interval: 21600
+  proxy-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy-ips.cidr
+    path: ./garasu/proxy-ips.txt
+    interval: 21600
+  direct-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct-ips.cidr
+    path: ./garasu/direct-ips.txt
+    interval: 21600
+  ru-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.cidr
+    path: ./garasu/ru-ips.txt
+    interval: 21600
+rules:
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - RULE-SET,rkn-domains,Garasu
+  - RULE-SET,rkn-ips,Garasu,no-resolve
+  - RULE-SET,youtube,Garasu
+  - RULE-SET,discord,Garasu
+  - RULE-SET,ai,Garasu
+  - RULE-SET,crypto,Garasu
+  - RULE-SET,proxy,Garasu
+  - RULE-SET,proxy-ips,Garasu,no-resolve
+  - RULE-SET,ads,REJECT
+  - RULE-SET,games,DIRECT
+  - RULE-SET,direct,DIRECT
+  - RULE-SET,direct-ips,DIRECT,no-resolve
+  - GEOIP,LAN,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,ru,DIRECT
+  - DOMAIN-SUFFIX,su,DIRECT
+  - DOMAIN-SUFFIX,moscow,DIRECT
+  - DOMAIN-SUFFIX,xn--p1ai,DIRECT
+  - DOMAIN-SUFFIX,xn--p1acf,DIRECT
+  - DOMAIN-SUFFIX,xn--80asehdb,DIRECT
+  - DOMAIN-SUFFIX,xn--c1avg,DIRECT
+  - DOMAIN-SUFFIX,xn--80aswg,DIRECT
+  - DOMAIN-SUFFIX,xn--80adxhks,DIRECT
+  - DOMAIN-SUFFIX,xn--d1acj3b,DIRECT
+  - RULE-SET,ru-ips,DIRECT,no-resolve
+  - MATCH,Garasu

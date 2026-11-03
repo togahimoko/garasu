@@ -198,6 +198,44 @@ def decide(policy, hostname, address=None, *, blocked_domains=(),
     return "PROXY"
 
 
+def decide_answers(policy, hostname, addresses, *, blocked_domains=(),
+                   blocked_ips=(), ru_ips=(), verified_full_refilter=False):
+    """Reference oracle for one DNS answer set; NOT a native routing guarantee.
+
+    A blocked answer overrides an otherwise DIRECT Russian suffix; malformed,
+    missing and private answers to a public name are conservative PROXY.
+    All A and AAAA answers are checked without geo-CIDR escalation.
+    """
+    host = (hostname or "").lower().rstrip(".")
+    if _domain_matches(host, policy["local_domain_suffixes"]):
+        return "DIRECT"
+    if _domain_matches(host, blocked_domains):
+        return "PROXY"
+    if not verified_full_refilter or not isinstance(addresses, (list, tuple)) or not addresses:
+        return "PROXY"
+    parsed = []
+    for address in addresses:
+        try:
+            value = ipaddress.ip_address(address)
+        except (TypeError, ValueError):
+            return "PROXY"
+        if value.is_private or value.is_link_local or value.is_loopback:
+            return "PROXY"
+        if any(value in network for network in blocked_ips):
+            return "PROXY"
+        parsed.append(value)
+    if _domain_matches(host, policy["ru_tlds"]):
+        return "DIRECT"
+    try:
+        literal = ipaddress.ip_address(host)
+    except ValueError:
+        literal = None
+    if literal is not None and literal in parsed and any(
+            literal in network for network in ru_ips):
+        return "DIRECT"
+    return "PROXY"
+
+
 def _url(category, *, singbox=False, shadowrocket_ip=False, lock):
     engine = "singbox" if singbox else "shadowrocket" if shadowrocket_ip else "mihomo"
     return asset_url(lock, category, engine)

@@ -8,6 +8,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = {"MIHOMO": "Garasu Mihomo", "STASH": "Garasu Stash", "SINGBOX": "Garasu Singbox"}
+LEGACY_SINGBOX_UA = "^sfa|sfi|sfm|sft|karing|singbox"
+SINGBOX_UA = "^(?:sfa|sfi|sfm|sft|karing|singbox)"
 TEST_AGENTS = {"incy": "garasu-test-incy", "happ": "garasu-test-happ",
                "mihomo": "garasu-test-mihomo", "stash": "garasu-test-stash",
                "singbox": "garasu-test-singbox"}
@@ -89,6 +91,11 @@ def _full(current, links):
         )
     for typ, template in TEMPLATES.items():
         targets[typ.lower()].setdefault("responseModifications", {})["subscriptionTemplate"] = template
+    singbox_conditions = targets["singbox"].get("conditions", [])
+    if (len(singbox_conditions) == 1 and
+            singbox_conditions[0].get("operator") == "REGEX" and
+            singbox_conditions[0].get("value") == LEGACY_SINGBOX_UA):
+        singbox_conditions[0]["value"] = SINGBOX_UA
     return result
 
 

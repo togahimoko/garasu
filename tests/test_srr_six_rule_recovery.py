@@ -6,6 +6,7 @@ XRAY_BASE64 fallback; it does not have individual Happ/INCY SRR entries.
 import base64
 import copy
 import json
+import re
 import unittest
 from scripts import build_srr
 
@@ -41,6 +42,19 @@ def stub_links():
 
 
 class SixRuleSRRRecovery(unittest.TestCase):
+    def test_singbox_regex_is_anchored_in_full_and_preview(self):
+        original = minimal_srr()
+        original["rules"][3]["conditions"] = [{
+            "headerName": "user-agent", "operator": "REGEX",
+            "value": "^sfa|sfi|sfm|sft|karing|singbox",
+            "caseSensitive": False}]
+        full = build_srr.patch(original, stub_links(), mode="full")
+        regex = full["rules"][3]["conditions"][0]["value"]
+        self.assertTrue(re.search(regex, "singbox/1.14", re.I))
+        self.assertFalse(re.search(regex, "foo-karing", re.I))
+        preview = build_srr.patch(original, stub_links(), mode="test")
+        self.assertEqual(preview["rules"][8], original["rules"][3])
+
     def test_canary_does_not_touch_six_existing_live_rules(self):
         original = minimal_srr()
         saved = copy.deepcopy(original)

@@ -16,7 +16,7 @@
 - Use one deterministic script with no network access and no credentials.
 - Block CI only on malformed input or inconsistent source inventory, not on expected precedence overrides.
 - Commit reports only with verified rule data; no wall-clock timestamps that generate useless six-hour diffs.
-- Do not alter Remnawave, subscriptions, VPN node addresses or traffic flows.
+- Do not alter active deployment infrastructure, subscriptions, VPN node addresses or traffic flows.
 
 ## Tasks
 

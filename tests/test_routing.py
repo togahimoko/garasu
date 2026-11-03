@@ -82,7 +82,7 @@ class GarasuTests(unittest.TestCase):
             return  # first repo bootstrap before initial scheduled build
         manifest = json.loads(path.read_text())
         self.assertEqual(manifest["name"], "Garasu MAX")
-        self.assertIn(len(manifest["files"]), (17, 32))  # migration-safe before generation
+        self.assertEqual(len(manifest["files"]), 32)
         for filename, record in manifest["files"].items():
             data = (ROOT / filename).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"], filename)
@@ -186,6 +186,32 @@ class GarasuTests(unittest.TestCase):
         self.assertLess(proxi, direct)
         self.assertEqual(rules[proxi]["outbound"], "→ Remnawave")
         self.assertEqual(rules[direct]["outbound"], "direct")
+
+    def test_xray_advanced_template_requires_virtual_host(self):
+        xray = json.loads((ROOT / "clients/xray-advanced-remnawave.json").read_text())
+        self.assertTrue(xray["remnawave"]["addVirtualHostAsOutbound"])
+        self.assertEqual(xray["routing"]["rules"][-1]["outboundTag"], "proxy")
+        self.assertEqual(xray["routing"]["rules"][-1]["network"], "tcp,udp")
+        self.assertIn("geosite:banned-ru", xray["routing"]["rules"][3]["domain"])
+        self.assertIn("geoip:blocked-ru", xray["routing"]["rules"][4]["ip"])
+        self.assertEqual(xray["routing"]["rules"][5]["outboundTag"], "direct")
+        self.assertEqual(xray["routing"]["rules"][6]["outboundTag"], "direct")
+        self.assertEqual([o["tag"] for o in xray["outbounds"]], ["direct", "block"])
+
+    def test_all_singbox_rule_sets_are_published(self):
+        base = ROOT / "rules/singbox"
+        if not base.exists():
+            return
+        cfg = json.loads((ROOT / "clients/singbox-remnawave.json").read_text())
+        for provider in cfg["route"]["rule_set"]:
+            filename = base / (provider["tag"].removeprefix("garasu-") + ".json")
+            self.assertTrue(filename.exists(), filename)
+            doc = json.loads(filename.read_text())
+            self.assertEqual(doc["version"], 3)
+            self.assertTrue(doc["rules"])
+            self.assertTrue(doc["rules"][0].get("domain_suffix") or
+                            doc["rules"][0].get("domain") or
+                            doc["rules"][0].get("ip_cidr"))
 
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():

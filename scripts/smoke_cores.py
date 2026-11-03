@@ -58,18 +58,32 @@ def prepare_mihomo(template, out, node_count=1):
     return result
 
 
-def prepare_singbox(template, out):
+def prepare_singbox(template, out, node_count=1):
+    """Model Remnawave replacement of the outbounds:null injection marker.
+
+    The default stable selector is manual. The opt-in urltest candidate is
+    tested for parser correctness only until live Remnawave confirms injection.
+    """
+    if not isinstance(node_count, int) or not 1 <= node_count <= 32:
+        raise ValueError("node_count must be in 1..32")
     doc = json.loads((ROOT / template).read_text(encoding="utf-8"))
-    selectors = [x for x in doc["outbounds"] if x.get("type") == "selector"]
-    if len(selectors) != 1 or selectors[0].get("outbounds") is not None:
+    groups = [x for x in doc["outbounds"]
+              if x.get("type") in ("selector", "urltest")
+              and x.get("outbounds") is None]
+    if len(groups) != 1:
         raise ValueError("Unexpected Remnawave sing-box node injection marker")
-    selectors[0]["outbounds"] = ["garasu-ci-node"]
-    doc["outbounds"].append({
-        "type": "http",
-        "tag": "garasu-ci-node",
-        "server": "127.0.0.1",
-        "server_port": 1080,
-    })
+    names = [
+        "garasu-ci-node" if node_count == 1 else "garasu-ci-node-" + str(i + 1)
+        for i in range(node_count)
+    ]
+    groups[0]["outbounds"] = names
+    for i, name in enumerate(names):
+        doc["outbounds"].append({
+            "type": "http",
+            "tag": name,
+            "server": "127.0.0.1",
+            "server_port": 1080 + i,
+        })
     for provider in doc["route"]["rule_set"]:
         source = ROOT / "rules" / "singbox" / (
             provider["tag"].removeprefix("garasu-") + ".json"

@@ -116,6 +116,30 @@ class UnifiedSRR(unittest.TestCase):
             self.assertTrue(c[0]["value"].startswith("garasu-test-"))
         self.assertEqual(prepare_unified_srr.prepare(output, REV, mode="preview", root=ROOT), output)
 
+    def test_preview_stages_new_template_names_without_affecting_live_response(self):
+        new = {"mihomo": "Garasu Unified Mihomo",
+               "stash": "Garasu Unified Stash",
+               "singbox": "Garasu Unified Singbox"}
+        prev = prepare_unified_srr.prepare(
+            self.original, REV, mode="preview", root=ROOT, template_names=new)
+        for idx, expected in ((3, new["mihomo"]), (4, new["stash"]),
+                              (5, new["singbox"])):
+            self.assertEqual(prev["rules"][idx]["responseModifications"][
+                "subscriptionTemplate"], expected)
+        # Original active rules are preserved byte-for-byte, including names.
+        self.assertEqual(prev["rules"][-7:], self.original["rules"][1:])
+        full = prepare_unified_srr.prepare(
+            self.original, REV, mode="full", root=ROOT, template_names=new)
+        for idx, expected in ((3, new["mihomo"]), (4, new["stash"]),
+                              (5, new["singbox"])):
+            self.assertEqual(full["rules"][idx]["responseModifications"][
+                "subscriptionTemplate"], expected)
+        self.assertEqual(full["rules"][-1], self.original["rules"][-1])
+        with self.assertRaises(ValueError):
+            prepare_unified_srr.prepare(
+                self.original, REV, root=ROOT,
+                template_names={"mihomo": "only one"})
+
     def test_fail_closed_for_missing_or_reordered_browser_or_fallback(self):
         for idx, kind in [(0, "CLASH"), (-1, "CLASH")]:
             bad = eight_rules()

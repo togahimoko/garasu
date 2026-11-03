@@ -304,7 +304,9 @@ class GarasuTests(unittest.TestCase):
             self.assertEqual(route(domain), expected, domain)
 
     def test_no_secrets(self):
-        for path in (ROOT / "clients").iterdir():
+        for path in (ROOT / "clients").rglob("*"):
+            if not path.is_file():
+                continue
             content = path.read_text()
             for secret in ("BEGIN PRIVATE KEY", "YOUR_UUID", "SUBSCRIPTION_TOKEN"):
                 self.assertNotIn(secret, content)

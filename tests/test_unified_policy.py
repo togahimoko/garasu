@@ -70,7 +70,7 @@ class UnifiedPolicyContract(unittest.TestCase):
         self.assertNotIn("  - GEOIP,RU,DIRECT", config)
         self.assertNotIn("      - DIRECT\n", config)
         self.assertIn("refilter-domain-full.list", config)
-        self.assertIn("refilter-ip-full.list", config)
+        self.assertIn("refilter-ip-full.cidr", config)
         self.assertLess(config.index("RULE-SET,rkn-domains-full,Garasu"),
                         config.index("RULE-SET,ads,REJECT"))
 
@@ -98,8 +98,34 @@ class UnifiedPolicyContract(unittest.TestCase):
         self.assertTrue(all(k.startswith("clients/unified/") for k in outputs))
         self.assertEqual(len(outputs), len(set(outputs)))
 
-    def test_cli_check_detects_drift_without_writing(self):
-        self.assertTrue(unified.check_candidates(ROOT, self.policy))
+    def test_committed_candidates_match_generator_except_unpublished_native_shadowrocket(self):
+        # The single remaining adapter is generated locally by --write but
+        # cannot be claimed as a committed, checked-in native profile.
+        self.assertEqual(unified.candidate_drift(ROOT, self.policy),
+                         ["clients/unified/shadowrocket.conf"])
+        self.assertFalse(unified.check_candidates(ROOT, self.policy))
+
+    def test_full_registry_and_every_format_are_from_same_verified_rows(self):
+        rules = ROOT / "rules/unified"
+        raw_domains = (rules / "refilter-domain-full.list").read_text(encoding="utf-8")
+        domains = [x[2:] for x in raw_domains.splitlines() if x.startswith("+.")]
+        raw_ips = (rules / "refilter-ip-full.cidr").read_text(encoding="utf-8")
+        ips = [x for x in raw_ips.splitlines() if x and not x.startswith("#")]
+        self.assertEqual(len(domains), self.policy["snapshot"]["domain_count"])
+        self.assertEqual(len(ips), self.policy["snapshot"]["ip_count"])
+        self.assertEqual(len(domains), len(set(domains)))
+        self.assertEqual(len(ips), len(set(ips)))
+        self.assertEqual(domains, json.loads((rules /
+            "refilter-domain-full.singbox.json").read_text())["rules"][0]["domain_suffix"])
+        self.assertEqual(ips, json.loads((rules /
+            "refilter-ip-full.singbox.json").read_text())["rules"][0]["ip_cidr"])
+        shadow = [x for x in (rules /
+            "refilter-ip-full-shadowrocket.list").read_text().splitlines()
+            if x and not x.startswith("#")]
+        self.assertEqual(shadow, [
+            ("IP-CIDR6" if ":" in ip else "IP-CIDR") + "," + ip for ip in ips
+        ])
+
 
 
 if __name__ == "__main__":

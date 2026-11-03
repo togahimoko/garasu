@@ -183,6 +183,84 @@ def policy_for(name):
     return "reject" if name == "ads" else ("direct" if name in ("games", "direct", "direct-ips", "ru-ips") else "proxy")
 
 
+def _protobuf_varint(data, index):
+    result = 0
+    for shift in range(0, 70, 7):
+        if index >= len(data):
+            raise ValueError("Truncated GeoIP/GeoSite protobuf")
+        octet = data[index]
+        index += 1
+        result |= (octet & 127) << shift
+        if not (octet & 128):
+            return result, index
+    raise ValueError("Invalid protobuf varint")
+
+
+def _protobuf_fields(data):
+    """Read protobuf wire fields without depending on non-standard packages."""
+    pos = 0
+    while pos < len(data):
+        tag, pos = _protobuf_varint(data, pos)
+        number, wire = tag >> 3, tag & 7
+        if not number:
+            raise ValueError("Invalid protobuf field 0")
+        if wire == 0:
+            _, pos = _protobuf_varint(data, pos)
+        elif wire == 1:
+            pos += 8
+        elif wire == 2:
+            length, pos = _protobuf_varint(data, pos)
+            if length > len(data) - pos:
+                raise ValueError("Truncated protobuf payload")
+            yield number, data[pos:pos + length]
+            pos += length
+        elif wire == 5:
+            pos += 4
+        else:
+            raise ValueError("Invalid protobuf wire type " + str(wire))
+        if pos > len(data):
+            raise ValueError("Truncated protobuf scalar")
+
+
+GEODATA_REQUIRED = {
+    "geosite.dat": {"category-geoblock-ru": 10000, "category-ru": 500,
+                    "youtube": 70, "ai": 70, "banned-ru": 20,
+                    "telegram": 5, "private": 20},
+    "geoip.dat": {"ru": 10000, "blocked-ru": 500,
+                  "telegram": 5, "private": 10},
+}
+
+
+def validate_geodata(name, data, requirements=None):
+    """Validate GeoIPList/GeoSiteList data and presence of required categories.
+
+    Schema: v2fly/v2ray-core app/router/routercommon/common.proto.
+    Both top-level lists have repeated 'entry' in field 1.
+    Each entry has country_code (field 1) and repeated domain/CIDR (field 2).
+    """
+    requirements = GEODATA_REQUIRED[name] if requirements is None else requirements
+    categories = {}
+    for number, entry in _protobuf_fields(data):
+        if number != 1:
+            continue
+        code = None
+        count = 0
+        for field, value in _protobuf_fields(entry):
+            if field == 1:
+                code = value.decode("utf-8").lower()
+            elif field == 2:
+                count += 1
+        if code:
+            if code in categories:
+                raise ValueError(name + ": duplicate geodata category " + code)
+            categories[code] = count
+    for code, minimum in requirements.items():
+        if categories.get(code, 0) < minimum:
+            raise ValueError(name + ": " + code + " is missing or too small: "
+                             + str(categories.get(code, 0)))
+    return categories
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -220,6 +298,7 @@ def run():
             blob = fetch(source)
             if len(blob) < minimum or blob.startswith(b"<html"):
                 raise ValueError("Invalid geodata " + name)
+            validate_geodata(name, blob)
             add("geo/" + name, blob, source)
         previous_path = ROOT / "install/manifest.json"
         previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}

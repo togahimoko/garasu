@@ -400,6 +400,39 @@ class GarasuTests(unittest.TestCase):
             self.assertLess(blocked, suffix)
             self.assertEqual(rules[suffix]["outbound"], "direct")
 
+    def test_rejects_poisoned_domain_sources(self):
+        for payload in (
+            b"+.ru\n", b"+.com\n", b"+.*\n", b"+.example..com\n",
+            b"+.-example.com\n", b"+.example-.com\n", b"+.example.com.\n",
+            b"+.example.com\x00\n", b"+.example.com\n+.ru\n",
+        ):
+            with self.subTest(payload=repr(payload)):
+                with self.assertRaises(ValueError):
+                    mod.domains(payload, 1)
+        good, count = mod.domains(b"+.chatgpt.com\n+.xn--p1ai.ru\n", 2)
+        self.assertEqual(count, 2)
+        self.assertIn(b"+.xn--p1ai.ru", good)
+
+    def test_rejects_unexpectedly_broad_proxy_ip_ranges(self):
+        for name in ("rkn-ips", "proxy-ips"):
+            for cidr in (b"0.0.0.0/0\n", b"0.0.0.0/1\n", b"2000::/3\n"):
+                with self.subTest(name=name, cidr=cidr):
+                    with self.assertRaises(ValueError):
+                        mod.ip_data(cidr, 1, name=name)
+        data, text_rules, count = mod.ip_data(b"224.0.0.0/3\n", 1, name="direct-ips")
+        self.assertIn(b"224.0.0.0/3", text_rules)
+        self.assertEqual(count, 1)
+
+    def test_action_dependencies_are_pinned_to_immutable_commits(self):
+        import re
+        for path in (ROOT / ".github/workflows").glob("*.yml"):
+            body = path.read_text(encoding="utf-8")
+            for line in body.splitlines():
+                m = re.search(r"^\s*-\s*uses:\s*([^\s]+)", line)
+                if m and not m.group(1).startswith("./"):
+                    self.assertRegex(m.group(1), r"^[\w.-]+/[\w.-]+@[a-f0-9]{40}$",
+                                     f"Mutable dependency in {path.name}: {m.group(1)}")
+
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():
             content = path.read_text()

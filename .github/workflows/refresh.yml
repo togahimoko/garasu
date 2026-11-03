@@ -50,5 +50,9 @@ jobs:
             echo "No changes: keeping last validated release."
           else
             git commit -m "chore: refresh validated Garasu MAX routing data"
+            # Another authorized change may have landed while sources downloaded.
+            # Rebase instead of forcing the branch. If incompatible, fail closed.
+            git fetch origin main
+            git rebase origin/main
             git push origin HEAD:main
           fi

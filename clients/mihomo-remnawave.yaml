@@ -27,6 +27,9 @@ dns:
     - '+.msftncsi.com'
     - 'time.*.com'
     - 'ntp.*.com'
+# Remnawave inserts the subscriber's permitted nodes here.
+proxies: # LEAVE THIS LINE!
+
 proxy-groups:
   - name: Garasu
     type: select
@@ -43,8 +46,8 @@ proxy-groups:
     include-all: true
     remnawave:
       include-proxies: false
-    proxies:
-      # LEAVE THIS LINE! Remnawave merges personal nodes automatically.
+    proxies: # LEAVE THIS LINE!
+      # Personal nodes are selected automatically by include-all.
 rule-providers:
   rkn-domains:
     type: http

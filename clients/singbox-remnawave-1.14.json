@@ -70,6 +70,22 @@
         "method": "default"
       },
       {
+        "domain_suffix": [
+          "ru",
+          "su",
+          "moscow",
+          "xn--p1ai",
+          "xn--p1acf",
+          "xn--80asehdb",
+          "xn--c1avg",
+          "xn--80aswg",
+          "xn--80adxhks",
+          "xn--d1acj3b"
+        ],
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
         "rule_set": [
           "garasu-games",
           "garasu-direct",

@@ -125,6 +125,63 @@ def singbox_ips(blob):
                        ensure_ascii=False, separators=(",", ":")) + "\n").encode()
 
 
+def surge_domains(blob):
+    """Create Surge/Loon rule-set syntax (policy supplied by referencing profile)."""
+    rules = []
+    for line in blob.decode("utf-8").splitlines():
+        item = line.strip()
+        if not item or item.startswith("#"):
+            continue
+        if item.startswith(("+.", "*.")):
+            rules.append("DOMAIN-SUFFIX," + item[2:])
+        elif item.startswith("."):
+            rules.append("DOMAIN-SUFFIX," + item[1:])
+        else:
+            rules.append("DOMAIN," + item)
+    return ("# Garasu MAX | Surge and Loon shared rule set\n" + "\n".join(rules) + "\n").encode()
+
+
+def surge_ips(blob):
+    """Create Surge/Loon IP rules from canonical CIDR lists."""
+    rules = []
+    for line in blob.decode("utf-8").splitlines():
+        item = line.strip()
+        if item and not item.startswith("#"):
+            ipaddress.ip_network(item)
+            rules.append(("IP-CIDR6," if ":" in item else "IP-CIDR,") + item)
+    return ("# Garasu MAX | Surge and Loon shared IP rule set\n" + "\n".join(rules) + "\n").encode()
+
+
+def quantumultx_domains(blob, policy):
+    """Quantumult X remote filter entries with explicit fallback policy."""
+    rules = []
+    for line in blob.decode("utf-8").splitlines():
+        item = line.strip()
+        if not item or item.startswith("#"):
+            continue
+        if item.startswith(("+.", "*.")):
+            rules.append("host-suffix, " + item[2:] + ", " + policy)
+        elif item.startswith("."):
+            rules.append("host-suffix, " + item[1:] + ", " + policy)
+        else:
+            rules.append("host, " + item + ", " + policy)
+    return ("# Garasu MAX | Quantumult X filters\n" + "\n".join(rules) + "\n").encode()
+
+
+def quantumultx_ips(blob, policy):
+    rules = []
+    for line in blob.decode("utf-8").splitlines():
+        item = line.strip()
+        if item and not item.startswith("#"):
+            ipaddress.ip_network(item)
+            rules.append(("ip6-cidr, " if ":" in item else "ip-cidr, ") + item + ", " + policy)
+    return ("# Garasu MAX | Quantumult X IP filters\n" + "\n".join(rules) + "\n").encode()
+
+
+def policy_for(name):
+    return "reject" if name == "ads" else ("direct" if name in ("games", "direct", "direct-ips", "ru-ips") else "proxy")
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -146,12 +203,18 @@ def run():
             blob, count = domains(fetch(source), minimum)
             add("rules/" + name + ".list", blob, source, count)
             add("rules/singbox/" + name + ".json", singbox_domains(blob), source, count)
+            add("rules/surge/" + name + ".list", surge_domains(blob), source, count)
+            add("rules/quantumultx/" + name + ".list",
+                quantumultx_domains(blob, policy_for(name)), source, count)
         for name, (source, minimum) in IP.items():
             original = fetch(source)
             sr, mihomo, count = ip_data(original, minimum)
             add("rules/" + name + ".list", sr, source, count)
             add("rules/" + name + ".cidr", mihomo, source, count)
             add("rules/singbox/" + name + ".json", singbox_ips(mihomo), source, count)
+            add("rules/surge/" + name + ".list", surge_ips(mihomo), source, count)
+            add("rules/quantumultx/" + name + ".list",
+                quantumultx_ips(mihomo, policy_for(name)), source, count)
         for name, (source, minimum) in GEO.items():
             blob = fetch(source)
             if len(blob) < minimum or blob.startswith(b"<html"):
@@ -190,7 +253,7 @@ def run():
         # Validate all dependent artifacts before any persistent file write.
         assert "geoip:blocked-ru" in profile["ProxyIp"]
         assert "geosite:banned-ru" in profile["ProxySites"]
-        assert len(records) == 32, len(records)
+        assert len(records) == 58, len(records)
         assert json.loads(generated["clients/incy.json"])["Name"] == "Garasu MAX"
         for relative, data in generated.items():
             target = temp / relative

@@ -65,6 +65,8 @@ proxy-groups:
     timeout: 8000
     max-failed-times: 2
     expected-status: 204
+    # Do not resolve an empty subscriber pool as implicit DIRECT.
+    empty-fallback: REJECT
     include-all: true
     remnawave:
       include-proxies: false

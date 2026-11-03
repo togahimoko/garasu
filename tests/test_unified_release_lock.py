@@ -53,6 +53,33 @@ class UnifiedDeliveryLock(unittest.TestCase):
                     self.assertNotIn("/main/", url)
                     self.assertNotIn("/feature/", url)
 
+    def test_integrity_verifies_actual_bytes_and_detects_tampering(self):
+        from tempfile import TemporaryDirectory
+        lock = unified_policy.load_release_lock(LOCK, self.policy)
+        category = "rules/ai.list"
+        original = (ROOT / category).read_bytes()
+        with TemporaryDirectory() as folder:
+            relative = Path(folder) / category
+            relative.parent.mkdir(parents=True)
+            relative.write_bytes(original)
+            self.assertEqual(
+                unified_policy.verify_release_assets(folder, lock, paths=[category]), 1
+            )
+            relative.write_bytes(original + b"tampering")
+            with self.assertRaisesRegex(ValueError, "integrity"):
+                unified_policy.verify_release_assets(folder, lock, paths=[category])
+
+    def test_integrity_rejects_missing_files_and_unknown_inventory(self):
+        from tempfile import TemporaryDirectory
+        lock = unified_policy.load_release_lock(LOCK, self.policy)
+        with TemporaryDirectory() as folder:
+            with self.assertRaises((FileNotFoundError, ValueError)):
+                unified_policy.verify_release_assets(
+                    folder, lock, paths=["rules/ai.list"])
+            with self.assertRaises(ValueError):
+                unified_policy.verify_release_assets(
+                    folder, lock, paths=["../private-token"])
+
     def test_rejects_modified_or_incomplete_lock(self):
         lock = json.loads(LOCK.read_text(encoding="utf-8"))
         broken = json.loads(json.dumps(lock))

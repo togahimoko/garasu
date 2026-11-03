@@ -7,13 +7,15 @@ GitHub alone does not select a Garasu template in the panel.
 
 [`remnawave-six-rule-preview.json`](remnawave-six-rule-preview.json) is an
 offline candidate generated from that export. Its six existing rules remain
-unchanged and in their original order. Five additional rules immediately
+unchanged and in their original order. Six additional rules immediately
 after Browser respond only to `garasu-test-incy`, `garasu-test-happ`,
-`garasu-test-mihomo`, `garasu-test-stash`, and `garasu-test-singbox` User-Agents.
+`garasu-test-mihomo`, `garasu-test-stash`, `garasu-test-singbox`, and
+`garasu-test-xray` User-Agents.
 The original XRAY_BASE64 fallback remains unconditional and last.
 
 Before importing the preview in Remnawave, install three additional panel
-templates named `Garasu Mihomo`, `Garasu Stash`, and `Garasu Singbox` from
+templates named `Garasu Mihomo`, `Garasu Stash`, `Garasu Singbox`, and
+`Garasu Xray JSON` from
 the corresponding current `clients/` files. Confirm their names and formats
 in the installed panel. Otherwise the preview rules that reference them may
 return an error. Save a complete panel export for rollback. Use a dedicated
@@ -28,10 +30,11 @@ keeps all existing conditions exactly as they are. The `CLASH` rule is also
 left unchanged; plain Clash and Clash Verge can receive different response
 types because Mihomo precedes CLASH in the supplied order.
 
-The [full six-rule candidate](remnawave-six-rule-full.json) is available for
+The [full candidate](remnawave-six-rule-full.json) is available for
 review, but has not been imported into the panel. It selects the three named
-templates and retains Browser, CLASH, and the unconditional fallback. To
+templates, adds one explicit `garasu-xray-json` Xray JSON rule, and retains
+Browser, CLASH, and the unconditional BASE64 fallback. To
 regenerate it from the original export, run
-`python3 scripts/build_srr.py original.json full.json --mode full`. See the
+`python3 scripts/build_srr.py original.json full.json --mode full --with-xray-json`. See the
 [installation guide](remnawave-six-rule-install.md) for the template files and
 preview probe. The script writes files locally; it does not modify the panel.

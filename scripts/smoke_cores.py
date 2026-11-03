@@ -149,6 +149,7 @@ def main():
         prepare_singbox("clients/singbox-remnawave.json", out),
         prepare_singbox("clients/singbox-remnawave-1.14.json", out),
         prepare_xray("clients/xray-advanced-remnawave.json", out),
+        prepare_xray("clients/xray-json-garasu-remnawave.json", out),
     ]
     for file in outputs:
         print(file)

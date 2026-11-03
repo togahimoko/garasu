@@ -21,6 +21,30 @@ RU_SUFFIXES = {"ru", "su", "moscow", "xn--p1ai", "xn--p1acf",
 
 
 class UnifiedCoreRoutes(unittest.TestCase):
+    def test_xray_json_panel_template_keeps_dns_and_garasu_priority(self):
+        doc = json.loads((ROOT / "clients/xray-json-garasu-remnawave.json").read_text())
+        tags = {item["tag"] for item in doc["inbounds"]}
+        self.assertTrue({"socks", "http", "socks-direct", "dns-in"} <= tags)
+        self.assertEqual(doc["dns"]["servers"][0], "fakedns")
+        self.assertEqual(doc["geodata"]["cron"], "0 */6 * * *")
+        self.assertTrue(all("/togahimoko/garasu/main/geo/" in item["url"]
+                            for item in doc["geodata"]["assets"]))
+        self.assertTrue(doc["remnawave"]["addVirtualHostAsOutbound"])
+        rules = doc["routing"]["rules"]
+        blocked = next(i for i, r in enumerate(rules)
+                       if "geosite:banned-ru" in r.get("domain", []))
+        ru = next(i for i, r in enumerate(rules)
+                  if r.get("ip") == ["geoip:ru"])
+        guard = next(i for i, r in enumerate(rules)
+                     if r.get("domain") == ["regexp:.+"] and
+                     r.get("ip") == ["geoip:private"])
+        private = next(i for i, r in enumerate(rules)
+                       if r.get("ip") == ["geoip:private"] and
+                       "domain" not in r)
+        self.assertLess(blocked, ru)
+        self.assertLess(guard, private)
+        self.assertEqual(rules[-1]["outboundTag"], "proxy")
+
     def test_mihomo_and_stash_blocked_first_ru_direct_foreign_proxy(self):
         for path in YAML:
             with self.subTest(path=path):

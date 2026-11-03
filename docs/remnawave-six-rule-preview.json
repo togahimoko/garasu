@@ -121,6 +121,24 @@
       }
     },
     {
+      "name": "Garasu Xray JSON preview",
+      "description": "TEST ONLY: explicit Xray JSON response",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "STARTS_WITH",
+          "value": "garasu-test-xray",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "XRAY_JSON",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Xray JSON"
+      }
+    },
+    {
       "name": "Mihomo Clients",
       "description": "Response with generated YAML config (Mihomo Template)",
       "enabled": true,

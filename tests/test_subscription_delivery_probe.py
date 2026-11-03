@@ -38,7 +38,7 @@ class FakeOpener:
 
 class DeliveryProbe(unittest.TestCase):
     def test_preview_agents_use_isolated_srr_user_agents(self):
-        for name in ("incy", "happ", "mihomo", "stash", "singbox"):
+        for name in ("incy", "happ", "mihomo", "stash", "singbox", "xray"):
             client = "preview_" + name
             opener = FakeOpener(b"proxies:\n")
             probe.request_once(SECRET, client, "direct", opener=opener)

@@ -42,6 +42,25 @@ def stub_links():
 
 
 class SixRuleSRRRecovery(unittest.TestCase):
+    def test_xray_json_is_opt_in_and_preserves_base64_fallback(self):
+        original = minimal_srr()
+        full = build_srr.patch(original, stub_links(), mode="full",
+                               include_xray=True)
+        self.assertEqual(len(full["rules"]), 7)
+        self.assertEqual(full["rules"][-1], original["rules"][-1])
+        xray = full["rules"][-2]
+        self.assertEqual(xray["responseType"], "XRAY_JSON")
+        self.assertEqual(xray["conditions"][0]["value"], "garasu-xray-json")
+        self.assertEqual(xray["responseModifications"]["subscriptionTemplate"],
+                         "Garasu Xray JSON")
+        preview = build_srr.patch(original, stub_links(), mode="test",
+                                  include_xray=True)
+        self.assertEqual(len(preview["rules"]), 12)
+        self.assertEqual(preview["rules"][7:], original["rules"][1:])
+        self.assertEqual(preview["rules"][6]["responseType"], "XRAY_JSON")
+        self.assertEqual(preview["rules"][6]["conditions"][0]["value"],
+                         "garasu-test-xray")
+
     def test_singbox_regex_is_anchored_in_full_and_preview(self):
         original = minimal_srr()
         original["rules"][3]["conditions"] = [{

@@ -61,6 +61,14 @@ jobs:
             -v "$RUNNER_TEMP/garasu-ci:$RUNNER_TEMP/garasu-ci" \
             ghcr.io/xtls/xray-core:26.10.21@sha256:447ffc750a0b87d6e4f2c38425f68105bfc8c789e59c22d83b94eb7e1e648c50 run -test \
             -config "$RUNNER_TEMP/garasu-ci/xray-advanced-remnawave.ci.json"
+      - name: 'Real Xray core: validate Garasu Xray JSON panel template'
+        run: |
+          docker run --rm --user 0 \
+            -e "XRAY_LOCATION_ASSET=$GITHUB_WORKSPACE/geo" \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RUNNER_TEMP/garasu-ci:$RUNNER_TEMP/garasu-ci" \
+            ghcr.io/xtls/xray-core:26.10.21@sha256:447ffc750a0b87d6e4f2c38425f68105bfc8c789e59c22d83b94eb7e1e648c50 run -test \
+            -config "$RUNNER_TEMP/garasu-ci/xray-json-garasu-remnawave.ci.json"
       - name: 'Real Mihomo core v1.19.32: parse and validate'
         run: |
           docker run --rm \

@@ -28,6 +28,8 @@ AGENTS = {
     "preview_mihomo": "garasu-test-mihomo",
     "preview_stash": "garasu-test-stash",
     "preview_singbox": "garasu-test-singbox",
+    "preview_xray": "garasu-test-xray",
+    "xray_json": "garasu-xray-json",
 }
 DEFAULT_AGENTS = ("mihomo", "clash", "stash", "singbox", "happ", "incy", "browser")
 MAX_BYTES = 65536

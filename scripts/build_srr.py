@@ -14,7 +14,9 @@ TEST_AGENTS = {"incy": "garasu-test-incy", "happ": "garasu-test-happ",
                "mihomo": "garasu-test-mihomo", "stash": "garasu-test-stash",
                "singbox": "garasu-test-singbox"}
 PREVIEW_NAMES = {"Garasu INCY preview", "Garasu Happ preview", "Garasu Mihomo preview",
-                 "Garasu Stash preview", "Garasu Singbox preview"}
+                 "Garasu Stash preview", "Garasu Singbox preview",
+                 "Garasu Xray JSON preview"}
+XRAY_RULE_NAME = "Garasu Xray JSON opt-in"
 
 
 def _validate_links(links):
@@ -58,13 +60,14 @@ def _target_rules(rules):
     return result
 
 
-def _full(current, links):
+def _full(current, links, *, include_xray=False):
     if not isinstance(current, dict) or current.get("version") != "1":
         raise ValueError("Not a supported Remnawave SRR export")
     raw = current.get("rules")
     if not isinstance(raw, list) or len(raw) < 6:
         raise ValueError("Expected at least six SRR rules")
-    rules = [r for r in raw if r.get("name") not in PREVIEW_NAMES]
+    rules = [r for r in raw if r.get("name") not in PREVIEW_NAMES
+             and r.get("name") != XRAY_RULE_NAME]
     if not rules or rules[0].get("responseType") != "BROWSER":
         raise ValueError("First rule must remain BROWSER")
     if rules[-1].get("responseType") != "XRAY_BASE64" or rules[-1].get("conditions"):
@@ -96,18 +99,30 @@ def _full(current, links):
             singbox_conditions[0].get("operator") == "REGEX" and
             singbox_conditions[0].get("value") == LEGACY_SINGBOX_UA):
         singbox_conditions[0]["value"] = SINGBOX_UA
+    if include_xray:
+        result["rules"].insert(-1, {
+            "name": XRAY_RULE_NAME,
+            "description": "Explicit Xray JSON opt-in; ordinary clients keep XRAY_BASE64 fallback",
+            "enabled": True,
+            "operator": "AND",
+            "conditions": [{"headerName": "user-agent", "operator": "STARTS_WITH",
+                            "value": "garasu-xray-json", "caseSensitive": False}],
+            "responseType": "XRAY_JSON",
+            "responseModifications": {"subscriptionTemplate": "Garasu Xray JSON"},
+        })
     return result
 
 
-def patch(current, links, mode="test"):
+def patch(current, links, mode="test", *, include_xray=False):
     """test: real client UAs remain unchanged; full: switch five client rules."""
     if mode not in ("test", "full"):
         raise ValueError("Choose test or full")
-    full = _full(current, links)
+    full = _full(current, links, include_xray=include_xray)
     if mode == "full":
         return full
     orig = copy.deepcopy(current)
-    orig["rules"] = [r for r in orig["rules"] if r.get("name") not in PREVIEW_NAMES]
+    orig["rules"] = [r for r in orig["rules"] if r.get("name") not in PREVIEW_NAMES
+                     and r.get("name") != XRAY_RULE_NAME]
     targets = _target_rules(full["rules"])
     previews = []
     labels = {"incy": "Garasu INCY preview", "happ": "Garasu Happ preview",
@@ -131,6 +146,12 @@ def patch(current, links, mode="test"):
         rule["conditions"] = [{"headerName": "user-agent", "operator": "STARTS_WITH",
                                "value": agent, "caseSensitive": False}]
         previews.append(rule)
+    if include_xray:
+        rule = copy.deepcopy(full["rules"][-2])
+        rule["name"] = "Garasu Xray JSON preview"
+        rule["description"] = "TEST ONLY: explicit Xray JSON response"
+        rule["conditions"][0]["value"] = "garasu-test-xray"
+        previews.append(rule)
     orig["rules"] = orig["rules"][:1] + previews + orig["rules"][1:]
     return orig
 
@@ -140,13 +161,16 @@ def main():
     p.add_argument("source", help="Current Remnawave SRR export JSON")
     p.add_argument("destination", help="New output path; original never overwritten")
     p.add_argument("--mode", choices=["test", "full"], default="test")
+    p.add_argument("--with-xray-json", action="store_true",
+                   help="add an explicit Xray JSON rule before BASE64 fallback")
     a = p.parse_args()
     source, dest = Path(a.source), Path(a.destination)
     if source.resolve() == dest.resolve():
         p.error("Input and output paths must differ")
     current = json.loads(source.read_text(encoding="utf-8"))
     links = json.loads((ROOT / "install/links.json").read_text(encoding="utf-8"))
-    result = patch(current, links, mode=a.mode)
+    result = patch(current, links, mode=a.mode,
+                   include_xray=a.with_xray_json)
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("Garasu mode=" + a.mode, "rules=" + str(len(result["rules"])))

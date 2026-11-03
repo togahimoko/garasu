@@ -86,6 +86,24 @@
       "responseType": "CLASH"
     },
     {
+      "name": "Garasu Xray JSON opt-in",
+      "description": "Explicit Xray JSON opt-in; ordinary clients keep XRAY_BASE64 fallback",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "STARTS_WITH",
+          "value": "garasu-xray-json",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "XRAY_JSON",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Xray JSON"
+      }
+    },
+    {
       "name": "Fallback Base64",
       "description": "System critical: do not delete or disable this rule.",
       "enabled": true,

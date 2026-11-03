@@ -224,8 +224,8 @@ def _render_shadowrocket(root, policy, lock):
              "# General RU bypass deliberately disabled for cold-start safety.\n")
     prefix = original.split("[Rule]\n", 1)[0]
     prefix = prefix.replace(
-        "https://raw.githubusercontent.com/togahimoko/garasu/main/clients/canary/shadowrocket.conf",
-        "# Candidate has no published update-url until release promotion")
+        "update-url = https://raw.githubusercontent.com/togahimoko/garasu/main/clients/canary/shadowrocket.conf",
+        "# update-url disabled until the profile receives an immutable release URL")
     local = original.split("[Rule]\n", 1)[1].split("# RKN exceptions", 1)[0]
     result = intro + prefix + "[Rule]\n" + local
     for item in policy["priority"]:

@@ -1,0 +1,184 @@
+# Garasu MAX | Remnawave Mihomo template (not a standalone subscription).
+# Import as MIHOMO TEMPLATE in Remnawave; Remnawave injects each user's nodes.
+# No Moscow proxy chain. Geo/RKN lists auto-update from Garasu GitHub.
+mode: rule
+log-level: warning
+allow-lan: false
+ipv6: false
+unified-delay: true
+tcp-concurrent: true
+profile:
+  store-selected: true
+  store-fake-ip: true
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  default-nameserver:
+    - 1.1.1.1
+    - 8.8.8.8
+  nameserver:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+  # DIRECT destinations should resolve using the local network resolver.
+  direct-nameserver:
+    - system
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - '+.msftconnecttest.com'
+    - '+.msftncsi.com'
+    - 'time.*.com'
+    - 'ntp.*.com'
+# Remnawave inserts the subscriber's permitted nodes here.
+proxies: # LEAVE THIS LINE!
+
+proxy-groups:
+  - name: Garasu
+    type: select
+    proxies:
+      - Garasu Auto
+      - DIRECT
+    remnawave:
+      include-proxies: false
+  - name: Garasu Auto
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 300
+    tolerance: 150
+    include-all: true
+    remnawave:
+      include-proxies: false
+    proxies: # LEAVE THIS LINE!
+      # Personal nodes are selected automatically by include-all.
+rule-providers:
+  rkn-domains:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-domains.list
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-rkn-domains.list
+    interval: 21600
+  youtube:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/youtube.list
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-youtube.list
+    interval: 21600
+  discord:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/discord.list
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-discord.list
+    interval: 21600
+  ai:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ai.list
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-ai.list
+    interval: 21600
+  crypto:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/crypto.list
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-crypto.list
+    interval: 21600
+  proxy:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy.list
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-proxy.list
+    interval: 21600
+  ads:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ads.list
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-ads.list
+    interval: 21600
+  games:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/games.list
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-games.list
+    interval: 21600
+  direct:
+    type: http
+    behavior: domain
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct.list
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-direct.list
+    interval: 21600
+  rkn-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-ips.cidr
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-rkn-ips.cidr
+    interval: 21600
+  proxy-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy-ips.cidr
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-proxy-ips.cidr
+    interval: 21600
+  direct-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct-ips.cidr
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-direct-ips.cidr
+    interval: 21600
+  ru-ips:
+    type: http
+    behavior: ipcidr
+    format: text
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.cidr
+    proxy: Garasu Auto
+    path: ./rule-providers/garasu-ru-ips.cidr
+    interval: 21600
+rules:
+  - RULE-SET,rkn-domains,Garasu
+  - RULE-SET,rkn-ips,Garasu,no-resolve
+  - RULE-SET,youtube,Garasu
+  - RULE-SET,discord,Garasu
+  - RULE-SET,ai,Garasu
+  - RULE-SET,crypto,Garasu
+  - RULE-SET,proxy,Garasu
+  - RULE-SET,proxy-ips,Garasu,no-resolve
+  - RULE-SET,ads,REJECT
+  - RULE-SET,games,DIRECT
+  - RULE-SET,direct,DIRECT
+  - RULE-SET,direct-ips,DIRECT,no-resolve
+  - GEOIP,LAN,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,ru,DIRECT
+  - DOMAIN-SUFFIX,su,DIRECT
+  - DOMAIN-SUFFIX,moscow,DIRECT
+  - DOMAIN-SUFFIX,xn--p1ai,DIRECT
+  - DOMAIN-SUFFIX,xn--p1acf,DIRECT
+  - DOMAIN-SUFFIX,xn--80asehdb,DIRECT
+  - DOMAIN-SUFFIX,xn--c1avg,DIRECT
+  - DOMAIN-SUFFIX,xn--80aswg,DIRECT
+  - DOMAIN-SUFFIX,xn--80adxhks,DIRECT
+  - DOMAIN-SUFFIX,xn--d1acj3b,DIRECT
+  - RULE-SET,ru-ips,DIRECT,no-resolve
+  - MATCH,Garasu

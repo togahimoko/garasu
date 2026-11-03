@@ -30,39 +30,51 @@ TEST_NODE = "garasu-ci-node"
 
 
 class MockProxy(socketserver.BaseRequestHandler):
-    requests = []
-
+    """Minimal CONNECT-capable keep-alive HTTP forwarder for synthetic CI."""
     def handle(self):
         self.request.settimeout(6)
-        buf = b""
-        while b"\r\n\r\n" not in buf and len(buf) < 16384:
-            chunk = self.request.recv(4096)
-            if not chunk:
-                return
-            buf += chunk
-        first = buf.split(b"\r\n", 1)[0].decode("ascii", errors="replace")
-        self.server.seen.append(first)
-        # Mihomo opens an HTTP CONNECT tunnel even when the health-check
-        # URL itself is plain HTTP. The mock must speak both proxy protocols.
-        if first.startswith("CONNECT "):
-            self.request.sendall(b"HTTP/1.1 200 Connection Established\r\n\r\n")
-            buf = b""
-            while b"\r\n\r\n" not in buf and len(buf) < 16384:
-                chunk = self.request.recv(4096)
-                if not chunk:
+        reader = self.request.makefile("rb")
+        try:
+            for _ in range(12):
+                try:
+                    first = reader.readline(16384)
+                except (OSError, TimeoutError):
                     return
-                buf += chunk
-            first = buf.split(b"\r\n", 1)[0].decode("ascii", errors="replace")
-            self.server.seen.append(first)
-        if "/generate_204" in first:
-            payload = b"HTTP/1.1 204 No Content\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-        else:
-            body = b"GARASU_CORE_PROXY_PATH_OK"
-            payload = (b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n"
-                       + b"Content-Length: " + str(len(body)).encode()
-                       + b"\r\nConnection: close\r\n\r\n" + body)
-        self.request.sendall(payload)
-
+                if not first:
+                    return
+                headers = []
+                while True:
+                    line = reader.readline(16384)
+                    if not line or line in (b"\r\n", b"\n"):
+                        break
+                    headers.append(line)
+                request = first.decode("ascii", errors="replace").strip()
+                self.server.seen.append(request)
+                if request.startswith("CONNECT "):
+                    self.request.sendall(
+                        b"HTTP/1.1 200 Connection Established\r\n"
+                        b"Proxy-Agent: Garasu-Mock\r\n\r\n"
+                    )
+                    continue
+                if "/generate_204" in request:
+                    self.request.sendall(
+                        b"HTTP/1.1 204 No Content\r\n"
+                        b"Content-Length: 0\r\nConnection: keep-alive\r\n\r\n"
+                    )
+                else:
+                    body = b"GARASU_CORE_PROXY_PATH_OK"
+                    self.request.sendall(
+                        b"HTTP/1.1 200 OK\r\n"
+                        b"Content-Type: text/plain\r\nContent-Length: "
+                        + str(len(body)).encode()
+                        + b"\r\nConnection: keep-alive\r\n\r\n" + body
+                    )
+                if any(line.lower().startswith(b"connection: close") for line in headers):
+                    return
+        except (OSError, TimeoutError):
+            return
+        finally:
+            reader.close()
 
 class ThreadedTCPServer(socketserver.ThreadingTCPServer):
     allow_reuse_address = True

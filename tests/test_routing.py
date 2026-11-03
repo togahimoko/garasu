@@ -433,6 +433,17 @@ class GarasuTests(unittest.TestCase):
                     self.assertRegex(m.group(1), r"^[\w.-]+/[\w.-]+@[a-f0-9]{40}$",
                                      f"Mutable dependency in {path.name}: {m.group(1)}")
 
+    def test_source_content_swap_with_same_count_is_rejected(self):
+        previous = b"# old\n+.alpha.example\n+.beta.example\n+.gamma.example\n+.delta.example\n"
+        malicious = b"# new\n+.bad1.example\n+.bad2.example\n+.bad3.example\n+.bad4.example\n"
+        routine = b"# new\n+.alpha.example\n+.beta.example\n+.gamma.example\n+.epsilon.example\n"
+        with self.assertRaises(ValueError):
+            mod.validate_source_churn("rules/direct.list", previous, malicious, max_churn=0.4)
+        mod.validate_source_churn("rules/direct.list", previous, routine, max_churn=0.4)
+        mod.validate_source_churn("rules/direct.list", None, routine, max_churn=0.4)
+        with self.assertRaises(ValueError):
+            mod.validate_source_churn("rules/direct.list", previous, b"", max_churn=0.4)
+
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():
             content = path.read_text()

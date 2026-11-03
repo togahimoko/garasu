@@ -8,6 +8,7 @@ if history is missing, a blob differs or an asset's source commit is wrong.
 """
 import argparse
 import hashlib
+import os
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
@@ -66,17 +67,46 @@ def verify_history(root, lock):
     return count
 
 
+def materialize_history(root, lock):
+    """Restore only pinned source assets from verified Git objects for CI.
+
+    This mutates the working tree and is allowed ONLY in an ephemeral Actions
+    job after strict Git-history validation. CLI invocation requires
+    GITHUB_ACTIONS=true, and production scripts never invoke it implicitly.
+    """
+    root = Path(root).resolve()
+    verify_history(root, lock)
+    count = 0
+    for path, metadata in sorted(lock["assets"].items()):
+        target = (root / path).resolve()
+        if not target.is_relative_to(root) or target.is_symlink():
+            raise ValueError("Unsafe CI restore target")
+        data = _git(root, "cat-file", "blob", metadata["git_blob"])
+        if not target.is_file() or target.read_bytes() != data:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+            count += 1
+    return count
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path,
                         default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--ci-materialize", action="store_true",
+                        help="Restore historical asset bytes in CI worktree ONLY")
     args = parser.parse_args()
     root = args.root.resolve()
     policy = unified_policy.load_policy(root / "policy/unified-v1.json")
     lock = unified_policy.load_release_lock(
         root / "policy/unified-release-lock.json", policy)
     print("Verified historical pinned Git assets:", verify_history(root, lock))
-    print("Mutable current-main rule files are intentionally not compared.")
+    if args.ci_materialize:
+        if os.environ.get("GITHUB_ACTIONS") != "true":
+            parser.error("--ci-materialize only permitted in GitHub Actions")
+        print("Restored pinned CI fixtures:", materialize_history(root, lock))
+    else:
+        print("Mutable current-main rule files are intentionally not compared.")
 
 
 if __name__ == "__main__":

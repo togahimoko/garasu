@@ -18,6 +18,16 @@ jobs:
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.2
       - name: Test Garasu data analyzer and existing routing
         run: python -m unittest discover -s tests -v
-      - name: Verify committed quality reports
+      - name: Generate quality report from published rules
+        run: python scripts/audit_rules.py --root . --write
+      - name: Check deterministic report and tracked version when present
         run: |
           python scripts/audit_rules.py --root . --check
+          if git ls-files --error-unmatch reports/quality.json >/dev/null 2>&1; then
+            git diff --exit-code -- reports/quality.json reports/quality.md
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: garasu-rule-quality
+          path: reports/quality.*
+          if-no-files-found: error

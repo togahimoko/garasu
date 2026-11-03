@@ -444,6 +444,26 @@ class GarasuTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             mod.validate_source_churn("rules/direct.list", previous, b"", max_churn=0.4)
 
+    def test_xray_core_fixture_uses_real_geodata_categories(self):
+        import tempfile
+        spec = importlib.util.spec_from_file_location(
+            "garasu_smoke_xray", ROOT / "scripts/smoke_cores.py")
+        plugin = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(plugin)
+        with tempfile.TemporaryDirectory(prefix="garasu-xray-") as d:
+            output = plugin.prepare_xray("clients/xray-advanced-remnawave.json", Path(d))
+            parsed = json.loads(output.read_text())
+            self.assertNotIn("remnawave", parsed)
+            self.assertIn("proxy", [o["tag"] for o in parsed["outbounds"]])
+            referenced = [
+                r for r in parsed["routing"]["rules"]
+                if any(v.startswith("geosite:") for v in r.get("domain", []))
+                   or any(v.startswith("geoip:") for v in r.get("ip", []))
+            ]
+            self.assertGreaterEqual(len(referenced), 3)
+            self.assertTrue((ROOT / "geo/geoip.dat").is_file())
+            self.assertTrue((ROOT / "geo/geosite.dat").is_file())
+
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():
             content = path.read_text()

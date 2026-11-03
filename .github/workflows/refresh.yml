@@ -1,0 +1,52 @@
+name: Garasu - refresh routing
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'clients/**'
+      - 'tests/**'
+      - '.github/workflows/refresh.yml'
+permissions:
+  contents: write
+concurrency:
+  group: garasu-routing-refresh
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check static profiles and builder
+        run: python -m unittest discover -s tests -v
+      - name: Download and validate full routing datasets
+        run: python scripts/refresh.py
+      - name: Verify generated output
+        run: |
+          test -s geo/geoip.dat
+          test -s geo/geosite.dat
+          test -s rules/rkn-domains.list
+          test -s rules/rkn-ips.list
+          test -s rules/rkn-ips.cidr
+          test -s install/links.json
+          python -m unittest discover -s tests -v
+      - name: Publish only complete validated build
+        run: |
+          git config user.name 'garasu-routing-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add rules/ geo/ clients/ install/
+          if git diff --cached --quiet; then
+            echo "No changes: keeping last validated release."
+          else
+            git commit -m "chore: refresh validated Garasu MAX routing data"
+            git push origin HEAD:main
+          fi

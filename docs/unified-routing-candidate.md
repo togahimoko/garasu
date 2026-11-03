@@ -10,7 +10,7 @@ Status: **candidate only**. Nothing in this branch changes the live Remnawave/eG
 - Blocked domains and blocked IPs have priority over broad Russian routing; service PROXY categories precede advertising REJECT.
 - All proxy hosts are injected from each subscriber's Remnawave allocation. No country-specific hostnames or node-count cap.
 - Exhausted node pool must not silently become DIRECT.
-- **General RU TLD/IP DIRECT is deliberately disabled in current candidates.** The full registry is now pinned, but a native cold-start proof that it is loaded before broad RU DIRECT is not yet implemented. The reference oracle shows desired RU behavior only when full exceptions are verified.
+- **General RU bypass stays disabled in ordinary subscription templates.** A separate optional self-contained Mihomo RU-TLD profile is generated only after the complete pinned blocker snapshot passes integrity checks. It embeds 75,306 blocked domains and 25,391 IP ranges, so those two required registries cannot be missing from its cold-start YAML. This has passed Mihomo 1.19.32 parsing, but **runtime DNS rule selection, IPv6 and Russian ISP acceptance remain unverified**. RU IP-literal and Russian-owned foreign-TLD bypass are not enabled.
 
 ## Full registry provenance
 
@@ -39,9 +39,31 @@ The generator writes only under clients/unified/ (not clients/ production files)
 3. sing-box 1.14: full blocked registry, real sing-box 1.14.2 parser passed. Remnawave injection emulated.
 4. Xray advanced: real Xray 26.10.21 parser passed. Existing GeoIP/GeoSite categories are **not** equivalent to a recompiled full unified registry; broad RU bypass disabled.
 5. INCY and Happ JSON: wide foreign DIRECT removed, and optional ad blocking disabled because proprietary block-proxy-direct ordering cannot establish service priority. Native imports and routing headers remain unverified.
-6. Shadowrocket: generator present, but the candidate .conf is not yet checked in; import and automatic updating unverified.
+6. Shadowrocket: generator output is included as a native .conf **inside the offline ZIP artifact**, but is not tracked as a standalone .conf in the Git branch; import and automatic updating unverified.
+7. Mihomo RU TLD snapshot: optional mihomo-ru-tld-verified.yaml included in the offline ZIP. Both full blocker providers are embedded as inline payloads (no network refetch for those lists); general RU DIRECT is limited to Russian domain suffixes and remains absent from ordinary Remnawave templates.
 
-The strict command 'python3 scripts/unified_policy.py --check' requires ALL seven committed candidates to match their generated content. The tests explicitly report missing outputs rather than declaring a complete build.
+The strict command 'python3 scripts/unified_policy.py --check' requires the seven base candidate outputs to be present and byte-identical. Shadowrocket .conf is intentionally packaged by the offline release builder instead of committed as a standalone file. The optional RU TLD profile is a separate eighth variant generated after pinned-registry validation.
+
+## Reproducible local release, recovery and limits
+
+Run on a clean checkout with the pinned source assets:
+
+    python3 -m scripts.package_unified_release --publish --output-dir ./dist/unified
+    python3 -m scripts.package_unified_release --verify --output-dir ./dist/unified
+    python3 -m scripts.package_unified_release --rollback --output-dir ./dist/unified
+
+The content-addressed ZIP includes the pinned policy, release lock, 22 rule
+and geodata files, the seven base candidate profiles, and one optional
+Mihomo Russian-TLD DIRECT profile. bundle-manifest.json indexes the exact
+contents. CURRENT.json is the atomic same-filesystem pointer; the
+previous verified ZIP is retained for rollback. File tampering, corrupted
+archives or missing previous releases block promotion/rollback.
+
+This makes local candidate packaging reproducible; it does **not** provide
+a remotely atomic HTTP cache, live Remnawave subscription update, or an
+installer for proprietary mobile clients. The CI workflow publishes the
+candidate as a downloadable action artifact, not as a public subscription.
+Never upload personal Remnawave keys/subscription content to the artifact.
 
 ## DNS/TUN/subscriptions
 
@@ -80,6 +102,8 @@ matching real client and the panel's SRR are inspected.
 - [x] Reference oracle checks all A/AAAA answers: blocked-IP override, malformed/missing DNS conservative PROXY.
 - [x] Mihomo 1.19.32, sing-box 1.14.2 and Xray 26.10.21 parsers.
 - [x] Mihomo HTTP / TLS CONNECT through a credential-free synthetic node.
+- [x] Offline deterministic ZIP includes seven base profiles plus optional RU TLD Mihomo candidate; same-filesystem CURRENT.json pointer and verified local rollback tested.
+- [x] Real Mihomo 1.19.32 parser accepts full inlined 75,306-domain / 25,391-IP RU TLD variant (syntax/load test only).
 - [ ] Full atomic versioned **profile and native cache** publication with rollback (immutable source-asset delivery itself is implemented).
 - [ ] Cold start verifies full registry **before** general RU DIRECT; blocked-IP and multi-A/AAAA behavior tested.
 - [ ] Native INCY, Happ, Shadowrocket, Stash, Surge, Loon and Quantumult X route behavior and subscription updates.

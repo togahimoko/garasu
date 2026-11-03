@@ -1,0 +1,289 @@
+{
+  "schema_version": 1,
+  "product": "Garasu MAX",
+  "snapshot_sha256": "8dc5ae93c4d3d6fbdfbd68f84772bd6fa95e922bc05d7099db1cf16aa5521968",
+  "manifest_asset_count": 58,
+  "domain_counts": {
+    "rkn-domains": 21989,
+    "youtube": 176,
+    "discord": 28,
+    "ai": 215,
+    "crypto": 96,
+    "proxy": 154,
+    "ads": 1221,
+    "games": 117,
+    "direct": 3282
+  },
+  "ip_counts": {
+    "rkn-ips": {
+      "total": 1141,
+      "ipv4": 1141,
+      "ipv6": 0
+    },
+    "proxy-ips": {
+      "total": 6,
+      "ipv4": 6,
+      "ipv6": 0
+    },
+    "direct-ips": {
+      "total": 28,
+      "ipv4": 16,
+      "ipv6": 12
+    },
+    "ru-ips": {
+      "total": 25157,
+      "ipv4": 12987,
+      "ipv6": 12170
+    }
+  },
+  "policy_order": [
+    "rkn-domains",
+    "rkn-ips",
+    "youtube",
+    "discord",
+    "ai",
+    "crypto",
+    "proxy",
+    "proxy-ips",
+    "ads",
+    "games",
+    "direct",
+    "direct-ips",
+    "ru-ips"
+  ],
+  "policy_overrides": [
+    {
+      "higher_priority": "rkn-domains",
+      "lower_priority": "games",
+      "examples": [
+        {
+          "proxied": "blaper.artstation.com",
+          "direct_suffix": "artstation.com"
+        },
+        {
+          "proxied": "digitalfly.artstation.com",
+          "direct_suffix": "artstation.com"
+        },
+        {
+          "proxied": "tr.rbxcdn.com",
+          "direct_suffix": "rbxcdn.com"
+        }
+      ],
+      "count": 3
+    },
+    {
+      "higher_priority": "rkn-domains",
+      "lower_priority": "direct",
+      "examples": [
+        {
+          "proxied": "alko-scherbinka.at.ua",
+          "direct_suffix": "at.ua"
+        },
+        {
+          "proxied": "antago.at.ua",
+          "direct_suffix": "at.ua"
+        },
+        {
+          "proxied": "anwap.ru.com",
+          "direct_suffix": "ru.com"
+        },
+        {
+          "proxied": "aspina.ucoz.com",
+          "direct_suffix": "ucoz.com"
+        },
+        {
+          "proxied": "buh.ucoz.net",
+          "direct_suffix": "ucoz.net"
+        },
+        {
+          "proxied": "cxema.at.ua",
+          "direct_suffix": "at.ua"
+        },
+        {
+          "proxied": "d.docs.live.net",
+          "direct_suffix": "live.net"
+        },
+        {
+          "proxied": "domodedovo-alko.at.ua",
+          "direct_suffix": "at.ua"
+        },
+        {
+          "proxied": "edgeservices.bing.com",
+          "direct_suffix": "bing.com"
+        },
+        {
+          "proxied": "fangames.at.ua",
+          "direct_suffix": "at.ua"
+        }
+      ],
+      "count": 58
+    },
+    {
+      "higher_priority": "ai",
+      "lower_priority": "direct",
+      "examples": [
+        {
+          "proxied": "coderabbit.gallery.vsassets.io",
+          "direct_suffix": "vsassets.io"
+        },
+        {
+          "proxied": "copilot.microsoft.com",
+          "direct_suffix": "microsoft.com"
+        },
+        {
+          "proxied": "openaiapi-site.azureedge.net",
+          "direct_suffix": "azureedge.net"
+        },
+        {
+          "proxied": "openaiassets.blob.core.windows.net",
+          "direct_suffix": "windows.net"
+        },
+        {
+          "proxied": "openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net",
+          "direct_suffix": "azurefd.net"
+        },
+        {
+          "proxied": "openaicomproductionae4b.blob.core.windows.net",
+          "direct_suffix": "windows.net"
+        },
+        {
+          "proxied": "production-openaicom-storage.azureedge.net",
+          "direct_suffix": "azureedge.net"
+        }
+      ],
+      "count": 7
+    },
+    {
+      "higher_priority": "proxy",
+      "lower_priority": "direct",
+      "examples": [
+        {
+          "proxied": "ads.twitch.tv",
+          "direct_suffix": "twitch.tv"
+        },
+        {
+          "proxied": "copilotprodattachments.blob.core.windows.net",
+          "direct_suffix": "windows.net"
+        },
+        {
+          "proxied": "gql.twitch.tv",
+          "direct_suffix": "twitch.tv"
+        },
+        {
+          "proxied": "playlist.ttvnw.net",
+          "direct_suffix": "ttvnw.net"
+        },
+        {
+          "proxied": "productionresultssa0.blob.core.windows.net",
+          "direct_suffix": "windows.net"
+        },
+        {
+          "proxied": "productionresultssa1.blob.core.windows.net",
+          "direct_suffix": "windows.net"
+        },
+        {
+          "proxied": "productionresultssa10.blob.core.windows.net",
+          "direct_suffix": "windows.net"
+        },
+        {
+          "proxied": "productionresultssa11.blob.core.windows.net",
+          "direct_suffix": "windows.net"
+        },
+        {
+          "proxied": "productionresultssa12.blob.core.windows.net",
+          "direct_suffix": "windows.net"
+        },
+        {
+          "proxied": "productionresultssa13.blob.core.windows.net",
+          "direct_suffix": "windows.net"
+        }
+      ],
+      "count": 25
+    }
+  ],
+  "exact_policy_conflicts": [],
+  "ip_overrides": {
+    "rkn-ips -> direct-ips": {
+      "count": 0,
+      "examples": []
+    },
+    "rkn-ips -> ru-ips": {
+      "count": 1141,
+      "examples": [
+        {
+          "proxied": "103.113.68.20/32",
+          "direct_range": "103.113.68.0/24"
+        },
+        {
+          "proxied": "103.113.68.36/32",
+          "direct_range": "103.113.68.0/24"
+        },
+        {
+          "proxied": "103.113.68.38/32",
+          "direct_range": "103.113.68.0/24"
+        },
+        {
+          "proxied": "103.74.94.222/32",
+          "direct_range": "103.74.94.0/23"
+        },
+        {
+          "proxied": "109.172.36.223/32",
+          "direct_range": "109.172.32.0/20"
+        },
+        {
+          "proxied": "109.172.7.148/32",
+          "direct_range": "109.172.0.0/21"
+        },
+        {
+          "proxied": "109.172.7.197/32",
+          "direct_range": "109.172.0.0/21"
+        },
+        {
+          "proxied": "109.172.84.24/32",
+          "direct_range": "109.172.84.0/22"
+        },
+        {
+          "proxied": "109.172.87.81/32",
+          "direct_range": "109.172.84.0/22"
+        },
+        {
+          "proxied": "109.172.91.83/32",
+          "direct_range": "109.172.88.0/22"
+        }
+      ]
+    },
+    "proxy-ips -> direct-ips": {
+      "count": 0,
+      "examples": []
+    },
+    "proxy-ips -> ru-ips": {
+      "count": 6,
+      "examples": [
+        {
+          "proxied": "185.148.104.0/22",
+          "direct_range": "185.148.104.0/22"
+        },
+        {
+          "proxied": "193.9.49.0/24",
+          "direct_range": "193.9.48.0/23"
+        },
+        {
+          "proxied": "213.241.198.0/24",
+          "direct_range": "213.241.192.0/18"
+        },
+        {
+          "proxied": "31.12.75.0/24",
+          "direct_range": "31.12.75.0/24"
+        },
+        {
+          "proxied": "45.142.120.0/24",
+          "direct_range": "45.142.120.0/24"
+        },
+        {
+          "proxied": "77.232.140.0/24",
+          "direct_range": "77.232.140.0/23"
+        }
+      ]
+    }
+  }
+}

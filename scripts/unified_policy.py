@@ -8,11 +8,10 @@ Published main templates and Remnawave SRR are intentionally unchanged.
 import argparse
 import ipaddress
 import json
-from pathlib import Path
+import re
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
-BRANCH = "feature/unified-routing-astra-2026-11-03"
-BASE = "https://raw.githubusercontent.com/togahimoko/garasu/" + BRANCH
 PROXY_TAG = "Garasu"
 FULL = {
     "rkn-domains-full": "rules/unified/refilter-domain-full.list",
@@ -23,6 +22,98 @@ FULL_SB = {
     "rkn-ips-full": "rules/unified/refilter-ip-full.singbox.json",
 }
 
+
+
+SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+SAFE_PATH = re.compile(r"^[a-zA-Z0-9_./-]+$")
+
+
+def validate_release_lock(lock, policy):
+    """Reject floating refs, unlisted assets, traversal and mixed snapshots."""
+    if not isinstance(lock, dict) or lock.get("schema_version") != 1:
+        raise ValueError("Invalid release lock schema")
+    if lock.get("repository") != "togahimoko/garasu":
+        raise ValueError("Unexpected release repository")
+    if lock.get("source_revision") != policy["snapshot"]["upstream_revision"]:
+        raise ValueError("Release lock / policy upstream revision mismatch")
+    sources = lock.get("sources")
+    if not isinstance(sources, dict) or set(sources) != {"base", "blocked"}:
+        raise ValueError("Invalid release source set")
+    for source in sources.values():
+        if not isinstance(source, dict) or not SHA_RE.fullmatch(source.get("revision", "")):
+            raise ValueError("Release sources must be immutable 40-char Git revisions")
+    categories = lock.get("categories")
+    wanted = {item["category"] for item in policy["priority"]}
+    if not isinstance(categories, dict) or set(categories) != wanted:
+        raise ValueError("Missing or extra release category")
+    assets = lock.get("assets")
+    if not isinstance(assets, dict):
+        raise ValueError("Missing pinned assets")
+    needed = set()
+    for name, mapping in categories.items():
+        expect = "blocked" if name.endswith("-full") else "base"
+        if not isinstance(mapping, dict) or set(mapping) != {
+                "source", "mihomo", "singbox", "shadowrocket"}:
+            raise ValueError("Invalid category format mapping")
+        if mapping["source"] != expect:
+            raise ValueError("Mixed full-refilter and original release source")
+        for engine in ("mihomo", "singbox", "shadowrocket"):
+            candidate = mapping[engine]
+            if not isinstance(candidate, str) or not candidate.startswith("rules/"):
+                raise ValueError("Untrusted asset location")
+            needed.add(candidate)
+            if engine == "singbox" and not candidate.endswith(".json"):
+                raise ValueError("sing-box source must be JSON")
+            if engine == "mihomo" and name.endswith("ips") and not candidate.endswith(".cidr"):
+                raise ValueError("Mihomo IP rule-set needs CIDR")
+    geo = lock.get("geodata")
+    if not isinstance(geo, dict) or set(geo) != {"source", "geoip", "geosite"}:
+        raise ValueError("Geodata not declared")
+    if geo["source"] != "base":
+        raise ValueError("Geodata from unrelated release")
+    for kind in ("geoip", "geosite"):
+        path = geo[kind]
+        if path != "geo/" + kind + ".dat":
+            raise ValueError("Invalid GeoIP/GeoSite path")
+        needed.add(path)
+    if set(assets) != needed:
+        raise ValueError("Release asset inventory is not exhaustive")
+    for path, info in assets.items():
+        if (not SAFE_PATH.fullmatch(path) or "\\" in path
+                or any(x in ("", ".", "..") for x in PurePosixPath(path).parts)):
+            raise ValueError("Path traversal or unusual release asset")
+        if not isinstance(info, dict) or set(info) != {"source", "git_blob", "bytes"}:
+            raise ValueError("Invalid pinned asset metadata")
+        if (info["source"] not in sources or not SHA_RE.fullmatch(
+                info.get("git_blob", "")) or not isinstance(info.get("bytes"), int)
+                or info["bytes"] < 1):
+            raise ValueError("Missing asset content integrity metadata")
+    for entry in categories.values():
+        for kind in ("mihomo", "singbox", "shadowrocket"):
+            if assets[entry[kind]]["source"] != entry["source"]:
+                raise ValueError("Asset revision disagrees with category source")
+    if any(assets[geo[kind]]["source"] != "base" for kind in ("geoip", "geosite")):
+        raise ValueError("Geodata revision disagrees with base release")
+    return lock
+
+
+def load_release_lock(path, policy):
+    lock = json.loads(Path(path).read_text(encoding="utf-8"))
+    return validate_release_lock(lock, policy)
+
+
+def asset_url(lock, category, engine):
+    mapping = lock["categories"][category]
+    path = mapping[engine]
+    rev = lock["sources"][mapping["source"]]["revision"]
+    return "https://raw.githubusercontent.com/" + lock["repository"] + "/" + rev + "/" + path
+
+
+def geo_url(lock, kind):
+    source = lock["geodata"]["source"]
+    revision = lock["sources"][source]["revision"]
+    return ("https://raw.githubusercontent.com/" + lock["repository"] + "/"
+            + revision + "/" + lock["geodata"][kind])
 
 def load_policy(path):
     data = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -81,23 +172,12 @@ def decide(policy, hostname, address=None, *, blocked_domains=(),
     return "PROXY"
 
 
-def _url(category, *, singbox=False, shadowrocket_ip=False):
-    if singbox and category in FULL_SB:
-        return BASE + "/" + FULL_SB[category]
-    if shadowrocket_ip and category == "rkn-ips-full":
-        return BASE + "/rules/unified/refilter-ip-full-shadowrocket.list"
-    if category in FULL:
-        return BASE + "/" + FULL[category]
-    suffix = ".cidr" if category == "proxy-ips" and not singbox else ".list"
-    if singbox:
-        return ("https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/"
-                + category + ".json")
-    if shadowrocket_ip and category == "proxy-ips":
-        suffix = ".list"
-    return "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/" + category + suffix
+def _url(category, *, singbox=False, shadowrocket_ip=False, lock):
+    engine = "singbox" if singbox else "shadowrocket" if shadowrocket_ip else "mihomo"
+    return asset_url(lock, category, engine)
 
 
-def _all_providers(policy, *, mihomo):
+def _all_providers(policy, *, mihomo, lock):
     result = []
     for item in policy["priority"]:
         category = item["category"]
@@ -107,7 +187,7 @@ def _all_providers(policy, *, mihomo):
             "    type: http",
             "    behavior: " + ("ipcidr" if ip else "domain"),
             "    format: text",
-            "    url: " + _url(category),
+            "    url: " + _url(category, lock=lock),
         ])
         if mihomo:
             result.append("    proxy: Garasu Auto")
@@ -121,13 +201,13 @@ def _local_yaml(source):
     return local.split("  - RULE-SET,rkn-domains,Garasu", 1)[0]
 
 
-def _render_yaml(root, policy, filename, *, mihomo):
+def _render_yaml(root, policy, filename, *, mihomo, lock):
     source = (root / "clients/canary" / filename).read_text(encoding="utf-8")
     prefix = source.split("rule-providers:\n", 1)[0]
     intro = ("# Garasu Unified v1 CANDIDATE — not activated in Remnawave.\n"
              "# RU bypass is disabled until complete blocked-registry startup is\n"
              "# verified on the native client (no fail-open on cold cache).\n")
-    result = intro + prefix + "rule-providers:\n" + _all_providers(policy, mihomo=mihomo)
+    result = intro + prefix + "rule-providers:\n" + _all_providers(policy, mihomo=mihomo, lock=lock)
     result += "rules:\n" + _local_yaml(source)
     for item in policy["priority"]:
         cat = item["category"]
@@ -138,14 +218,14 @@ def _render_yaml(root, policy, filename, *, mihomo):
     return result
 
 
-def _render_shadowrocket(root, policy):
+def _render_shadowrocket(root, policy, lock):
     original = (root / "clients/canary/shadowrocket.conf").read_text(encoding="utf-8")
     intro = ("# Garasu Unified v1 CANDIDATE; import personal nodes separately.\n"
              "# General RU bypass deliberately disabled for cold-start safety.\n")
     prefix = original.split("[Rule]\n", 1)[0]
     prefix = prefix.replace(
         "https://raw.githubusercontent.com/togahimoko/garasu/main/clients/canary/shadowrocket.conf",
-        BASE + "/clients/unified/shadowrocket.conf")
+        "# Candidate has no published update-url until release promotion")
     local = original.split("[Rule]\n", 1)[1].split("# RKN exceptions", 1)[0]
     result = intro + prefix + "[Rule]\n" + local
     for item in policy["priority"]:
@@ -153,11 +233,11 @@ def _render_shadowrocket(root, policy):
         ip = item["kind"] == "ipcidr"
         kind = "RULE-SET" if ip else "DOMAIN-SET"
         action = item["action"]
-        result += kind + "," + _url(cat, shadowrocket_ip=ip) + "," + action + "\n"
+        result += kind + "," + asset_url(lock, cat, "shadowrocket") + "," + action + "\n"
     return result + "FINAL,PROXY,dns-failed\n"
 
 
-def _render_singbox(root, policy):
+def _render_singbox(root, policy, lock):
     base = json.loads((root / "clients/canary/singbox-remnawave-1.14.json").read_text())
     previous = {x["tag"]: x for x in base["route"]["rule_set"]}
     providers = []
@@ -169,7 +249,7 @@ def _render_singbox(root, policy):
         else:
             item = {"type": "remote", "tag": tag, "format": "source",
                     "update_interval": "6h", "http_client": "garasu-rules"}
-        item["url"] = _url(category, singbox=True)
+        item["url"] = _url(category, singbox=True, lock=lock)
         providers.append(item)
     base["route"]["rule_set"] = providers
     old = base["route"]["rules"]
@@ -195,7 +275,7 @@ def _render_xray(root, policy):
     return json.dumps(config, ensure_ascii=False, indent=2) + "\n"
 
 
-def _render_mobile_xray(root, policy):
+def _render_mobile_xray(root, policy, lock):
     config = json.loads((root / "clients/incy.json").read_text())
     config["Name"] = "Garasu Unified v1 CANDIDATE"
     # The production profile contains a moving refresh timestamp. Unified
@@ -207,22 +287,25 @@ def _render_mobile_xray(root, policy):
     # Keep native ad filtering off until the proprietary client is tested.
     config["BlockSites"] = []
     config["BlockIp"] = []
+    config["Geoipurl"] = geo_url(lock, "geoip")
+    config["Geositeurl"] = geo_url(lock, "geosite")
     return json.dumps(config, ensure_ascii=False, indent=2) + "\n"
 
 
 def build_candidates(root, policy):
     root = Path(root)
+    lock = load_release_lock(root / "policy/unified-release-lock.json", policy)
     # Candidate-only outputs: NEVER write clients/ production paths.
     result = {
         "clients/unified/mihomo-remnawave.yaml":
-            _render_yaml(root, policy, "mihomo-remnawave.yaml", mihomo=True),
+            _render_yaml(root, policy, "mihomo-remnawave.yaml", mihomo=True, lock=lock),
         "clients/unified/stash-remnawave.yaml":
-            _render_yaml(root, policy, "stash-remnawave.yaml", mihomo=False),
-        "clients/unified/shadowrocket.conf": _render_shadowrocket(root, policy),
-        "clients/unified/singbox-remnawave-1.14.json": _render_singbox(root, policy),
+            _render_yaml(root, policy, "stash-remnawave.yaml", mihomo=False, lock=lock),
+        "clients/unified/shadowrocket.conf": _render_shadowrocket(root, policy, lock),
+        "clients/unified/singbox-remnawave-1.14.json": _render_singbox(root, policy, lock),
         "clients/unified/xray-advanced-remnawave.json": _render_xray(root, policy),
-        "clients/unified/incy.json": _render_mobile_xray(root, policy),
-        "clients/unified/happ.json": _render_mobile_xray(root, policy),
+        "clients/unified/incy.json": _render_mobile_xray(root, policy, lock),
+        "clients/unified/happ.json": _render_mobile_xray(root, policy, lock),
     }
     return result
 

@@ -1,4 +1,4 @@
-"""Offline cross-format policy oracle for one Czech node.
+"""Offline cross-format policy oracle for any number of nodes.
 
 Uses committed rule sets and exact order from canary profile files.
 This catches policy drift and adapter inconsistencies, not client runtime
@@ -17,7 +17,7 @@ DIRECT = "DIRECT"
 REJECT = "REJECT"
 
 GOLDEN = {
-    # Hostname -> intended policy. One Remnawave node, not multiple exits.
+    # Hostname -> intended policy. Proxy goes via available Remnawave nodes.
     "printer.local": DIRECT,
     "printer.home.arpa": DIRECT,
     "www.yandex.ru": DIRECT,

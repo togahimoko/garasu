@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def prepare_mihomo(template, out, node_count=1):
-    """Emulate 1..32 Remnawave subscribers' nodes without real credentials."""
+    """Emulate a 0..32-node Remnawave subscription without real credentials."""
     if not isinstance(node_count, int) or not 0 <= node_count <= 32:
         raise ValueError("node_count must be in 0..32")
     doc = yaml.safe_load((ROOT / template).read_text(encoding="utf-8"))

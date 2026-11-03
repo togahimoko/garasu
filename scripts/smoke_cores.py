@@ -14,23 +14,31 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def prepare_mihomo(template, out):
+def prepare_mihomo(template, out, node_count=1):
+    """Emulate 1..32 Remnawave subscribers' nodes without real credentials."""
+    if not isinstance(node_count, int) or not 1 <= node_count <= 32:
+        raise ValueError("node_count must be in 1..32")
     doc = yaml.safe_load((ROOT / template).read_text(encoding="utf-8"))
     if "proxies" not in doc or doc["proxies"] is not None:
         raise ValueError("Missing Remnawave top-level injection marker")
-    # Emulate subscriber node injection. Loopback-only invalid external endpoint.
-    doc["proxies"] = [{
-        "name": "garasu-ci-node",
-        "type": "http",
-        "server": "127.0.0.1",
-        "port": 1080,
-        "udp": False,
-    }]
+    names = [
+        "garasu-ci-node" if node_count == 1 else "garasu-ci-node-" + str(i + 1)
+        for i in range(node_count)
+    ]
+    doc["proxies"] = [
+        {"name": name, "type": "http", "server": "127.0.0.1",
+         "port": 1080 + i, "udp": False}
+        for i, name in enumerate(names)
+    ]
     for group in doc["proxy-groups"]:
         group.pop("remnawave", None)
         if group.get("proxies") is None:
-            group["proxies"] = ["garasu-ci-node"] if group["name"] == "Garasu" else []
+            # Stash uses an injected direct membership list. Mihomo's
+            # Garasu Auto is populated dynamically by include-all=true.
+            group["proxies"] = names if group["name"] == "Garasu" else []
     assert doc["proxy-groups"]
+    assert all(not isinstance(x.get("proxies"), type(None))
+               for x in doc["proxy-groups"])
     # Use committed local providers to test parsing without network fluctuations.
     for name, provider in doc["rule-providers"].items():
         remote = provider["url"].split("/rules/", 1)[-1]

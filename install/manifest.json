@@ -360,12 +360,16 @@
     "geo/geoip.dat": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/v2ray/geoip.dat",
       "sha256": "d231316c3c43b9805c35f07179cf9672bdbf588da5e38a98a1434113d7ca49f1",
-      "bytes": 1049786
+      "bytes": 1049786,
+      "source_sha256": "1bd2cefb1e4d108c88c19dc463ec6cd854539ef5a90cb7aa431525c04d722dcd",
+      "source_bytes": 807285
     },
     "geo/geosite.dat": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/v2ray/geosite.dat",
       "sha256": "11a5219411c4de6722072be24a883c1e0bb7b45d60f46d4bac94a00dc677f849",
-      "bytes": 2189335
+      "bytes": 2189335,
+      "source_sha256": "9b380c4c27e5eec8efc42a0634b83dafa1d3d590045752edaf2e69d5f02dbed7",
+      "source_bytes": 623393
     }
   }
 }

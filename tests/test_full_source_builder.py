@@ -1,6 +1,7 @@
 """The complete blocked snapshot must reach every published client format."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -50,6 +51,17 @@ class FullSourceBuilderTests(unittest.TestCase):
                          (sha + "\trefs/heads/main\n" + sha + "\trefs/heads/main\n").encode()):
             with self.subTest(response=response), self.assertRaises(ValueError):
                 refresh.parse_git_revision(response)
+
+    def test_commit_date_is_pinned_to_the_upstream_revision(self):
+        sha = "a" * 40
+        patch_header = ("From " + sha + " Mon Sep 17 00:00:00 2001\n"
+                        "From: Bot <bot@example.com>\n"
+                        "Date: Tue, 3 Nov 2026 15:04:26 +0000\n"
+                        "Subject: [PATCH] update\n\n").encode()
+        self.assertEqual(refresh.parse_upstream_commit_date(patch_header, sha),
+                         "1793718266")
+        with self.assertRaises(ValueError):
+            refresh.parse_upstream_commit_date(patch_header, "b" * 40)
 
     def test_one_time_full_source_migration_keeps_future_churn_gate(self):
         old = {"files": {"rules/rkn-domains.list": {
@@ -117,11 +129,41 @@ class FullSourceBuilderTests(unittest.TestCase):
                  patch.object(refresh, "DOMAIN", {"ads": ("release/reject.list", 1),
                                                  "ai": ("release/ai.list", 1)}), \
                  patch.object(refresh, "resolve_upstream_revision", return_value="a" * 40), \
+                 patch.object(refresh, "upstream_commit_date", return_value="1793718266"), \
                  patch.object(refresh, "fetch", side_effect=[b"+.example.com\n",
                                                             ValueError("invalid full source")]):
                 with self.assertRaisesRegex(ValueError, "invalid full source"):
                     refresh.run()
             self.assertEqual(target.read_bytes(), b"# previous valid snapshot\n+.example.com\n")
+
+    def test_promotion_rolls_back_files_when_a_replace_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "published"
+            stage = Path(tmp) / "stage"
+            root.mkdir()
+            stage.mkdir()
+            for name, data in {"one": b"old one", "two": b"old two"}.items():
+                (root / name).write_bytes(data)
+                (stage / name).write_bytes(b"new " + name.encode())
+            (stage / "three").write_bytes(b"new three")
+            actual_replace = os.replace
+            calls = 0
+
+            def fail_second_replace(source, target):
+                nonlocal calls
+                calls += 1
+                if calls == 2:
+                    raise OSError("simulated promotion failure")
+                return actual_replace(source, target)
+
+            with patch.object(refresh.os, "replace", side_effect=fail_second_replace):
+                with self.assertRaisesRegex(OSError, "simulated promotion failure"):
+                    refresh.promote_staged(root, stage, {"one": b"new one",
+                                                        "two": b"new two",
+                                                        "three": b"new three"})
+            self.assertEqual((root / "one").read_bytes(), b"old one")
+            self.assertEqual((root / "two").read_bytes(), b"old two")
+            self.assertFalse((root / "three").exists())
 
     def test_published_snapshot_manifest_matches_all_blocked_formats(self):
         root = Path(__file__).resolve().parents[1]
@@ -146,6 +188,17 @@ class FullSourceBuilderTests(unittest.TestCase):
             "banned-ru"], sources["blocked_domains"]["entries"])
         self.assertEqual(refresh.validate_geodata("geoip.dat", (root / "geo/geoip.dat").read_bytes())[
             "blocked-ru"], sources["blocked_ips"]["entries"])
+
+    def test_geo_manifest_records_raw_input_and_generated_output_digests(self):
+        root = Path(__file__).resolve().parents[1]
+        manifest = json.loads((root / "install/manifest.json").read_text())
+        for name in ("geosite.dat", "geoip.dat"):
+            path = "geo/" + name
+            record = manifest["files"][path]
+            self.assertEqual(record["sha256"], hashlib.sha256((root / path).read_bytes()).hexdigest())
+            self.assertGreater(record["source_bytes"], 200000)
+            self.assertRegex(record["source_sha256"], r"^[0-9a-f]{64}$")
+            self.assertNotEqual(record["source_sha256"], record["sha256"])
 
 
 if __name__ == "__main__":

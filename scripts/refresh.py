@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Garasu routing data publisher. Standard library only; no VPN credentials."""
 import base64
+from email.utils import parsedate_to_datetime
 import hashlib
 import ipaddress
 import json
@@ -84,6 +85,35 @@ def resolve_upstream_revision():
     if len(result.stdout) > 1024:
         raise ValueError("Unexpectedly large upstream Git ref response")
     return parse_git_revision(result.stdout)
+
+
+def parse_upstream_commit_date(blob, revision):
+    """Extract a stable Unix timestamp from a patch for the pinned commit."""
+    if not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("Invalid upstream revision")
+    header = blob.decode("utf-8").split("\n\n", 1)[0].splitlines()
+    if not header or header[0] != "From " + revision + " Mon Sep 17 00:00:00 2001":
+        raise ValueError("Commit patch does not match upstream revision")
+    dates = [line[6:] for line in header if line.startswith("Date: ")]
+    if len(dates) != 1:
+        raise ValueError("Commit patch has no unique date")
+    parsed = parsedate_to_datetime(dates[0])
+    if parsed.tzinfo is None:
+        raise ValueError("Commit patch date has no timezone")
+    return str(int(parsed.timestamp()))
+
+
+def upstream_commit_date(revision):
+    """Read immutable commit metadata without using GitHub's API endpoint."""
+    if not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("Invalid upstream revision")
+    url = "https://github.com/DigneZzZ/routing/commit/" + revision + ".patch"
+    request = urllib.request.Request(url, headers={"User-Agent": "Garasu-Routing/1.0"})
+    with urllib.request.urlopen(request, timeout=20) as response:
+        if response.status != 200 or response.url != url:
+            raise ValueError("Upstream commit patch lookup failed")
+        header = response.read(8192)
+    return parse_upstream_commit_date(header, revision)
 
 
 def fetch(path, revision):
@@ -436,10 +466,56 @@ def validate_source_churn(path, previous_blob, current_blob, max_churn=0.5):
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
+
+def promote_staged(root, stage, generated):
+    """Promote all files with prepared backups; restore on a write failure."""
+    changed = {relative for relative, data in generated.items()
+               if not (root / relative).is_file() or (root / relative).read_bytes() != data}
+    if not changed:
+        return
+    with tempfile.TemporaryDirectory(prefix=".garasu-publish-", dir=root) as workspace:
+        workspace = Path(workspace)
+        incoming = workspace / "incoming"
+        backups = workspace / "backups"
+        existed = set()
+        for relative in sorted(changed):
+            prepared = incoming / relative
+            prepared.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(stage / relative, prepared)
+            target = root / relative
+            if target.is_file():
+                saved = backups / relative
+                saved.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(target, saved)
+                existed.add(relative)
+        promoted = []
+        try:
+            for relative in sorted(changed):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(incoming / relative, target)
+                promoted.append(relative)
+        except OSError:
+            failures = []
+            for relative in reversed(promoted):
+                target = root / relative
+                try:
+                    if relative in existed:
+                        os.replace(backups / relative, target)
+                    else:
+                        target.unlink()
+                except OSError as error:
+                    failures.append(str(error))
+            if failures:
+                raise RuntimeError("Promotion failed and rollback was incomplete: "
+                                   + "; ".join(failures))
+            raise
+
 def run():
     if not re.fullmatch(r"[\w.-]+/[\w.-]+", REPO):
         raise ValueError("Invalid GITHUB_REPOSITORY")
     revision = resolve_upstream_revision()
+    last_updated = upstream_commit_date(revision)
     upstream_origin = "https://raw.githubusercontent.com/DigneZzZ/routing/" + revision
     previous_path = ROOT / "install/manifest.json"
     previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
@@ -449,7 +525,7 @@ def run():
         generated = {}
         source_metadata = {}
         source_bytes = {}
-        def add(path, data, source=None, count=None):
+        def add(path, data, source=None, count=None, source_blob=None):
             if path.startswith("rules/") and path.count("/") == 1:
                 current = ROOT / path
                 previous_blob = current.read_bytes() if current.is_file() else None
@@ -460,6 +536,9 @@ def run():
             generated[path] = data
             if source is not None:
                 entry = {"source": upstream_raw_url(revision, source), "sha256": digest(data), "bytes": len(data)}
+                if source_blob is not None:
+                    entry["source_sha256"] = digest(source_blob)
+                    entry["source_bytes"] = len(source_blob)
                 if count is not None:
                     entry["entries"] = count
                 records[path] = entry
@@ -497,7 +576,8 @@ def run():
             if len(source_bytes[key]) != info["bytes"] or digest(source_bytes[key]) != info["sha256"]:
                 raise ValueError("Blocked input integrity mismatch: " + key)
         for name, (source, minimum) in GEO.items():
-            blob = fetch(source, revision)
+            original = fetch(source, revision)
+            blob = original
             if len(blob) < minimum or blob.startswith(b"<html"):
                 raise ValueError("Invalid geodata " + name)
             validate_geodata(name, blob)
@@ -513,7 +593,7 @@ def run():
                 required_count = source_metadata["blocked_ips"]["entries"]
             if validate_geodata(name, blob)[required_category] != required_count:
                 raise ValueError("Geodata blocked category differs from complete source")
-            add("geo/" + name, blob, source)
+            add("geo/" + name, blob, source, source_blob=original)
         validate_update_budget(records, previous)
         changed = previous.get("files") != records
         manifest = {"name": "Garasu MAX", "upstream": upstream_origin,
@@ -521,15 +601,13 @@ def run():
                     "files": records}
         add("install/manifest.json", (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode())
         base = "https://raw.githubusercontent.com/" + REPO + "/main"
-        last_updated = str(int(time.time())) if changed else None
         for app in ("incy", "happ"):
             profile = json.loads((ROOT / "clients" / (app + ".json")).read_text())
             profile["Name"] = "Garasu MAX"
             profile["GlobalProxy"] = "true"
             profile["Geoipurl"] = base + "/geo/geoip.dat"
             profile["Geositeurl"] = base + "/geo/geosite.dat"
-            if last_updated:
-                profile["LastUpdated"] = last_updated
+            profile["LastUpdated"] = last_updated
             encoded = (json.dumps(profile, ensure_ascii=False, indent=2) + "\n").encode()
             add("clients/" + app + ".json", encoded)
             if app == "happ":
@@ -577,11 +655,7 @@ def run():
         )
         for relative in ("reports/quality.json", "reports/quality.md"):
             generated[relative] = (temp / relative).read_bytes()
-        for relative, data in generated.items():
-            target = ROOT / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            if not target.exists() or target.read_bytes() != data:
-                shutil.copyfile(temp / relative, target)
+        promote_staged(ROOT, temp, generated)
         print("Garasu MAX: " + str(len(records)) + " validated datasets; changed=" + str(changed))
 
 if __name__ == "__main__":

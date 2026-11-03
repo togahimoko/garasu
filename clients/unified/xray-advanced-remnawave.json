@@ -24,14 +24,6 @@
       {
         "type": "field",
         "domain": [
-          "geosite:category-ads",
-          "geosite:win-spy"
-        ],
-        "outboundTag": "block"
-      },
-      {
-        "type": "field",
-        "domain": [
           "geosite:banned-ru",
           "geosite:youtube",
           "geosite:discord",
@@ -52,6 +44,14 @@
           "geoip:telegram"
         ],
         "outboundTag": "proxy"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ads",
+          "geosite:win-spy"
+        ],
+        "outboundTag": "block"
       },
       {
         "type": "field",

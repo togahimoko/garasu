@@ -17,6 +17,10 @@ jobs:
       - name: Install validator
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.2
       - name: Verify all existing and canary rules
+        # Historical immutable assets are checked strictly in the unified gate;
+        # current-main geodata may already have advanced from the old lock.
+        env:
+          GARASU_ALLOW_REFRESHED_CANDIDATE_SKIP: '1'
         run: python -m unittest discover -s tests -v
       - name: Generate credential-free canary fixtures
         env:

@@ -80,7 +80,7 @@ rule-providers:
     type: http
     behavior: domain
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/eae553c8eea684d96b83de964c949104ee9acc23/rules/unified/refilter-domain-full.list
+    url: https://raw.githubusercontent.com/togahimoko/garasu/2fb95bafa8e674b232187c6cdcd39aefd6131465/rules/unified/refilter-domain-full.list
     proxy: Garasu Auto
     path: ./garasu-unified/rkn-domains-full.txt
     interval: 21600
@@ -88,7 +88,7 @@ rule-providers:
     type: http
     behavior: ipcidr
     format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/eae553c8eea684d96b83de964c949104ee9acc23/rules/unified/refilter-ip-full.cidr
+    url: https://raw.githubusercontent.com/togahimoko/garasu/2fb95bafa8e674b232187c6cdcd39aefd6131465/rules/unified/refilter-ip-full.cidr
     proxy: Garasu Auto
     path: ./garasu-unified/rkn-ips-full.txt
     interval: 21600

@@ -357,6 +357,12 @@
       "bytes": 886776,
       "entries": 25157
     },
+    "rules/quantumultx/ru-tlds.list": {
+      "source": "garasu:routing-policy:ru-suffixes",
+      "sha256": "88d060560a38060f9f2cce84f3d84c88bd36c330f175d0f67efa89b5256e0921",
+      "bytes": 337,
+      "entries": 10
+    },
     "geo/geoip.dat": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/v2ray/geoip.dat",
       "sha256": "d231316c3c43b9805c35f07179cf9672bdbf588da5e38a98a1434113d7ca49f1",
@@ -371,26 +377,20 @@
       "source_sha256": "9b380c4c27e5eec8efc42a0634b83dafa1d3d590045752edaf2e69d5f02dbed7",
       "source_bytes": 623393
     },
-    "rules/quantumultx/ru-tlds.list": {
-      "source": "garasu:routing-policy:ru-suffixes",
-      "sha256": "88d060560a38060f9f2cce84f3d84c88bd36c330f175d0f67efa89b5256e0921",
-      "bytes": 337,
-      "entries": 10
-    },
-    "clients/shadowrocket.conf": {
-      "source": "garasu:managed-config:shadowrocket",
-      "sha256": "ac8907fd44a52a3ff381e907d0b1e1a1cba31b37c069cbc6c72d80a681be3b8e",
-      "bytes": 2325
+    "clients/incy.json": {
+      "source": "garasu:profile-template:incy",
+      "sha256": "e6c24295f9397b09551ca5c891cc630f86380d85618f71685ef18e1b7b855bb1",
+      "bytes": 1348
     },
     "clients/happ.json": {
       "source": "garasu:profile-template:happ",
       "sha256": "e6c24295f9397b09551ca5c891cc630f86380d85618f71685ef18e1b7b855bb1",
       "bytes": 1348
     },
-    "clients/incy.json": {
-      "source": "garasu:profile-template:incy",
-      "sha256": "e6c24295f9397b09551ca5c891cc630f86380d85618f71685ef18e1b7b855bb1",
-      "bytes": 1348
+    "clients/shadowrocket.conf": {
+      "source": "garasu:managed-config:shadowrocket",
+      "sha256": "ac8907fd44a52a3ff381e907d0b1e1a1cba31b37c069cbc6c72d80a681be3b8e",
+      "bytes": 2325
     }
   }
 }

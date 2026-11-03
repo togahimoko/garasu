@@ -39,6 +39,9 @@ class PinnedGitHistory(unittest.TestCase):
             # not mutate the locked historical Git release.
             asset.write_bytes(b"+.different.example.org\n")
             self.assertEqual(history.verify_history(directory, lock), 1)
+            self.assertEqual(history.materialize_history(directory, lock), 1)
+            self.assertEqual(asset.read_bytes(), payload)
+
             lock["assets"]["rules/test.list"]["bytes"] += 1
             with self.assertRaises(ValueError):
                 history.verify_history(directory, lock)

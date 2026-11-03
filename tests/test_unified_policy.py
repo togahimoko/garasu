@@ -69,14 +69,14 @@ class UnifiedPolicyTests(unittest.TestCase):
         good = {
             "blocked_domains": {
                 "dataset": "refilter-domain-full",
-                "url": f"https://example.test/{revision}/refilter-domain-full.list",
+                "url": f"https://raw.githubusercontent.com/DigneZzZ/routing/{revision}/release/refilter-domain-full.list",
                 "revision": revision,
                 "sha256": "b" * 64,
                 "entries": 100,
             },
             "blocked_ips": {
                 "dataset": "refilter-ip-full",
-                "url": f"https://example.test/{revision}/refilter-ip-full.list",
+                "url": f"https://raw.githubusercontent.com/DigneZzZ/routing/{revision}/release/refilter-ip-full.list",
                 "revision": revision,
                 "sha256": "c" * 64,
                 "entries": 50,
@@ -87,7 +87,10 @@ class UnifiedPolicyTests(unittest.TestCase):
             {"blocked_domains": good["blocked_domains"]},
             {**good, "blocked_domains": {**good["blocked_domains"], "dataset": "refilter-domain"}},
             {**good, "blocked_ips": {**good["blocked_ips"], "sha256": ""}},
-            {**good, "blocked_ips": {**good["blocked_ips"], "url": "https://example.test/main/refilter-ip-full.list"}},
+            {**good, "blocked_ips": {**good["blocked_ips"], "url": "https://raw.githubusercontent.com/DigneZzZ/routing/main/release/refilter-ip-full.list"}},
+            {**good, "blocked_domains": {**good["blocked_domains"], "url": f"https://example.test/DigneZzZ/routing/{revision}/release/refilter-domain-full.list"}},
+            {**good, "blocked_domains": {**good["blocked_domains"], "url": f"https://raw.githubusercontent.com/other/routing/{revision}/release/refilter-domain-full.list"}},
+            {**good, "blocked_ips": {**good["blocked_ips"], "url": f"https://raw.githubusercontent.com/{revision}/DigneZzZ/routing/release/refilter-ip-full.list"}},
             {**good, "blocked_ips": {**good["blocked_ips"], "revision": "d" * 40}},
         ):
             with self.subTest(bad=bad), self.assertRaises(ValueError):

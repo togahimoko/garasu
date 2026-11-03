@@ -15,7 +15,6 @@ its caller has already enforced that gate.
 
 import ipaddress
 import re
-from urllib.parse import urlsplit
 
 
 _LAN_NETWORKS = tuple(ipaddress.ip_network(value) for value in (
@@ -112,11 +111,9 @@ def validate_source_metadata(metadata: dict[str, dict[str, object]]) -> None:
             raise ValueError("Invalid blocked source metadata: " + key)
         if not isinstance(url, str):
             raise ValueError("Invalid blocked source URL: " + key)
-        parsed = urlsplit(url)
-        path = parsed.path.strip("/").split("/")
-        if (parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password
-                or parsed.query or parsed.fragment or revision not in path
-                or path[-1] != dataset + ".list"):
+        expected_url = ("https://raw.githubusercontent.com/DigneZzZ/routing/"
+                        + revision + "/release/" + dataset + ".list")
+        if url != expected_url:
             raise ValueError("Blocked source URL is not pinned: " + key)
         revisions.add(revision.lower())
     if len(revisions) != 1:

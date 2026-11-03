@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 import socket
 import socketserver
+import ssl
 import subprocess
 import tempfile
 import threading
@@ -55,7 +56,38 @@ class MockProxy(socketserver.BaseRequestHandler):
                         b"HTTP/1.1 200 Connection Established\r\n"
                         b"Proxy-Agent: Garasu-Mock\r\n\r\n"
                     )
-                    continue
+                    # Mihomo also CONNECT-tunnels HTTP destinations on port 80.
+                    # Preserve plaintext handling for latency/HTTP probes; only
+                    # perform a TLS handshake for the dedicated HTTPS test.
+                    target = request.split(" ", 2)[1]
+                    if not target.endswith(":443"):
+                        continue
+                    # Terminate a genuine TLS session at the synthetic node:
+                    # this tests CONNECT + TLS, not only a plaintext GET.
+                    with self.server.ssl_context.wrap_socket(
+                            self.request, server_side=True) as secure:
+                        secure.settimeout(6)
+                        tls_reader = secure.makefile("rb")
+                        try:
+                            tls_request = tls_reader.readline(16384)
+                            if not tls_request:
+                                return
+                            while True:
+                                line = tls_reader.readline(16384)
+                                if not line or line in (b"\r\n", b"\n"):
+                                    break
+                            self.server.seen.append(
+                                "TLS " + tls_request.decode("ascii", "replace").strip()
+                            )
+                            body = b"GARASU_TLS_CONNECT_OK"
+                            secure.sendall(
+                                b"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n"
+                                b"Content-Length: " + str(len(body)).encode()
+                                + b"\r\nConnection: close\r\n\r\n" + body
+                            )
+                        finally:
+                            tls_reader.close()
+                    return
                 if "/generate_204" in request:
                     # Older Mihomo rounds sub-millisecond loopback checks to
                     # zero and reports 503 even when the proxy succeeded.
@@ -120,8 +152,20 @@ def test_runtime(template_path):
         config = out / "runtime.yaml"
         config.write_text(yaml.safe_dump(doc, allow_unicode=True, sort_keys=False),
                           encoding="utf-8")
+        cert = out / "garasu-probe.crt"
+        key = out / "garasu-probe.key"
+        subprocess.run(
+            ["openssl", "req", "-x509", "-newkey", "rsa:2048",
+             "-sha256", "-nodes", "-days", "1", "-keyout", str(key),
+             "-out", str(cert), "-subj", "/CN=garasu-probe.invalid",
+             "-addext", "subjectAltName=DNS:garasu-probe.invalid"],
+            check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        tls_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        tls_context.load_cert_chain(certfile=str(cert), keyfile=str(key))
         with ThreadedTCPServer(("127.0.0.1", MOCK_PORT), MockProxy) as mock:
             mock.seen = []
+            mock.ssl_context = tls_context
             worker = threading.Thread(target=mock.serve_forever, daemon=True)
             worker.start()
             command = [
@@ -182,6 +226,27 @@ def test_runtime(template_path):
                 if not any("/proxy-path" in x for x in mock.seen):
                     raise AssertionError("Mock outbound node never received request")
                 print("PASS: HTTP listener -> Garasu group -> synthetic node", flush=True)
+
+                # Verify actual TLS certificate validation after HTTP CONNECT.
+                # A simple 200 CONNECT response is NOT proof TLS functions.
+                https_context = ssl.create_default_context(cafile=str(cert))
+                https_client = http.client.HTTPSConnection(
+                    "127.0.0.1", LISTENER_PORT, timeout=12,
+                    context=https_context,
+                )
+                https_client.set_tunnel("garasu-probe.invalid", 443)
+                try:
+                    https_client.request("GET", "/tls-probe",
+                                         headers={"Host": "garasu-probe.invalid"})
+                    https_response = https_client.getresponse()
+                    https_body = https_response.read()
+                finally:
+                    https_client.close()
+                if https_response.status != 200 or https_body != b"GARASU_TLS_CONNECT_OK":
+                    raise AssertionError("HTTPS CONNECT + TLS path failed")
+                if not any(x.startswith("TLS GET /tls-probe") for x in mock.seen):
+                    raise AssertionError("The synthetic proxy never observed TLS HTTP request")
+                print("PASS: HTTPS CONNECT -> TLS -> synthetic node", flush=True)
             finally:
                 proc.terminate()
                 try:

@@ -91,10 +91,18 @@ def prepare_singbox(template, out, node_count=1):
             "server_port": 1080 + i,
         })
     for provider in doc["route"]["rule_set"]:
-        source = ROOT / "rules" / "singbox" / (
-            provider["tag"].removeprefix("garasu-") + ".json"
-        )
-        if not source.exists():
+        # Candidate rule sets are compiled from one full Refilter snapshot.
+        # Resolve the exact repository asset declared by the remote provider,
+        # rather than inventing a path from a tag (which misses pinned data).
+        url = provider.get("url", "")
+        prefix = "https://raw.githubusercontent.com/togahimoko/garasu/"
+        if not url.startswith(prefix) or "/rules/" not in url:
+            raise ValueError("Untrusted synthetic rule-set URL")
+        relative = url.split("/rules/", 1)[1]
+        if any(part in ("..", ".") for part in Path(relative).parts):
+            raise ValueError("Unsafe synthetic rule-set path")
+        source = ROOT / "rules" / relative
+        if not source.is_file():
             raise ValueError("Missing remote source rule set: " + str(source))
         provider["type"] = "local"
         provider["path"] = str(source)

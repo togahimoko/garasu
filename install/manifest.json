@@ -1,353 +1,353 @@
 {
   "name": "Garasu MAX",
-  "upstream": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e",
-  "upstream_revision": "dc2387651714c1a127e4794802ef780634bc4f6e",
+  "upstream": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28",
+  "upstream_revision": "29115cbf9a00c65aea80977a73a18f27511a0e28",
   "files": {
     "rules/ads.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/reject.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/reject.list",
       "sha256": "ca480525bac52f057a191de5b2a04f3237a5e81bf7a8033937721aa494c903b8",
       "bytes": 27040,
       "entries": 1221
     },
     "rules/singbox/ads.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/reject.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/reject.list",
       "sha256": "e314fdc81819beaa2ef54a13f10e9d4fc273e29de14c0b7abfa0450555e89c06",
       "bytes": 27029,
       "entries": 1221
     },
     "rules/surge/ads.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/reject.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/reject.list",
       "sha256": "069536a93998b7296ea4846f0559a29a9ca5ba4fb21a8e28095ab310988f9114",
       "bytes": 41683,
       "entries": 1221
     },
     "rules/quantumultx/ads.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/reject.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/reject.list",
       "sha256": "02124ad0d5e0989ef6164e182d83663c81456bb9bda28a4fa01276edc4e42cea",
       "bytes": 50220,
       "entries": 1221
     },
     "rules/ai.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/ai.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/ai.list",
       "sha256": "cd252e4365bd6538f1757b7ec8f6ea126c8baf25f4381a29cf637bcfcdb74155",
       "bytes": 4037,
       "entries": 215
     },
     "rules/singbox/ai.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/ai.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/ai.list",
       "sha256": "03671db731433ca19c7bda9d54b6a0a9093fff66c1b537d46c43fefe2443f69f",
       "bytes": 4026,
       "entries": 215
     },
     "rules/surge/ai.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/ai.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/ai.list",
       "sha256": "fe3d30842f9e82cc9200b36a7caa2b1243b0bece48c14ff267b5eac1b25699f2",
       "bytes": 6608,
       "entries": 215
     },
     "rules/quantumultx/ai.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/ai.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/ai.list",
       "sha256": "b924b7a582aa2e8ec5f10dfaf30b607ff2185432ca62f9e22ce95066400cbeca",
       "bytes": 7888,
       "entries": 215
     },
     "rules/crypto.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/crypto.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/crypto.list",
       "sha256": "84aaaedd11f702016383ad93bbb20d597c78be14121305a5509471795127105f",
       "bytes": 1398,
       "entries": 96
     },
     "rules/singbox/crypto.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/crypto.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/crypto.list",
       "sha256": "aa5634cb7f65fa08627f36d347182b87c87b276d9c845298f4e2f7404b628e10",
       "bytes": 1387,
       "entries": 96
     },
     "rules/surge/crypto.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/crypto.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/crypto.list",
       "sha256": "5cff86a8ed5669f4e83bb1b1cae5f230d1f011563b9423f67ce707b9d1c5cad0",
       "bytes": 2541,
       "entries": 96
     },
     "rules/quantumultx/crypto.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/crypto.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/crypto.list",
       "sha256": "04ebaf8cfb0d4024a8626b440afc05a4fe0d30d4e886e43772d6e9bbac1e65e9",
       "bytes": 3107,
       "entries": 96
     },
     "rules/direct.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/direct.list",
-      "sha256": "12a02b90d7afd2f651ddb67bda92280896e9dd6f4e4f2d1931510f77e204443f",
-      "bytes": 60384,
-      "entries": 3282
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct.list",
+      "sha256": "39b2429d724fbee8887f4eb06b41bc4118c832db3ca3bb1341cff1538ff8ac96",
+      "bytes": 60397,
+      "entries": 3283
     },
     "rules/singbox/direct.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/direct.list",
-      "sha256": "0b2e49e3768bcde86666babbca3a7668fb96c275c6cb5256eaa4df1a8993a096",
-      "bytes": 60373,
-      "entries": 3282
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct.list",
+      "sha256": "ab545c0b36574bfeedb1e5aaec185c5fee56dcf95080361e345f902f4bcc61c8",
+      "bytes": 60386,
+      "entries": 3283
     },
     "rules/surge/direct.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/direct.list",
-      "sha256": "d3f1b33e0cdf4c27db1e3f6fad0ad1a195c78795833ca1406524b9f85f13d811",
-      "bytes": 99759,
-      "entries": 3282
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct.list",
+      "sha256": "e0bba423e52cba9723727e6d975ffc37af67ce228c3c260a58303a5d782e7051",
+      "bytes": 99784,
+      "entries": 3283
     },
     "rules/quantumultx/direct.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/direct.list",
-      "sha256": "1d893ac56b00db7466ead07475f4eb59acdaf00c30adfcfd80ebaa1a17d0df42",
-      "bytes": 122723,
-      "entries": 3282
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct.list",
+      "sha256": "9dbfd0d195c1bbad99b1abd4e51d74bc8e7055246d2e8da7e5818eeddda39e83",
+      "bytes": 122755,
+      "entries": 3283
     },
     "rules/discord.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/discord.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/discord.list",
       "sha256": "5cce29628a34c721a4994e7a0f9c38c74f7b8c4555a3327a90110bf4ecf25f8c",
       "bytes": 602,
       "entries": 28
     },
     "rules/singbox/discord.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/discord.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/discord.list",
       "sha256": "28312ba7d54638b873f19b5702ea0a9fd40902230bf0e0d99797a0481cd54553",
       "bytes": 591,
       "entries": 28
     },
     "rules/surge/discord.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/discord.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/discord.list",
       "sha256": "abaa4727996737e13ded29151508947a655aa0a72da9467ecf1fbe814cddd8e3",
       "bytes": 929,
       "entries": 28
     },
     "rules/quantumultx/discord.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/discord.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/discord.list",
       "sha256": "769f943d164a657deccdbdbeb759ea341a93ee95f682a863ea5e2e0cd8f87dd7",
       "bytes": 1087,
       "entries": 28
     },
     "rules/games.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/games.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/games.list",
       "sha256": "6f6b6266990b0e0dccfbd64211ed7e4d2fd30f0421bd42caf19c363cc44bfc43",
       "bytes": 2422,
       "entries": 117
     },
     "rules/singbox/games.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/games.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/games.list",
       "sha256": "be19cac98945f8eb87dd919bc9f835218a07e48cc3f50fde1c4b3b63a3bdb4fa",
       "bytes": 2411,
       "entries": 117
     },
     "rules/surge/games.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/games.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/games.list",
       "sha256": "a2473311b3646f8ff8ecd7c02c13a54920b1c1bab9f5ab780b0e57fea3b58c45",
       "bytes": 3817,
       "entries": 117
     },
     "rules/quantumultx/games.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/games.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/games.list",
       "sha256": "d62ab1a47482601f1cb280776a45bfa5d403c6976388edeb2cd1d165b52138dd",
       "bytes": 4626,
       "entries": 117
     },
     "rules/proxy.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/proxy.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy.list",
       "sha256": "d05f08f2fa799f24f0657101d9443fb766a06b6a205ac0378779dd5a899f53f7",
       "bytes": 3222,
       "entries": 154
     },
     "rules/singbox/proxy.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/proxy.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy.list",
       "sha256": "bb224d8f6ea596d37a1834a87326dd746dce99bcc1419d3a9b92e314e7311d8c",
       "bytes": 3211,
       "entries": 154
     },
     "rules/surge/proxy.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/proxy.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy.list",
       "sha256": "cff7a036500cc98996dae2e2d48e87faeb6485c574a1c33da1851b37c05b840c",
       "bytes": 5061,
       "entries": 154
     },
     "rules/quantumultx/proxy.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/proxy.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy.list",
       "sha256": "3fb4ee7f4060a2a2bdeee4150549362eae6b45417cba3467644549afdab48e99",
       "bytes": 5975,
       "entries": 154
     },
     "rules/rkn-domains.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/refilter-domain.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain.list",
       "sha256": "e38521e98264c75c23b1bef8ffee75627e3ceb516cae31785bf1280b8511cda5",
       "bytes": 393752,
       "entries": 21989
     },
     "rules/singbox/rkn-domains.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/refilter-domain.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain.list",
       "sha256": "8247565f7d987731650fec18ffd1a45013e19512a18a28d89c6ae7183f69e4d2",
       "bytes": 393741,
       "entries": 21989
     },
     "rules/surge/rkn-domains.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/refilter-domain.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain.list",
       "sha256": "dbc9c0c9e5433fa44ac3d46f85ec196bb97c9478c06518b5f2dfbd2095bd279a",
       "bytes": 657611,
       "entries": 21989
     },
     "rules/quantumultx/rkn-domains.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/refilter-domain.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain.list",
       "sha256": "922d6fa9dbedabed8e1e1992318928852e8c69a99accda07e87bb96e3452c5a4",
       "bytes": 789535,
       "entries": 21989
     },
     "rules/youtube.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/youtube.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/youtube.list",
       "sha256": "34f6109308f88ac2122d32e40ecde54b5ed8ef24f5530bf1ca900dd8578cec7b",
       "bytes": 2773,
       "entries": 176
     },
     "rules/singbox/youtube.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/youtube.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/youtube.list",
       "sha256": "8cc91aba4ed0bfc8d37192df2e5c2e4317f71f5518c397a3a9b513817323a68a",
       "bytes": 2762,
       "entries": 176
     },
     "rules/surge/youtube.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/youtube.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/youtube.list",
       "sha256": "d52b6fce0d5df3357a1227d8a9f8fdc713e5f2869be6c02be8b3ad211cac7aab",
       "bytes": 4876,
       "entries": 176
     },
     "rules/quantumultx/youtube.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/youtube.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/youtube.list",
       "sha256": "0f0f4b517d1597fa5def12f292914e5184f95725c89e432692127a1047cdfa1d",
       "bytes": 5922,
       "entries": 176
     },
     "rules/rkn-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/refilter-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
       "sha256": "c70f447d9f5cad0c5a957974cf53f40dbc0714a6d4fe8e07bb09968a57cdfd83",
       "bytes": 28564,
       "entries": 1141
     },
     "rules/rkn-ips.cidr": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/refilter-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
       "sha256": "6f008b2e263d1b51316c3bc09faa637197110a296d6f3ba1aae8d850a089d6b7",
       "bytes": 19436,
       "entries": 1141
     },
     "rules/singbox/rkn-ips.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/refilter-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
       "sha256": "c8f3544e72faa8db0d994200add69e5b7a7468cb7033b34ec5eb2a627265d1f2",
       "bytes": 21701,
       "entries": 1141
     },
     "rules/surge/rkn-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/refilter-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
       "sha256": "198e2426fad0203ba76256dcbdd923dd4f7a932b6655cc7a60eb00ad2023a18c",
       "bytes": 28558,
       "entries": 1141
     },
     "rules/quantumultx/rkn-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/refilter-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
       "sha256": "b5561b9beeb89f395fd76a8772c8ede254882464529090d0c38ba20b99c1a791",
       "bytes": 37676,
       "entries": 1141
     },
     "rules/proxy-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/proxy-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy-ip.list",
       "sha256": "c9d7fc443317ddd5548f92ce304c5b8804d2ab45bb365ea163489e6ebbe0f3b4",
       "bytes": 197,
       "entries": 6
     },
     "rules/proxy-ips.cidr": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/proxy-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy-ip.list",
       "sha256": "c3175fd1a9a83b2e6e32328eb62cd3d83c0766a18088b5b1dcb487dbe920b638",
       "bytes": 149,
       "entries": 6
     },
     "rules/singbox/proxy-ips.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/proxy-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy-ip.list",
       "sha256": "5a5bc2338204a928e4d5f0bca6a910c0448f91c470541c07ca25b07fbcbe91b6",
       "bytes": 144,
       "entries": 6
     },
     "rules/surge/proxy-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/proxy-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy-ip.list",
       "sha256": "ef527124f2ccddb12e799a221cf8b7f6aa26b96d3def0ca9c458c836d813322d",
       "bytes": 191,
       "entries": 6
     },
     "rules/quantumultx/proxy-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/proxy-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy-ip.list",
       "sha256": "128f35fcf12aaac85a94a5364ea8a7e18a7a4bd70a576e803eb94f0577e1248f",
       "bytes": 229,
       "entries": 6
     },
     "rules/direct-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/direct-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct-ip.list",
       "sha256": "db16c90a518157ed14803811a7aad0f3c80ede58a848b777473f9c68c360aa9f",
       "bytes": 646,
       "entries": 28
     },
     "rules/direct-ips.cidr": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/direct-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct-ip.list",
       "sha256": "8fa0a16c1c934d5c71400a82494bf67006476347543c20a9d2fd0508f4a34590",
       "bytes": 410,
       "entries": 28
     },
     "rules/singbox/direct-ips.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/direct-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct-ip.list",
       "sha256": "7bf03825961a45eb17ea73d65af761302eae11bc62a9ea19fa2eb63ad656f7dd",
       "bytes": 449,
       "entries": 28
     },
     "rules/surge/direct-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/direct-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct-ip.list",
       "sha256": "b6e7e939eb8eb6d426e9268e871509b4b8916223936be2ee99efde3ff629a4d1",
       "bytes": 640,
       "entries": 28
     },
     "rules/quantumultx/direct-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/direct-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct-ip.list",
       "sha256": "037e2d2523f73fb3129592cda59ec4638c8772f40a151d9e9d39a22a79e98765",
       "bytes": 882,
       "entries": 28
     },
     "rules/ru-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/ru-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/ru-ip.list",
       "sha256": "e21dc9958eb6d9a2d10b5f5fefb6c4456ec27c356669eb8b0accdbc82203d754",
       "bytes": 660379,
       "entries": 25157
     },
     "rules/ru-ips.cidr": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/ru-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/ru-ip.list",
       "sha256": "d80be0627cf91ddc986ed8442fd0ff547d59810e2a5a7cebc418ba52d020e59d",
       "bytes": 446953,
       "entries": 25157
     },
     "rules/singbox/ru-ips.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/ru-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/ru-ip.list",
       "sha256": "16c631a7b5b6a430b994cc0658e8117c0fccc1938a257c72fdfb8749903d4a63",
       "bytes": 497250,
       "entries": 25157
     },
     "rules/surge/ru-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/ru-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/ru-ip.list",
       "sha256": "0f7ff67d149c5e4f06527b33cec14f2ef9f01bcf96ea392d317ed2d55b546508",
       "bytes": 660373,
       "entries": 25157
     },
     "rules/quantumultx/ru-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/release/ru-ip.list",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/ru-ip.list",
       "sha256": "45e051c4f1b368723ce42852cf271d95a5201c04e9e58556e08b38b0de78c793",
       "bytes": 886776,
       "entries": 25157
     },
     "geo/geoip.dat": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/v2ray/geoip.dat",
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/v2ray/geoip.dat",
       "sha256": "1bd2cefb1e4d108c88c19dc463ec6cd854539ef5a90cb7aa431525c04d722dcd",
       "bytes": 807285
     },
     "geo/geosite.dat": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/dc2387651714c1a127e4794802ef780634bc4f6e/v2ray/geosite.dat",
-      "sha256": "73935744dedf8f9b9c66b1fe7641bc415a001627a8d54e5e5a66268e3ff71df0",
-      "bytes": 623361
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/v2ray/geosite.dat",
+      "sha256": "9b380c4c27e5eec8efc42a0634b83dafa1d3d590045752edaf2e69d5f02dbed7",
+      "bytes": 623393
     }
   }
 }

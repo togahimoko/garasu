@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "product": "Garasu MAX",
-  "snapshot_sha256": "8dc5ae93c4d3d6fbdfbd68f84772bd6fa95e922bc05d7099db1cf16aa5521968",
+  "snapshot_sha256": "b54c463fb0dbfc3283ee67a80edb68edec0a99894ac342b7bd4a1f6d55c7437f",
   "manifest_asset_count": 58,
   "domain_counts": {
     "rkn-domains": 21989,
@@ -12,7 +12,7 @@
     "proxy": 154,
     "ads": 1221,
     "games": 117,
-    "direct": 3282
+    "direct": 3283
   },
   "ip_counts": {
     "rkn-ips": {

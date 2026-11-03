@@ -79,6 +79,9 @@ class GarasuDataQualityTests(unittest.TestCase):
         revision = "a" * 40
         raw = json.dumps({"sha": revision}).encode()
         self.assertEqual(refresh.parse_upstream_revision(raw), revision)
+        self.assertEqual(refresh.parse_upstream_revision(json.dumps(
+            {"ref": "refs/heads/main", "object": {"sha": revision, "type": "commit"}}
+        ).encode()), revision)
         self.assertEqual(
             refresh.upstream_raw_url(revision, "release/youtube.list"),
             "https://raw.githubusercontent.com/DigneZzZ/routing/" + revision

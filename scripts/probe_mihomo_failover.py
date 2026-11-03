@@ -2,8 +2,10 @@
 """Mihomo multi-node automatic failover test using only synthetic localhost nodes.
 
 Starts three injected nodes: first healthy, second healthy, third unreachable.
-Kills the first proxy and waits for automatic health-based selection of #2.
-This exercises real Mihomo, not real user VPN credentials or ISP connectivity.
+Kills the first proxy and verifies automatic selection of #2, then kills #2.
+Proves a full outage does not route PROXY traffic directly, verifies that
+local DIRECT still works, and restores #2 to test automatic recovery.
+This exercises real Mihomo, not real VPN credentials or ISP connectivity.
 """
 import http.client
 from pathlib import Path

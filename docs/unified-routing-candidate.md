@@ -49,6 +49,29 @@ Mihomo uses system DNS for node bootstrap; remote rule providers use the injecte
 
 Remnawave Subscription Response Rules, Browser and XRAY_BASE64 fallback, eGames Reverse Proxy and live subscriber URLs have **not** been modified. Subscription-refresh faults require live sanitized SRR and native client checks, not mere GitHub parser tests.
 
+## Read-only subscription refresh diagnosis
+
+The CLI tool scripts/probe_subscription_delivery.py compares subscription
+delivery formats for Mihomo, Clash, Stash, sing-box, Happ, INCY and browser.
+It does not modify Remnawave, does not log the subscription URL or response
+body and deliberately blocks redirects.
+
+Use an interactive masked entry rather than embedding the private URL
+in a terminal command or sharing it in GitHub:
+
+    read -rs GARASU_SUBSCRIPTION_URL
+    export GARASU_SUBSCRIPTION_URL
+    python3 scripts/probe_subscription_delivery.py
+    unset GARASU_SUBSCRIPTION_URL
+
+For an additional local HTTP proxy path, set GARASU_HTTP_PROXY to the
+already-running local proxy URL, and run the same command. The report
+contains only status code, detected response format, bounded response
+size and sanitized error class. It cannot certify certificate provenance,
+node health, VPN throughput or a native client's actual User-Agent.
+A passing generic UA probe does not prove real SRR delivery until a
+matching real client and the panel's SRR are inspected.
+
 ## Promotion requirements
 
 - [x] Unified contract and independent domain/IP route oracle.

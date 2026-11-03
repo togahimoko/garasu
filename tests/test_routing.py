@@ -57,5 +57,22 @@ class GarasuTests(unittest.TestCase):
             for secret in ("BEGIN PRIVATE KEY", "YOUR_UUID", "SUBSCRIPTION_TOKEN"):
                 self.assertNotIn(secret, content)
 
+    def test_subpage_patcher_is_idempotent(self):
+        spec = importlib.util.spec_from_file_location("garasu_subpage", ROOT / "scripts/patch_subpage.py")
+        plugin = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(plugin)
+        source = {"platforms": {"ios": {"apps": [{"name": "Happ", "blocks": [
+            {"title": {"en": "Add Subscription"}, "buttons": [
+                {"type": "subscriptionLink", "link": "happ://add/{{SUBSCRIPTION_LINK}}"}]}
+        ]}]}}}
+        links = {"happ": "happ://routing/onadd/abc"}
+        updated, changed = plugin.patch(source, links)
+        self.assertEqual(changed, ["ios/Happ"])
+        self.assertEqual(len(updated["platforms"]["ios"]["apps"][0]["blocks"]), 2)
+        updated, _ = plugin.patch(updated, links)
+        blocks = updated["platforms"]["ios"]["apps"][0]["blocks"]
+        self.assertEqual(len(blocks), 2)
+        self.assertEqual(blocks[0]["buttons"][0]["type"], "subscriptionLink")
+
 if __name__ == "__main__":
     unittest.main()

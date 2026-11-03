@@ -184,6 +184,7 @@ def run():
             "mihomo_template": base + "/clients/mihomo-remnawave.yaml",
             "stash_template": base + "/clients/stash-remnawave.yaml",
             "singbox_template": base + "/clients/singbox-remnawave.json",
+            "xray_advanced_template": base + "/clients/xray-advanced-remnawave.json",
         }
         add("install/links.json", (json.dumps(links, ensure_ascii=False, indent=2) + "\n").encode())
         # Validate all dependent artifacts before any persistent file write.

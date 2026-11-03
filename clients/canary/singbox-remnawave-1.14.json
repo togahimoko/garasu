@@ -17,8 +17,7 @@
       },
       {
         "tag": "local",
-        "type": "udp",
-        "server": "1.1.1.1"
+        "type": "local"
       },
       {
         "tag": "remote",
@@ -42,6 +41,16 @@
       {
         "protocol": "dns",
         "action": "hijack-dns"
+      },
+      {
+        "domain_suffix": [
+          "localhost",
+          "local",
+          "lan",
+          "home.arpa"
+        ],
+        "action": "route",
+        "outbound": "direct"
       },
       {
         "ip_is_private": true,

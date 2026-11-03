@@ -48,7 +48,7 @@ def _target_rules(rules):
             if key in result:
                 raise ValueError("Ambiguous duplicate rules for " + key)
             result[key] = rule
-    missing = set(TEST_AGENTS) - set(result)
+    # The normal six-rule SRR has no per-client INCY/Happ entries.\n    # Those clients use the existing unconditional XRAY_BASE64 fallback.\n    missing = set(TEMPLATES) - {key.upper() for key in result}
     if missing:
         raise ValueError("Missing existing client rules: " + ", ".join(sorted(missing)))
     return result
@@ -71,6 +71,10 @@ def _full(current, links):
     targets = _target_rules(result["rules"])
     for key, label, header_name in [("incy", "INCY + Garasu MAX", "autorouting"),
                                     ("happ", "Happ + Garasu MAX", "routing")]:
+        # No live client-specific UA rule? Keep the fallback untouched.
+        # Optional headers are exercised in isolated diagnostic preview rules.
+        if key not in targets:
+            continue
         rule = targets[key]
         mod = rule.setdefault("responseModifications", {})
         mod["headers"] = [{"key": header_name, "value": links[key]}]
@@ -102,7 +106,19 @@ def patch(current, links, mode="test"):
               "mihomo": "Garasu Mihomo preview", "stash": "Garasu Stash preview",
               "singbox": "Garasu Singbox preview"}
     for key, agent in TEST_AGENTS.items():
-        rule = copy.deepcopy(targets[key])
+        if key in targets:
+            rule = copy.deepcopy(targets[key])
+        elif key in ("incy", "happ"):
+            # Generate a test-only response from the original generic fallback.
+            # Never modify a real client's response merely to add routing headers.
+            rule = copy.deepcopy(full["rules"][-1])
+            header_name = "autorouting" if key == "incy" else "routing"
+            mod = rule.setdefault("responseModifications", {})
+            mod["headers"] = [{"key": header_name, "value": links[key]}]
+            mod["applyHeadersToEnd"] = True
+            mod["ignoreServeJsonAtBaseSubscription"] = True
+        else:
+            raise ValueError("Missing response rule for " + key)
         rule["name"] = labels[key]
         rule["description"] = "TEST ONLY: matches custom diagnostic User-Agent; existing customer rules unchanged"
         rule["conditions"] = [{"headerName": "user-agent", "operator": "STARTS_WITH",

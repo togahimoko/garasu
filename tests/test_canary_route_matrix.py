@@ -82,7 +82,7 @@ class CanaryRouteMatrix(unittest.TestCase):
             if kind == "RULE-SET":
                 category = parts[1]
                 if category in cls.suffix and suffix_matches(host, cls.suffix[category]):
-                    return parts[2]
+                    return PROXY if parts[2] == "Garasu" else parts[2]
             if kind == "MATCH":
                 return PROXY if parts[1] == "Garasu" else parts[1]
         raise AssertionError("No Mihomo fallback: " + host)

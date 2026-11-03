@@ -71,3 +71,16 @@ jobs:
             -config "$RUNNER_TEMP/garasu-unified/xray-advanced-remnawave.ci.json"
       - name: Real Mihomo loopback HTTP and HTTPS CONNECT through synthetic node
         run: python scripts/probe_mihomo_runtime.py --template clients/unified/mihomo-remnawave.yaml
+      - name: Produce verified offline ZIP with native Shadowrocket candidate
+        run: |
+          python -m scripts.package_unified_release --publish --output-dir "$RUNNER_TEMP/garasu-unified-bundle"
+          python -m scripts.package_unified_release --verify --output-dir "$RUNNER_TEMP/garasu-unified-bundle"
+          python scripts/unified_policy.py --write
+          python scripts/unified_policy.py --check
+      - name: Upload immutable offline candidate (not a live VPN subscription)
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: garasu-unified-offline-candidate
+          path: ${{ runner.temp }}/garasu-unified-bundle/
+          retention-days: 7
+          if-no-files-found: error

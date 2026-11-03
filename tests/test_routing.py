@@ -82,7 +82,7 @@ class GarasuTests(unittest.TestCase):
             return  # first repo bootstrap before initial scheduled build
         manifest = json.loads(path.read_text())
         self.assertEqual(manifest["name"], "Garasu MAX")
-        self.assertEqual(len(manifest["files"]), 32)
+        self.assertIn(len(manifest["files"]), (32, 58))  # prior build may be 32 before refresh
         for filename, record in manifest["files"].items():
             data = (ROOT / filename).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"], filename)
@@ -100,6 +100,11 @@ class GarasuTests(unittest.TestCase):
         encoded = links["happ"].removeprefix("happ://routing/onadd/")
         happ = json.loads(base64.b64decode(encoded, validate=True))
         self.assertEqual(happ, json.loads((ROOT / "clients/happ.json").read_text()))
+        if "quantumultx" in links:
+            self.assertTrue(links["quantumultx"].startswith(
+                "quantumult-x:///add-resource?remote-resource="))
+            self.assertEqual(len(links["surge_rulesets"]), 13)
+
 
     def test_srr_preserves_existing_rules(self):
         spec = importlib.util.spec_from_file_location("garasu_srr", ROOT / "scripts/build_srr.py")
@@ -212,6 +217,34 @@ class GarasuTests(unittest.TestCase):
             self.assertTrue(doc["rules"][0].get("domain_suffix") or
                             doc["rules"][0].get("domain") or
                             doc["rules"][0].get("ip_cidr"))
+
+    def test_surge_and_quantumultx_adapters(self):
+        sample = b"# source\n+.example.ru\n+.youtube.com\n"
+        surge = mod.surge_domains(sample).decode()
+        qx = mod.quantumultx_domains(sample, "proxy").decode()
+        self.assertIn("DOMAIN-SUFFIX,example.ru", surge)
+        self.assertIn("DOMAIN-SUFFIX,youtube.com", surge)
+        self.assertIn("host-suffix, example.ru, proxy", qx)
+        self.assertIn("host-suffix, youtube.com, proxy", qx)
+        source_ip = b"192.0.2.1/32\n2001:db8::/32\n"
+        surge_ip = mod.surge_ips(source_ip).decode()
+        qx_ip = mod.quantumultx_ips(source_ip, "direct").decode()
+        self.assertIn("IP-CIDR,192.0.2.1/32", surge_ip)
+        self.assertIn("IP-CIDR6,2001:db8::/32", surge_ip)
+        self.assertIn("ip-cidr, 192.0.2.1/32, direct", qx_ip)
+        self.assertIn("ip6-cidr, 2001:db8::/32, direct", qx_ip)
+        self.assertEqual(mod.policy_for("ads"), "reject")
+        self.assertEqual(mod.policy_for("direct"), "direct")
+        self.assertEqual(mod.policy_for("rkn-domains"), "proxy")
+
+    def test_extended_rule_catalog(self):
+        base = ROOT / "rules"
+        if not (base / "surge").exists():
+            return
+        for name in list(mod.DOMAIN) + list(mod.IP):
+            self.assertTrue((base / "surge" / (name + ".list")).is_file())
+            self.assertTrue((base / "quantumultx" / (name + ".list")).is_file())
+            self.assertTrue((base / "singbox" / (name + ".json")).is_file())
 
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():

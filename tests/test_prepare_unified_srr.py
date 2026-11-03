@@ -104,7 +104,7 @@ class UnifiedSRR(unittest.TestCase):
     def test_preview_uses_only_test_ua_and_preserves_all_existing_live_rules(self):
         output = prepare_unified_srr.prepare(self.original, REV, mode="preview", root=ROOT)
         self.assertEqual(output["rules"][0], self.original["rules"][0])
-        self.assertEqual(output["rules"][-8:], self.original["rules"][1:])
+        self.assertEqual(output["rules"][-7:], self.original["rules"][1:])
         names = [r["name"] for r in output["rules"][1:6]]
         self.assertEqual(names, ["Garasu Unified INCY preview", "Garasu Unified Happ preview",
                                  "Garasu Unified Mihomo preview", "Garasu Unified Stash preview",

@@ -2,13 +2,16 @@
 # Import as MIHOMO TEMPLATE in Remnawave; Remnawave injects each user's nodes.
 # No Moscow proxy chain. Geo/RKN lists auto-update from Garasu GitHub.
 mode: rule
+# Clash Verge Rev default local HTTP/SOCKS listener. The GUI system proxy
+# must point to this same port; change it there if already occupied.
+mixed-port: 7897
 log-level: warning
 allow-lan: false
 ipv6: false
 unified-delay: true
 tcp-concurrent: true
 profile:
-  store-selected: true
+  store-selected: false
   store-fake-ip: true
 dns:
   enable: true
@@ -38,7 +41,6 @@ proxy-groups:
     type: select
     proxies:
       - Garasu Auto
-      - DIRECT
     remnawave:
       include-proxies: false
   - name: Garasu Auto
@@ -46,6 +48,8 @@ proxy-groups:
     url: https://cp.cloudflare.com/generate_204
     interval: 300
     tolerance: 150
+    lazy: false
+    timeout: 8000
     include-all: true
     remnawave:
       include-proxies: false

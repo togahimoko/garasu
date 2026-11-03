@@ -54,6 +54,29 @@ jobs:
             -v "$RUNNER_TEMP/garasu-ci:$RUNNER_TEMP/garasu-ci" \
             ghcr.io/sagernet/sing-box:v1.14.2 check \
             -c "$RUNNER_TEMP/garasu-ci/singbox-remnawave-1.14.ci.json"
+      - name: Prepare five-node canary and experimental fixtures
+        env:
+          OUT: ${{ runner.temp }}/garasu-multi
+        run: |
+          mkdir -p "$OUT"
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          from scripts.smoke_cores import prepare_mihomo, prepare_singbox
+          out=Path(os.environ["OUT"])
+          for name in ("mihomo-remnawave.yaml", "stash-remnawave.yaml"):
+              prepare_mihomo("clients/canary/" + name, out, node_count=5)
+          prepare_singbox("clients/experimental/singbox-remnawave-1.14-auto.json", out, node_count=5)
+          PY
+      - name: Real Mihomo core parses 5-node auto pool
+        run: |
+          docker run --rm -v "$RUNNER_TEMP/garasu-multi:$RUNNER_TEMP/garasu-multi" metacubex/mihomo:v1.19.32 -t -f "$RUNNER_TEMP/garasu-multi/mihomo-remnawave.ci.yaml" -d "$RUNNER_TEMP/garasu-multi"
+      - name: Stash-compatible parser checks five-node fail-closed pool
+        run: |
+          docker run --rm -v "$RUNNER_TEMP/garasu-multi:$RUNNER_TEMP/garasu-multi" metacubex/mihomo:v1.19.32 -t -f "$RUNNER_TEMP/garasu-multi/stash-remnawave.ci.yaml" -d "$RUNNER_TEMP/garasu-multi"
+      - name: Experimental sing-box URLTest parses five injected nodes
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -v "$RUNNER_TEMP/garasu-multi:$RUNNER_TEMP/garasu-multi" ghcr.io/sagernet/sing-box:v1.14.2 check -c "$RUNNER_TEMP/garasu-multi/singbox-remnawave-1.14-auto.ci.json"
       - name: 'Real sing-box core v1.14.2: legacy-compatible template'
         run: |
           docker run --rm \

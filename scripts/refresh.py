@@ -40,8 +40,40 @@ GEO = {
     "geosite.dat": ("v2ray/geosite.dat", 200000),
 }
 
-def fetch(path):
-    url = UPSTREAM + "/" + path
+def parse_upstream_revision(blob):
+    """GitHub API commit SHA; never trust a moving tag for a multi-file release."""
+    response = json.loads(blob.decode("utf-8"))
+    revision = response["sha"]
+    if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("Invalid immutable upstream commit SHA")
+    return revision
+
+
+def upstream_raw_url(revision, path):
+    if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("Invalid upstream revision")
+    if not path or not re.fullmatch(r"[A-Za-z0-9._/-]+", path) or ".." in path.split("/"):
+        raise ValueError("Invalid source path")
+    return "https://raw.githubusercontent.com/DigneZzZ/routing/" + revision + "/" + path
+
+
+def resolve_upstream_revision():
+    req = urllib.request.Request(
+        "https://api.github.com/repos/DigneZzZ/routing/commits/main",
+        headers={"User-Agent": "Garasu-Routing/1.0",
+                 "Accept": "application/vnd.github+json"},
+    )
+    with urllib.request.urlopen(req, timeout=20) as response:
+        if response.status != 200:
+            raise ValueError("GitHub upstream revision lookup failed")
+        content = response.read(16385)
+    if len(content) > 16384:
+        raise ValueError("Unexpectedly large GitHub revision response")
+    return parse_upstream_revision(content)
+
+
+def fetch(path, revision):
+    url = upstream_raw_url(revision, path)
     error = None
     for retry in range(3):
         try:
@@ -191,6 +223,8 @@ def digest(data):
 def run():
     if not re.fullmatch(r"[\w.-]+/[\w.-]+", REPO):
         raise ValueError("Invalid GITHUB_REPOSITORY")
+    revision = resolve_upstream_revision()
+    upstream_origin = "https://raw.githubusercontent.com/DigneZzZ/routing/" + revision
     with tempfile.TemporaryDirectory(prefix="garasu-") as tmp:
         temp = Path(tmp)
         records = {}
@@ -198,19 +232,19 @@ def run():
         def add(path, data, source=None, count=None):
             generated[path] = data
             if source is not None:
-                entry = {"source": UPSTREAM + "/" + source, "sha256": digest(data), "bytes": len(data)}
+                entry = {"source": upstream_raw_url(revision, source), "sha256": digest(data), "bytes": len(data)}
                 if count is not None:
                     entry["entries"] = count
                 records[path] = entry
         for name, (source, minimum) in DOMAIN.items():
-            blob, count = domains(fetch(source), minimum)
+            blob, count = domains(fetch(source, revision), minimum)
             add("rules/" + name + ".list", blob, source, count)
             add("rules/singbox/" + name + ".json", singbox_domains(blob), source, count)
             add("rules/surge/" + name + ".list", surge_domains(blob), source, count)
             add("rules/quantumultx/" + name + ".list",
                 quantumultx_domains(blob, policy_for(name)), source, count)
         for name, (source, minimum) in IP.items():
-            original = fetch(source)
+            original = fetch(source, revision)
             sr, mihomo, count = ip_data(original, minimum)
             add("rules/" + name + ".list", sr, source, count)
             add("rules/" + name + ".cidr", mihomo, source, count)
@@ -219,14 +253,15 @@ def run():
             add("rules/quantumultx/" + name + ".list",
                 quantumultx_ips(mihomo, policy_for(name)), source, count)
         for name, (source, minimum) in GEO.items():
-            blob = fetch(source)
+            blob = fetch(source, revision)
             if len(blob) < minimum or blob.startswith(b"<html"):
                 raise ValueError("Invalid geodata " + name)
             add("geo/" + name, blob, source)
         previous_path = ROOT / "install/manifest.json"
         previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
         changed = previous.get("files") != records
-        manifest = {"name": "Garasu MAX", "upstream": UPSTREAM, "files": records}
+        manifest = {"name": "Garasu MAX", "upstream": upstream_origin,
+                    "upstream_revision": revision, "files": records}
         add("install/manifest.json", (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode())
         base = "https://raw.githubusercontent.com/" + REPO + "/main"
         last_updated = str(int(time.time())) if changed else None

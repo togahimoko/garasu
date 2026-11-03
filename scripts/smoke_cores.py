@@ -33,9 +33,13 @@ def prepare_mihomo(template, out, node_count=1):
     for group in doc["proxy-groups"]:
         group.pop("remnawave", None)
         if group.get("proxies") is None:
-            # Stash uses an injected direct membership list. Mihomo's
-            # Garasu Auto is populated dynamically by include-all=true.
+            # Stash injects direct members; Mihomo Auto uses include-all.
             group["proxies"] = names if group["name"] == "Garasu" else []
+        elif (group["name"] == "Garasu"
+              and "REJECT" in group.get("proxies", [])
+              and Path(template).name.startswith("stash-")):
+            # Preserve fail-closed sentinel when emulating Remnawave insertion.
+            group["proxies"] = names + group["proxies"]
     assert doc["proxy-groups"]
     assert all(not isinstance(x.get("proxies"), type(None))
                for x in doc["proxy-groups"])

@@ -90,6 +90,7 @@ def run():
             primary.ok_body = nodes[0].encode()
             standby.ok_body = nodes[1].encode()
             for server in (primary, standby):
+                server.seen = []
                 threading.Thread(target=server.serve_forever, daemon=True).start()
             proc = subprocess.Popen(
                 ["docker", "run", "--rm", "--network", "host",

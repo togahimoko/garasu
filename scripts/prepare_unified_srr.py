@@ -127,7 +127,7 @@ def prepare(source, ref, *, mode="preview", root=ROOT, template_names=None):
                 set(template_names) != {"mihomo", "stash", "singbox"} or
                 any(not isinstance(name, str) or
                     not name.strip() or len(name) > 128 or
-                    any(ch in name for ch in "\\r\\n")
+                    any(ch in name for ch in "\r\n")
                     for name in template_names.values()) or
                 len(set(template_names.values())) != 3):
             raise ValueError("All three distinct, installed template names required")

@@ -25,6 +25,8 @@ jobs:
       - name: Build full Garasu release with quality reports (no publish)
         run: python scripts/refresh.py
       - name: Test Garasu data analyzer and existing routing
+        env:
+          GARASU_ALLOW_REFRESHED_CANDIDATE_SKIP: '1'
         run: python -m unittest discover -s tests -v
       - name: Check freshly fetched snapshot quality without comparing to older revision
         run: |

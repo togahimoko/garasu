@@ -1,7 +1,10 @@
+import base64
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
 import unittest
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("garasu_refresh", ROOT / "scripts/refresh.py")
@@ -50,6 +53,53 @@ class GarasuTests(unittest.TestCase):
         self.assertIn("MATCH,Garasu", conf)
         self.assertNotIn("dialer-proxy", conf)
         self.assertNotIn("DST-PORT,443,REJECT", conf)
+
+    def test_mihomo_remnawave_injection_and_yaml(self):
+        conf = (ROOT / "clients/mihomo-remnawave.yaml").read_text()
+        self.assertEqual(conf.count("proxies: # LEAVE THIS LINE!"), 2)
+        data = yaml.safe_load(conf)
+        self.assertIn("proxies", data)
+        self.assertIsNone(data["proxies"])
+        groups = {group["name"]: group for group in data["proxy-groups"]}
+        self.assertIn("Garasu", groups)
+        self.assertIn("Garasu Auto", groups)
+        self.assertIn("Garasu Auto", groups["Garasu"]["proxies"])
+        self.assertTrue(groups["Garasu Auto"]["include-all"])
+        self.assertFalse(groups["Garasu Auto"]["remnawave"]["include-proxies"])
+        self.assertEqual(data["rules"][-1], "MATCH,Garasu")
+        for key, provider in data["rule-providers"].items():
+            self.assertTrue(provider["url"].startswith(
+                "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/"
+            ), key)
+            self.assertEqual(provider["format"], "text")
+            self.assertEqual(provider["type"], "http")
+        self.assertEqual(data["rule-providers"]["rkn-ips"]["behavior"], "ipcidr")
+        self.assertEqual(data["rule-providers"]["rkn-domains"]["behavior"], "domain")
+
+    def test_published_manifest_checksums(self):
+        path = ROOT / "install/manifest.json"
+        if not path.exists():
+            return  # first repo bootstrap before initial scheduled build
+        manifest = json.loads(path.read_text())
+        self.assertEqual(manifest["name"], "Garasu MAX")
+        self.assertEqual(len(manifest["files"]), 17)
+        for filename, record in manifest["files"].items():
+            data = (ROOT / filename).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"], filename)
+            self.assertEqual(len(data), record["bytes"], filename)
+
+    def test_install_links(self):
+        path = ROOT / "install/links.json"
+        if not path.exists():
+            return
+        links = json.loads(path.read_text())
+        self.assertTrue(links["incy"].startswith(
+            "incy://autorouting/onadd/https://raw.githubusercontent.com/togahimoko/garasu/"
+        ))
+        self.assertTrue(links["happ"].startswith("happ://routing/onadd/"))
+        encoded = links["happ"].removeprefix("happ://routing/onadd/")
+        happ = json.loads(base64.b64decode(encoded, validate=True))
+        self.assertEqual(happ, json.loads((ROOT / "clients/happ.json").read_text()))
 
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():

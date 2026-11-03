@@ -16,10 +16,10 @@ jobs:
           python-version: "3.12"
       - name: Install test dependencies
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.2
+      - name: Build full Garasu release with quality reports (no publish)
+        run: python scripts/refresh.py
       - name: Test Garasu data analyzer and existing routing
         run: python -m unittest discover -s tests -v
-      - name: Generate quality report from published rules
-        run: python scripts/audit_rules.py --root . --write
       - name: Check deterministic report and tracked version when present
         run: |
           python scripts/audit_rules.py --root . --check

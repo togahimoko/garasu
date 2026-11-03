@@ -57,9 +57,9 @@ class UnifiedDeliveryLock(unittest.TestCase):
         from tempfile import TemporaryDirectory
         import hashlib
         category = "rules/ai.list"
-        original = b"+.example.org\\n"
+        original = b"+.example.org\n"
         blob = (b"blob " + str(len(original)).encode("ascii") +
-                b"\\x00" + original)
+                b"\x00" + original)
         lock = {"assets": {category: {
             "source": "base", "git_blob": hashlib.sha1(blob).hexdigest(),
             "bytes": len(original)}}}

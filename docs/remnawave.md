@@ -42,6 +42,11 @@ Happ может обновлять GeoIP/GeoSite по своим собстве�
 
 ## Remnawave Subpage Builder
 
+Surge, Loon and Quantumult X integration candidates, including rule order,
+DNS, final policy, and device acceptance checks, are documented in
+[native routing candidates](native-routing-candidates.md). The published
+resources alone do not configure a personal node or activate the app VPN.
+
 В существующих карточках Shadowrocket, INCY и Happ добавьте кнопку `external` с соответствующей ссылкой из `install/links.json`. **Сохраняйте оригинальные кнопки персональных подписок.** Сначала экспортируйте Subpage Builder JSON, сохраните копию, добавьте кнопки и проверьте на одном тестовом пользователе.
 
 ## Критерии приёмки

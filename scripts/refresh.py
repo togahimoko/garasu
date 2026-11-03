@@ -281,7 +281,9 @@ def quantumultx_ips(blob, policy):
 
 
 def policy_for(name):
-    return "reject" if name == "ads" else ("direct" if name in ("games", "direct", "direct-ips", "ru-ips") else "proxy")
+    # The source's games/direct categories contain foreign services. Native
+    # resources may be imported independently, so never label them DIRECT.
+    return "reject" if name == "ads" else ("direct" if name == "ru-ips" else "proxy")
 
 
 def _protobuf_varint(data, index):
@@ -615,8 +617,7 @@ def run():
                     profile, ensure_ascii=False, separators=(",", ":")).encode()).decode()
         qx_filters = []
         rule_order = ("rkn-domains", "rkn-ips", "youtube", "discord", "ai",
-                      "crypto", "proxy", "proxy-ips", "ads", "games", "direct",
-                      "direct-ips", "ru-ips")
+                      "crypto", "proxy", "proxy-ips", "ads", "ru-ips")
         for name in rule_order:
             qx_filters.append(
                 base + "/rules/quantumultx/" + name + ".list, tag=Garasu-" + name

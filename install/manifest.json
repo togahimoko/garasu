@@ -113,8 +113,8 @@
     },
     "rules/quantumultx/direct.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct.list",
-      "sha256": "9dbfd0d195c1bbad99b1abd4e51d74bc8e7055246d2e8da7e5818eeddda39e83",
-      "bytes": 122755,
+      "sha256": "84f314efb2028859574981930ecbb54037754b6d508f758253d71e1811c1026a",
+      "bytes": 119472,
       "entries": 3283
     },
     "rules/discord.list": {
@@ -161,8 +161,8 @@
     },
     "rules/quantumultx/games.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/games.list",
-      "sha256": "d62ab1a47482601f1cb280776a45bfa5d403c6976388edeb2cd1d165b52138dd",
-      "bytes": 4626,
+      "sha256": "603a4c033395e694fbcaf0e28a29082ac03f1070b15983f738e1ae05ddd2bc6a",
+      "bytes": 4509,
       "entries": 117
     },
     "rules/proxy.list": {
@@ -323,8 +323,8 @@
     },
     "rules/quantumultx/direct-ips.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct-ip.list",
-      "sha256": "037e2d2523f73fb3129592cda59ec4638c8772f40a151d9e9d39a22a79e98765",
-      "bytes": 882,
+      "sha256": "c9190f70f7f93c2dda7ea166bda06e56e8bdabdfd750c52fc609a2c5bf283b37",
+      "bytes": 854,
       "entries": 28
     },
     "rules/ru-ips.list": {

@@ -18,20 +18,7 @@
   "RouteOrder": "block-proxy-direct",
   "DirectSites": [
     "geosite:private",
-    "geosite:category-ru",
-    "geosite:apple",
-    "geosite:microsoft",
-    "geosite:google-play",
-    "geosite:twitch",
-    "geosite:steam",
-    "geosite:epicgames",
-    "geosite:origin",
-    "geosite:riot",
-    "geosite:roblox",
-    "geosite:faceit",
-    "geosite:escapefromtarkov",
-    "geosite:ip-check",
-    "geosite:vpndetect"
+    "geosite:category-ru"
   ],
   "DirectIp": [
     "geoip:private",

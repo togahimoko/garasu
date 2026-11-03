@@ -1,0 +1,33 @@
+# Garasu Surge integration CANDIDATE; no native app parser or device validation here.
+# Paste the ordered [Rule] lines into a profile with personal Remnawave nodes.
+# Replace {{PERSONAL_PROXY_POLICY}} with that profile’s real node/policy group.
+# Configure node-hostname bootstrap DNS and local/LAN DNS in app settings.
+# Enable system VPN in the app; set remote resource refresh to six hours.
+[Rule]
+DOMAIN-SUFFIX,local,DIRECT
+DOMAIN-SUFFIX,lan,DIRECT
+DOMAIN-SUFFIX,home.arpa,DIRECT
+IP-CIDR,10.0.0.0/8,DIRECT
+IP-CIDR,172.16.0.0/12,DIRECT
+IP-CIDR,192.168.0.0/16,DIRECT
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/rkn-domains.list,{{PERSONAL_PROXY_POLICY}}
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/rkn-ips.list,{{PERSONAL_PROXY_POLICY}}
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/youtube.list,{{PERSONAL_PROXY_POLICY}}
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/discord.list,{{PERSONAL_PROXY_POLICY}}
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/ai.list,{{PERSONAL_PROXY_POLICY}}
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/crypto.list,{{PERSONAL_PROXY_POLICY}}
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/proxy.list,{{PERSONAL_PROXY_POLICY}}
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/proxy-ips.list,{{PERSONAL_PROXY_POLICY}}
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/ads.list,REJECT
+DOMAIN-SUFFIX,ru,DIRECT
+DOMAIN-SUFFIX,su,DIRECT
+DOMAIN-SUFFIX,moscow,DIRECT
+DOMAIN-SUFFIX,xn--p1ai,DIRECT
+DOMAIN-SUFFIX,xn--p1acf,DIRECT
+DOMAIN-SUFFIX,xn--80asehdb,DIRECT
+DOMAIN-SUFFIX,xn--c1avg,DIRECT
+DOMAIN-SUFFIX,xn--80aswg,DIRECT
+DOMAIN-SUFFIX,xn--80adxhks,DIRECT
+DOMAIN-SUFFIX,xn--d1acj3b,DIRECT
+RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/ru-ips.list,DIRECT
+FINAL,{{PERSONAL_PROXY_POLICY}}

@@ -39,8 +39,8 @@ class GarasuTests(unittest.TestCase):
 
     def test_shadowrocket_rule_order(self):
         conf = (ROOT / "clients/shadowrocket.conf").read_text()
-        self.assertLess(conf.index("rkn-domains.list,PROXY"), conf.index("direct.list,DIRECT"))
-        self.assertLess(conf.index("rkn-ips.list,PROXY"), conf.index("direct-ips.list,DIRECT"))
+        self.assertLess(conf.index("rkn-domains.list,PROXY"), conf.index("DOMAIN-SUFFIX,ru,DIRECT"))
+        self.assertLess(conf.index("rkn-ips.list,PROXY"), conf.index("ru-ips.list,DIRECT"))
         self.assertIn("FINAL,PROXY", conf)
         self.assertNotIn("DST-PORT,443,REJECT", conf)
         self.assertNotIn("*.ru,DIRECT", conf)
@@ -103,7 +103,7 @@ class GarasuTests(unittest.TestCase):
         if "quantumultx" in links:
             self.assertTrue(links["quantumultx"].startswith(
                 "quantumult-x:///add-resource?remote-resource="))
-            self.assertEqual(len(links["surge_rulesets"]), 13)
+            self.assertEqual(len(links["surge_rulesets"]), 10)
 
 
     def test_srr_preserves_live_clients_until_promotion(self):
@@ -183,7 +183,7 @@ class GarasuTests(unittest.TestCase):
         rules = data["rules"]
         self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
                         rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
-        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
                         rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
         self.assertNotIn("RULE-SET,direct,DIRECT", rules)
 
@@ -256,7 +256,7 @@ class GarasuTests(unittest.TestCase):
         self.assertIn("ip-cidr, 192.0.2.1/32, direct", qx_ip)
         self.assertIn("ip6-cidr, 2001:db8::/32, direct", qx_ip)
         self.assertEqual(mod.policy_for("ads"), "reject")
-        self.assertEqual(mod.policy_for("direct"), "direct")
+        self.assertEqual(mod.policy_for("direct"), "proxy")
         self.assertEqual(mod.policy_for("rkn-domains"), "proxy")
 
     def test_extended_rule_catalog(self):

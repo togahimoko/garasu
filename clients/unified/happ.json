@@ -42,6 +42,6 @@
   "BlockIp": [],
   "DomainStrategy": "IPIfNonMatch",
   "FakeDNS": "false",
-  "Geoipurl": "https://raw.githubusercontent.com/togahimoko/garasu/main/geo/geoip.dat",
-  "Geositeurl": "https://raw.githubusercontent.com/togahimoko/garasu/main/geo/geosite.dat"
+  "Geoipurl": "https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/geo/geoip.dat",
+  "Geositeurl": "https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/geo/geosite.dat"
 }

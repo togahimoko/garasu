@@ -50,9 +50,12 @@ jobs:
             echo "No changes: keeping last validated release."
           else
             git commit -m "chore: refresh validated Garasu MAX routing data"
-            # Another authorized change may have landed while sources downloaded.
-            # Rebase instead of forcing the branch. If incompatible, fail closed.
+            # Fail closed if main moved during the build. The latest push
+            # has its own queued run; never publish stale tested artifacts.
             git fetch origin main
-            git rebase origin/main
+            if [ "$(git rev-parse HEAD^)" != "$(git rev-parse origin/main)" ]; then
+              echo "Main advanced during build; skipping stale publication."
+              exit 0
+            fi
             git push origin HEAD:main
           fi

@@ -82,7 +82,7 @@ class GarasuTests(unittest.TestCase):
             return  # first repo bootstrap before initial scheduled build
         manifest = json.loads(path.read_text())
         self.assertEqual(manifest["name"], "Garasu MAX")
-        self.assertIn(len(manifest["files"]), (32, 58))  # prior build may be 32 before refresh
+        self.assertEqual(len(manifest["files"]), 58)
         for filename, record in manifest["files"].items():
             data = (ROOT / filename).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"], filename)
@@ -245,6 +245,48 @@ class GarasuTests(unittest.TestCase):
             self.assertTrue((base / "surge" / (name + ".list")).is_file())
             self.assertTrue((base / "quantumultx" / (name + ".list")).is_file())
             self.assertTrue((base / "singbox" / (name + ".json")).is_file())
+
+    def test_full_policy_domain_examples(self):
+        base = ROOT / "rules"
+        if not (base / "rkn-domains.list").exists():
+            return
+        routing = [
+            ("rkn-domains", "PROXY"),
+            ("youtube", "PROXY"),
+            ("discord", "PROXY"),
+            ("ai", "PROXY"),
+            ("crypto", "PROXY"),
+            ("proxy", "PROXY"),
+            ("ads", "REJECT"),
+            ("games", "DIRECT"),
+            ("direct", "DIRECT"),
+        ]
+        sets = {}
+        for name, _ in routing:
+            sets[name] = set(
+                line.strip().lower().removeprefix("+.")
+                for line in (base / (name + ".list")).read_text().splitlines()
+                if line.strip() and not line.startswith("#")
+            )
+        def route(domain):
+            domain = domain.lower()
+            for name, policy in routing:
+                if any(domain == suffix or domain.endswith("." + suffix)
+                       for suffix in sets[name]):
+                    return policy
+            return "PROXY"
+        cases = {
+            "www.youtube.com": "PROXY",
+            "r1.googlevideo.com": "PROXY",
+            "chatgpt.com": "PROXY",
+            "api.github.com": "PROXY",
+            "www.4pda.ru": "PROXY",
+            "www.yandex.ru": "DIRECT",
+            "ad.mail.ru": "REJECT",
+            "unlisted.foreign.test": "PROXY",
+        }
+        for domain, expected in cases.items():
+            self.assertEqual(route(domain), expected, domain)
 
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():

@@ -24,6 +24,8 @@ jobs:
           python-version: '3.12'
       - name: Install strict YAML parser
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.2
+      - name: Check every pinned release asset against exact Git blob integrity
+        run: python scripts/unified_policy.py --verify-assets
       - name: Verify full source parity and generate candidate fixtures
         env:
           OUT: ${{ runner.temp }}/garasu-unified

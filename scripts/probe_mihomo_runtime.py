@@ -57,6 +57,10 @@ class MockProxy(socketserver.BaseRequestHandler):
                     )
                     continue
                 if "/generate_204" in request:
+                    # Older Mihomo rounds sub-millisecond loopback checks to
+                    # zero and reports 503 even when the proxy succeeded.
+                    # Use a measurable delay for this *synthetic* test only.
+                    time.sleep(0.040)
                     self.request.sendall(
                         b"HTTP/1.1 204 No Content\r\n"
                         b"Content-Length: 0\r\nConnection: keep-alive\r\n\r\n"

@@ -196,6 +196,9 @@ def _render_xray(root, policy):
 def _render_mobile_xray(root, policy):
     config = json.loads((root / "clients/incy.json").read_text())
     config["Name"] = "Garasu Unified v1 CANDIDATE"
+    # The production profile contains a moving refresh timestamp. Unified
+    # candidates are pinned; never inherit a mutable LastUpdated value.
+    config.pop("LastUpdated", None)
     config["DirectSites"] = ["geosite:private"]
     config["DirectIp"] = ["geoip:private"]
     return json.dumps(config, ensure_ascii=False, indent=2) + "\n"

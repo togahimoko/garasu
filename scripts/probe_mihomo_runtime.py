@@ -56,6 +56,12 @@ class MockProxy(socketserver.BaseRequestHandler):
                         b"HTTP/1.1 200 Connection Established\r\n"
                         b"Proxy-Agent: Garasu-Mock\r\n\r\n"
                     )
+                    # Mihomo also CONNECT-tunnels HTTP destinations on port 80.
+                    # Preserve plaintext handling for latency/HTTP probes; only
+                    # perform a TLS handshake for the dedicated HTTPS test.
+                    target = request.split(" ", 2)[1]
+                    if not target.endswith(":443"):
+                        continue
                     # Terminate a genuine TLS session at the synthetic node:
                     # this tests CONNECT + TLS, not only a plaintext GET.
                     with self.server.ssl_context.wrap_socket(

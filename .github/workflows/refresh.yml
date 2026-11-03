@@ -18,7 +18,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,6 +41,38 @@ jobs:
           test -s rules/rkn-ips.cidr
           test -s install/links.json
           python -m unittest discover -s tests -v
+      - name: Generate synthetic node-injected profiles
+        run: python scripts/smoke_cores.py --output-dir "$RUNNER_TEMP/garasu-ci"
+      - name: Validate Mihomo in real core (v1.19.32)
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RUNNER_TEMP/garasu-ci:$RUNNER_TEMP/garasu-ci" \
+            metacubex/mihomo:v1.19.32 -t \
+            -f "$RUNNER_TEMP/garasu-ci/mihomo-remnawave.ci.yaml" \
+            -d "$RUNNER_TEMP/garasu-ci"
+      - name: Validate Stash YAML using Mihomo parser
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RUNNER_TEMP/garasu-ci:$RUNNER_TEMP/garasu-ci" \
+            metacubex/mihomo:v1.19.32 -t \
+            -f "$RUNNER_TEMP/garasu-ci/stash-remnawave.ci.yaml" \
+            -d "$RUNNER_TEMP/garasu-ci"
+      - name: Validate sing-box 1.14+ profile in real core
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RUNNER_TEMP/garasu-ci:$RUNNER_TEMP/garasu-ci" \
+            ghcr.io/sagernet/sing-box:v1.14.2 check \
+            -c "$RUNNER_TEMP/garasu-ci/singbox-remnawave-1.14.ci.json"
+      - name: Validate legacy-compatible sing-box profile in real core
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$RUNNER_TEMP/garasu-ci:$RUNNER_TEMP/garasu-ci" \
+            ghcr.io/sagernet/sing-box:v1.14.2 check \
+            -c "$RUNNER_TEMP/garasu-ci/singbox-remnawave.ci.json"
       - name: Publish only complete validated build
         run: |
           git config user.name 'garasu-routing-bot'

@@ -37,6 +37,14 @@ class FakeOpener:
 
 
 class DeliveryProbe(unittest.TestCase):
+    def test_preview_agents_use_isolated_srr_user_agents(self):
+        for name in ("incy", "happ", "mihomo", "stash", "singbox"):
+            client = "preview_" + name
+            opener = FakeOpener(b"proxies:\n")
+            probe.request_once(SECRET, client, "direct", opener=opener)
+            self.assertEqual(opener.seen_request.get_header("User-agent"),
+                             "garasu-test-" + name)
+
     def test_detects_independently_each_client_format_without_outputting_secret(self):
         cases = [
             ("mihomo", b"proxies:\n- name: node\n", "yaml"),

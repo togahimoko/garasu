@@ -28,9 +28,10 @@ keeps all existing conditions exactly as they are. The `CLASH` rule is also
 left unchanged; plain Clash and Clash Verge can receive different response
 types because Mihomo precedes CLASH in the supplied order.
 
-The full six-rule candidate is deliberately not published as the active
-panel configuration. Generate it from the original export after the preview
-works with `python3 scripts/build_srr.py original.json full.json --mode full`.
-That candidate selects the three named templates and retains Browser, CLASH,
-and the unconditional fallback. The script writes files locally; it does not
-modify the Remnawave panel.
+The [full six-rule candidate](remnawave-six-rule-full.json) is available for
+review, but has not been imported into the panel. It selects the three named
+templates and retains Browser, CLASH, and the unconditional fallback. To
+regenerate it from the original export, run
+`python3 scripts/build_srr.py original.json full.json --mode full`. See the
+[installation guide](remnawave-six-rule-install.md) for the template files and
+preview probe. The script writes files locally; it does not modify the panel.

@@ -1,0 +1,97 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "name": "Browser Subscription",
+      "description": "System critical: do not delete or disable this rule.",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "accept",
+          "operator": "CONTAINS",
+          "value": "text/html",
+          "caseSensitive": true
+        }
+      ],
+      "responseType": "BROWSER"
+    },
+    {
+      "name": "Mihomo Clients",
+      "description": "Response with generated YAML config (Mihomo Template)",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "REGEX",
+          "value": "^(?:flclash|rabbit|flowvy|murge|mihomo|prizrak-box|koala-clash|clash(?:-verge|-nyanpasu|x meta|[-.]?meta))",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "MIHOMO",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Mihomo"
+      }
+    },
+    {
+      "name": "Stash (iOS, macOS)",
+      "description": "Response with generated YAML config (Stash Template)",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "REGEX",
+          "value": "^stash",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "STASH",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Stash"
+      }
+    },
+    {
+      "name": "Sing-box clients",
+      "description": "Response with generated JSON config (Singbox template)",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "REGEX",
+          "value": "^(?:sfa|sfi|sfm|sft|karing|singbox)",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "SINGBOX",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Singbox"
+      }
+    },
+    {
+      "name": "Clash Core Clients",
+      "description": "Response with generated YAML config (Clash Template)",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "REGEX",
+          "value": "^clash",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "CLASH"
+    },
+    {
+      "name": "Fallback Base64",
+      "description": "System critical: do not delete or disable this rule.",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [],
+      "responseType": "XRAY_BASE64"
+    }
+  ]
+}

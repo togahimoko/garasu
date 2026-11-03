@@ -23,7 +23,13 @@ AGENTS = {
     "happ": "happ/1.0",
     "incy": "incy/1.0",
     "browser": "browser/1.0",
+    "preview_incy": "garasu-test-incy",
+    "preview_happ": "garasu-test-happ",
+    "preview_mihomo": "garasu-test-mihomo",
+    "preview_stash": "garasu-test-stash",
+    "preview_singbox": "garasu-test-singbox",
 }
+DEFAULT_AGENTS = ("mihomo", "clash", "stash", "singbox", "happ", "incy", "browser")
 MAX_BYTES = 65536
 
 
@@ -118,7 +124,7 @@ def main():
         description="Read-only status probe for private Remnawave subscriptions.")
     parser.add_argument("--timeout", type=float, default=8.0)
     parser.add_argument("--clients", nargs="+", choices=list(AGENTS),
-                        default=list(AGENTS))
+                        default=list(DEFAULT_AGENTS))
     args = parser.parse_args()
     url = os.environ.get("GARASU_SUBSCRIPTION_URL", "")
     if not url:

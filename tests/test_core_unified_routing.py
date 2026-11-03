@@ -55,11 +55,49 @@ class UnifiedCoreRoutes(unittest.TestCase):
                 blocked_ip = next(i for i, x in enumerate(rules)
                                   if "garasu-rkn-ips" in x.get("rule_set", []))
                 russian = next(i for i, x in enumerate(rules)
-                               if "ru" in x.get("domain_suffix", []))
+                               if "ru" in x.get("domain_suffix", []) and
+                               x.get("action") == "route")
                 ru_ip = next(i for i, x in enumerate(rules)
                              if "garasu-ru-ips" in x.get("rule_set", []))
                 self.assertLess(blocked, russian)
                 self.assertLess(blocked_ip, ru_ip)
+                ru_resolve = next(i for i, x in enumerate(rules)
+                                  if x.get("action") == "resolve" and
+                                  "ru" in x.get("domain_suffix", []))
+                resolve = next(i for i, x in enumerate(rules)
+                               if x.get("action") == "resolve" and
+                               x.get("server") == "cf-dns")
+                self.assertEqual(rules[ru_resolve]["server"], "local")
+                self.assertEqual(set(rules[ru_resolve]["domain_suffix"]), RU_SUFFIXES)
+                self.assertEqual(rules[resolve]["server"], "cf-dns")
+                self.assertTrue(rules[resolve].get("invert"),
+                                "RU names must not depend on the proxy DNS pool")
+                self.assertEqual(set(rules[resolve].get("domain_suffix", [])), RU_SUFFIXES)
+                self.assertNotIn("strategy", rules[resolve],
+                                 "Both IPv4 and IPv6 answers must remain routable")
+                self.assertLess(blocked, ru_resolve,
+                                "Known blocked domains must not require a DNS lookup")
+                self.assertLess(ru_resolve, resolve)
+                self.assertLess(resolve, blocked_ip)
+                self.assertLess(blocked_ip, russian)
+                private = [i for i, x in enumerate(rules) if x.get("ip_is_private")]
+                self.assertEqual(len(private), 2)
+                self.assertLess(private[0], resolve)
+                self.assertEqual(rules[private[0]]["outbound"], "direct")
+                self.assertGreater(private[1], resolve)
+                self.assertLess(private[1], russian)
+                self.assertEqual(rules[private[1]]["outbound"], "→ Remnawave")
+                cgnat = [i for i, x in enumerate(rules)
+                         if "100.64.0.0/10" in x.get("ip_cidr", [])]
+                self.assertEqual(len(cgnat), 2)
+                self.assertLess(cgnat[0], resolve)
+                self.assertGreater(cgnat[1], resolve)
+                self.assertEqual(rules[cgnat[0]]["outbound"], "direct")
+                self.assertEqual(rules[cgnat[1]]["outbound"], "→ Remnawave")
+                cf_dns = next(x for x in doc["dns"]["servers"]
+                              if x["tag"] == "cf-dns")
+                self.assertEqual(cf_dns["type"], "tls")
+                self.assertEqual(cf_dns["detour"], "→ Remnawave")
                 self.assertEqual(set(rules[russian]["domain_suffix"]), RU_SUFFIXES)
                 self.assertFalse(any(set(x.get("rule_set", [])) &
                                      {"garasu-games", "garasu-direct", "garasu-direct-ips"}

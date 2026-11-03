@@ -50,7 +50,7 @@ class CanaryRoutingTests(unittest.TestCase):
         rkn=next(i for i,r in enumerate(rules) if "garasu-rkn-domains" in r.get("rule_set",[]))
         rknip=next(i for i,r in enumerate(rules) if "garasu-rkn-ips" in r.get("rule_set",[]))
         direct=next(i for i,r in enumerate(rules) if "garasu-ru-ips" in r.get("rule_set",[]))
-        russian=next(i for i,r in enumerate(rules) if "ru" in r.get("domain_suffix",[]))
+        russian=next(i for i,r in enumerate(rules) if "ru" in r.get("domain_suffix",[]) and r.get("action")=="route")
         self.assertLess(rkn,direct)
         self.assertLess(rknip,direct)
         self.assertLess(rkn,russian)

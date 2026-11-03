@@ -45,11 +45,14 @@ def _source_entries(root):
         if not source.is_relative_to(root) or not source.is_file():
             raise ValueError("Unsafe or missing candidate input path")
         result[path] = source.read_bytes()
-    for path, contents in unified_policy.build_candidates(root, policy).items():
+    candidates = unified_policy.build_candidates(root, policy)
+    candidates["clients/unified/mihomo-ru-tld-verified.yaml"] = (
+        unified_policy.build_ru_tld_mihomo_candidate(root, policy))
+    for path, contents in candidates.items():
         if path in result or not path.startswith("clients/unified/"):
             raise ValueError("Unexpected candidate profile output")
         result[path] = contents.encode("utf-8")
-    if len(result) != len(lock["assets"]) + len(paths) + 7:
+    if len(result) != len(lock["assets"]) + len(paths) + 8:
         raise ValueError("Incomplete or duplicate candidate release inputs")
     return result, lock
 

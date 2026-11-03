@@ -22,6 +22,9 @@ proxy-groups:
     tolerance: 150
     lazy: false
     proxies: # LEAVE THIS LINE!
+      # An empty Stash group otherwise behaves as DIRECT.
+      # Explicit reject protects VPN-only destinations when no nodes exist.
+      - REJECT
 rule-providers:
   rkn-domains:
     type: http

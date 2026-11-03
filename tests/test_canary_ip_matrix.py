@@ -1,4 +1,4 @@
-"""Cross-engine IPv4 route-order regression tests for Garasu CZ-only canary.
+"""Cross-engine IPv4 route-order regression tests for Garasu any-node canary.
 
 Static policy oracle; no claims about live DNS resolution or real exit IP.
 """
@@ -11,7 +11,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 CANARY = ROOT / "clients" / "canary"
 CATEGORIES = ("rkn-ips", "proxy-ips", "direct-ips", "ru-ips")
-CZR = "PROXY"
+CZR = "PROXY"  # policy action, not a geographic exit
 DIR = "DIRECT"
 BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/"
 

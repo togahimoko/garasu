@@ -92,13 +92,13 @@ class MockProxy(socketserver.BaseRequestHandler):
                     # Older Mihomo rounds sub-millisecond loopback checks to
                     # zero and reports 503 even when the proxy succeeded.
                     # Use a measurable delay for this *synthetic* test only.
-                    time.sleep(0.040)
+                    time.sleep(getattr(self.server, "health_delay", 0.040))
                     self.request.sendall(
                         b"HTTP/1.1 204 No Content\r\n"
                         b"Content-Length: 0\r\nConnection: keep-alive\r\n\r\n"
                     )
                 else:
-                    body = b"GARASU_CORE_PROXY_PATH_OK"
+                    body = getattr(self.server, "ok_body", b"GARASU_CORE_PROXY_PATH_OK")
                     self.request.sendall(
                         b"HTTP/1.1 200 OK\r\n"
                         b"Content-Type: text/plain\r\nContent-Length: "

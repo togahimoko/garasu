@@ -23,7 +23,7 @@ dns:
   nameserver:
     - https://dns.google/dns-query
     - https://cloudflare-dns.com/dns-query
-  # Resolve the single Remnawave node without depending on proxy DoH bootstrap.
+  # Resolve Remnawave-provided node endpoints without depending on proxy DoH bootstrap.
   # This is a canary fallback to the local system resolver; test on real ISPs.
   proxy-server-nameserver:
     - system
@@ -56,11 +56,17 @@ proxy-groups:
       include-proxies: false
   - name: Garasu Auto
     type: url-test
+    # All subscriber nodes, irrespective of their country or name.
+    # Switch to another healthy node when the current node fails.
     url: https://cp.cloudflare.com/generate_204
-    interval: 300
+    interval: 180
     tolerance: 150
     lazy: false
     timeout: 8000
+    max-failed-times: 2
+    expected-status: 204
+    # Do not resolve an empty subscriber pool as implicit DIRECT.
+    empty-fallback: REJECT
     include-all: true
     remnawave:
       include-proxies: false

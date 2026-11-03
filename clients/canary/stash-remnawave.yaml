@@ -14,8 +14,17 @@ dns:
 proxies: # LEAVE THIS LINE!
 proxy-groups:
   - name: Garasu
-    type: select
+    # Remnawave injects every subscriber node at this anchor.
+    # Native Stash url-test automatically selects a healthy server.
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 180
+    tolerance: 150
+    lazy: false
     proxies: # LEAVE THIS LINE!
+      # An empty Stash group otherwise behaves as DIRECT.
+      # Explicit reject protects VPN-only destinations when no nodes exist.
+      - REJECT
 rule-providers:
   rkn-domains:
     type: http

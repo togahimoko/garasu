@@ -23,6 +23,10 @@
 | [geo](geo/) | Xray GeoIP / GeoSite assets |
 | [install](install/) | Installation links and integrity metadata |
 
+## Reliability
+
+Garasu routing is independent of server count or location. See [multi-node reliability](docs/multi-node-reliability.md) for automatic choice, failure behavior, and client-specific support. Production profiles are distinct from experimental failover templates.
+
 ## Updates and compatibility
 
 Rule sets are validated before scheduled publication. See [compatibility](docs/compatibility.md) for supported formats and limitations, and [sources](SOURCES.md) for third-party attribution.

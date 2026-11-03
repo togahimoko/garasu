@@ -45,6 +45,14 @@ def prepare_mihomo(template, out, node_count=1):
                for x in doc["proxy-groups"])
     # Use committed local providers to test parsing without network fluctuations.
     for name, provider in doc["rule-providers"].items():
+        if provider.get("type") == "inline":
+            # Preserve embedded immutable registries. A missing/empty inline
+            # payload is a fatal candidate fixture error, not a remote fallback.
+            if (provider.get("behavior") not in ("domain", "ipcidr")
+                    or not isinstance(provider.get("payload"), list)
+                    or not provider["payload"]):
+                raise ValueError("Missing full inline rule payload: " + name)
+            continue
         remote = provider["url"].split("/rules/", 1)[-1]
         source = ROOT / "rules" / remote
         if not source.exists():

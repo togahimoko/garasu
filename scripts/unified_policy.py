@@ -40,10 +40,13 @@ def load_policy(path):
     if any(item["action"] not in ("PROXY", "REJECT")
            for item in data["priority"]):
         raise ValueError("Unexpected implicit DIRECT in policy")
-    manifest_path = ROOT / data["snapshot"]["base_manifest"]
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if manifest.get("upstream_revision") != data["snapshot"]["upstream_revision"]:
-        raise ValueError("Full RKN snapshot revision disagrees with current manifest")
+    # The existing production manifest advances during scheduled refresh jobs.
+    # The unified source-lock is immutable and MUST NOT depend on that moving
+    # production file; CI regenerates it from a newer upstream independently.
+    pinned = data["snapshot"]["upstream_revision"]
+    if not isinstance(pinned, str) or len(pinned) != 40 or any(
+            ch not in "0123456789abcdef" for ch in pinned):
+        raise ValueError("Invalid pinned source revision")
     return data
 
 

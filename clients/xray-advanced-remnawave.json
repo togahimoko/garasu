@@ -10,6 +10,16 @@
       {
         "type": "field",
         "domain": [
+          "domain:localhost",
+          "domain:local",
+          "domain:lan",
+          "domain:home.arpa"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "domain": [
           "geosite:private"
         ],
         "outboundTag": "direct"
@@ -45,6 +55,16 @@
           "geosite:win-spy"
         ],
         "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "regexp:.+"
+        ],
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "proxy"
       },
       {
         "type": "field",

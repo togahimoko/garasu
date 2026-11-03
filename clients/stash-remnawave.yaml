@@ -130,13 +130,13 @@ rules:
   - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
   - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
   - RULE-SET,rkn-domains,Garasu
-  - RULE-SET,rkn-ips,Garasu,no-resolve
+  - RULE-SET,rkn-ips,Garasu
   - RULE-SET,youtube,Garasu
   - RULE-SET,discord,Garasu
   - RULE-SET,ai,Garasu
   - RULE-SET,crypto,Garasu
   - RULE-SET,proxy,Garasu
-  - RULE-SET,proxy-ips,Garasu,no-resolve
+  - RULE-SET,proxy-ips,Garasu
   - RULE-SET,ads,REJECT
   - GEOIP,LAN,DIRECT,no-resolve
   - DOMAIN-SUFFIX,ru,DIRECT

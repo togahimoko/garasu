@@ -17,7 +17,7 @@ class CanaryRoutingTests(unittest.TestCase):
         rules = yaml.safe_load((ROOT/"clients/mihomo-remnawave.yaml").read_text())["rules"]
         self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
                         rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
-        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
                         rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
 
     def test_mihomo_and_stash_have_same_russian_ip_override(self):
@@ -27,7 +27,7 @@ class CanaryRoutingTests(unittest.TestCase):
                 self.assertEqual(d["proxies"],None)
                 rules=d["rules"]
                 self.assertNotIn("GEOIP,RU,DIRECT",rules)
-                self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+                self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
                                 rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
                 self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
                                 rules.index("DOMAIN-SUFFIX,ru,DIRECT"))

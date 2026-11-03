@@ -28,8 +28,10 @@ class UnifiedCoreRoutes(unittest.TestCase):
                 rules = doc["rules"]
                 self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
                                 rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
-                self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+                self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
                                 rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
+                self.assertLess(rules.index("RULE-SET,proxy-ips,Garasu"),
+                                rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
                 self.assertEqual(rules[-1], "MATCH,Garasu")
                 self.assertFalse(any(x.startswith("RULE-SET," + name + ",DIRECT")
                                      for name in ("games", "direct", "direct-ips")
@@ -101,6 +103,16 @@ class UnifiedCoreRoutes(unittest.TestCase):
         ads = next(i for i, x in enumerate(routes)
                    if "geosite:category-ads" in x.get("domain", []))
         self.assertLess(blocked_ip, ads)
+        rebinding = next(i for i, x in enumerate(routes)
+                         if "geoip:private" in x.get("ip", []) and x.get("domain"))
+        private_ip = next(i for i, x in enumerate(routes)
+                          if "geoip:private" in x.get("ip", []) and not x.get("domain"))
+        self.assertLess(rebinding, private_ip)
+        self.assertEqual(routes[rebinding]["outboundTag"], "proxy")
+        lan = next(i for i, x in enumerate(routes)
+                   if "domain:lan" in x.get("domain", []))
+        self.assertLess(lan, rebinding)
+        self.assertEqual(routes[lan]["outboundTag"], "direct")
         self.assertLess(blocked_ip, next(i for i, x in enumerate(routes)
                                          if "geoip:ru" in x.get("ip", [])))
         self.assertEqual(routes[-1]["outboundTag"], "proxy")

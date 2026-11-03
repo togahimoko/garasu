@@ -8,6 +8,8 @@ import os
 from pathlib import Path
 import re
 import shutil
+import subprocess
+import sys
 import tempfile
 import time
 import urllib.request
@@ -274,6 +276,15 @@ def run():
             target = temp / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(data)
+        # Generate the quality snapshot from the SAME validated stage tree.
+        # If the audit fails, not a single persistent rule is published.
+        subprocess.run(
+            [sys.executable, str(ROOT / "scripts/audit_rules.py"),
+             "--root", str(temp), "--write"],
+            check=True,
+        )
+        for relative in ("reports/quality.json", "reports/quality.md"):
+            generated[relative] = (temp / relative).read_bytes()
         for relative, data in generated.items():
             target = ROOT / relative
             target.parent.mkdir(parents=True, exist_ok=True)

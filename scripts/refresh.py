@@ -30,6 +30,7 @@ IP = {
     "rkn-ips": ("release/refilter-ip.list", 600),
     "proxy-ips": ("release/proxy-ip.list", 4),
     "direct-ips": ("release/direct-ip.list", 15),
+    "ru-ips": ("release/ru-ip.list", 15000),
 }
 GEO = {
     "geoip.dat": ("v2ray/geoip.dat", 200000),
@@ -92,6 +93,38 @@ def ip_data(blob, minimum):
     mihomo = prefix + "\n".join(raw) + "\n"
     return sr.encode(), mihomo.encode(), len(raw)
 
+def singbox_domains(blob):
+    """Convert canonical +.domain provider lines to sing-box source rule sets."""
+    items = [line.strip() for line in blob.decode("utf-8").splitlines()
+             if line.strip() and not line.startswith("#")]
+    suffixes = []
+    exact = []
+    for item in items:
+        if item.startswith("+.") or item.startswith("*."):
+            suffixes.append(item[2:])
+        elif item.startswith("."):
+            suffixes.append(item[1:])
+        else:
+            exact.append(item)
+    rule = {}
+    if suffixes:
+        rule["domain_suffix"] = suffixes
+    if exact:
+        rule["domain"] = exact
+    return (json.dumps({"version": 3, "rules": [rule]},
+                       ensure_ascii=False, separators=(",", ":")) + "\n").encode()
+
+
+def singbox_ips(blob):
+    """Convert canonical CIDR files to sing-box source rule sets."""
+    entries = [line.strip() for line in blob.decode("utf-8").splitlines()
+               if line.strip() and not line.startswith("#")]
+    for net in entries:
+        ipaddress.ip_network(net)
+    return (json.dumps({"version": 3, "rules": [{"ip_cidr": entries}]},
+                       ensure_ascii=False, separators=(",", ":")) + "\n").encode()
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -112,11 +145,13 @@ def run():
         for name, (source, minimum) in DOMAIN.items():
             blob, count = domains(fetch(source), minimum)
             add("rules/" + name + ".list", blob, source, count)
+            add("rules/singbox/" + name + ".json", singbox_domains(blob), source, count)
         for name, (source, minimum) in IP.items():
             original = fetch(source)
             sr, mihomo, count = ip_data(original, minimum)
             add("rules/" + name + ".list", sr, source, count)
             add("rules/" + name + ".cidr", mihomo, source, count)
+            add("rules/singbox/" + name + ".json", singbox_ips(mihomo), source, count)
         for name, (source, minimum) in GEO.items():
             blob = fetch(source)
             if len(blob) < minimum or blob.startswith(b"<html"):
@@ -152,7 +187,7 @@ def run():
         # Validate all dependent artifacts before any persistent file write.
         assert "geoip:blocked-ru" in profile["ProxyIp"]
         assert "geosite:banned-ru" in profile["ProxySites"]
-        assert len(records) == 17, len(records)
+        assert len(records) == 32, len(records)
         assert json.loads(generated["clients/incy.json"])["Name"] == "Garasu MAX"
         for relative, data in generated.items():
             target = temp / relative

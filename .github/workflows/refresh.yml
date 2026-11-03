@@ -32,7 +32,7 @@ jobs:
       - name: Install validation dependency
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.2
       - name: Verify immutable source-release blobs in Git history
-        run: python scripts/verify_unified_git_objects.py
+        run: python -m scripts.verify_unified_git_objects
       - name: Check static profiles and builder
         # main may legitimately contain newer geo/rules after a prior refresh.
         # Immutable historical blobs are verified strictly in the step above.

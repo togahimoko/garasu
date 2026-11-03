@@ -464,6 +464,32 @@ class GarasuTests(unittest.TestCase):
             self.assertTrue((ROOT / "geo/geoip.dat").is_file())
             self.assertTrue((ROOT / "geo/geosite.dat").is_file())
 
+    def test_delivery_checker_rejects_tampering_and_insecure_mirrors(self):
+        spec = importlib.util.spec_from_file_location(
+            "garasu_delivery", ROOT / "scripts/check_delivery.py")
+        delivery = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(delivery)
+        payload = b"# Garasu\n+.youtube.com\n"
+        meta = {"files": {"rules/youtube.list": {
+            "sha256": hashlib.sha256(payload).hexdigest(),
+            "bytes": len(payload),
+        }}}
+        self.assertTrue(delivery.verify_asset("rules/youtube.list", payload, meta))
+        with self.assertRaises(ValueError):
+            delivery.verify_asset("rules/youtube.list", payload+b"+.evil.com\n", meta)
+        with self.assertRaises(ValueError):
+            delivery.verify_asset("rules/unknown.list", payload, meta)
+        self.assertEqual(
+            delivery.validate_base_url("https://rules.example.org/static/"),
+            "https://rules.example.org/static",
+        )
+        for insecure in ("http://rules.example.org", "https://u:p@rules.example.org",
+                         "https://rules.example.org/path?token=secret",
+                         "https://rules.example.org/#fragment"):
+            with self.subTest(insecure=insecure):
+                with self.assertRaises(ValueError):
+                    delivery.validate_base_url(insecure)
+
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():
             content = path.read_text()

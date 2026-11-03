@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Garasu routing data publisher. Standard library only; no VPN credentials."""
 import base64
+from email.utils import parsedate_to_datetime
 import hashlib
 import ipaddress
 import json
@@ -16,6 +17,9 @@ import urllib.request
 from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
+if not __package__:
+    sys.path.insert(0, str(ROOT))
+from scripts.routing_policy import validate_source_metadata
 UPSTREAM = "https://raw.githubusercontent.com/DigneZzZ/routing/main"
 REPO = os.environ.get("GITHUB_REPOSITORY", "togahimoko/garasu")
 DOMAIN = {
@@ -26,11 +30,11 @@ DOMAIN = {
     "discord": ("release/discord.list", 15),
     "games": ("release/games.list", 60),
     "proxy": ("release/proxy.list", 80),
-    "rkn-domains": ("release/refilter-domain.list", 10000),
+    "rkn-domains": ("release/refilter-domain-full.list", 70000),
     "youtube": ("release/youtube.list", 60),
 }
 IP = {
-    "rkn-ips": ("release/refilter-ip.list", 600),
+    "rkn-ips": ("release/refilter-ip-full.list", 20000),
     "proxy-ips": ("release/proxy-ip.list", 4),
     "direct-ips": ("release/direct-ip.list", 15),
     "ru-ips": ("release/ru-ip.list", 15000),
@@ -39,6 +43,12 @@ GEO = {
     "geoip.dat": ("v2ray/geoip.dat", 200000),
     "geosite.dat": ("v2ray/geosite.dat", 200000),
 }
+RU_SUFFIXES = ("ru", "su", "moscow", "xn--p1ai", "xn--p1acf",
+               "xn--80asehdb", "xn--c1avg", "xn--80aswg",
+               "xn--80adxhks", "xn--d1acj3b")
+NATIVE_PROXY_GEOSITES = ("telegram", "github", "discord", "whatsapp",
+                         "banned-ru", "hosting", "youtube", "ai", "crypto",
+                         "category-geoblock-ru", "twitch-ads")
 
 def parse_upstream_revision(blob):
     """GitHub API commit SHA; never trust a moving tag for a multi-file release."""
@@ -54,6 +64,17 @@ def parse_upstream_revision(blob):
     return revision
 
 
+def parse_git_revision(blob):
+    """Parse exactly the main ref returned by git ls-remote."""
+    lines = blob.decode("ascii").splitlines()
+    if len(lines) != 1:
+        raise ValueError("Unexpected upstream Git ref response")
+    match = re.fullmatch(r"([0-9a-f]{40})\trefs/heads/main", lines[0])
+    if not match:
+        raise ValueError("Invalid upstream Git ref response")
+    return match.group(1)
+
+
 def upstream_raw_url(revision, path):
     if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Invalid upstream revision")
@@ -63,18 +84,42 @@ def upstream_raw_url(revision, path):
 
 
 def resolve_upstream_revision():
-    req = urllib.request.Request(
-        "https://api.github.com/repos/DigneZzZ/routing/git/ref/heads/main",
-        headers={"User-Agent": "Garasu-Routing/1.0",
-                 "Accept": "application/vnd.github+json"},
+    result = subprocess.run(
+        ["git", "ls-remote", "https://github.com/DigneZzZ/routing.git",
+         "refs/heads/main"], capture_output=True, check=True, timeout=30,
     )
-    with urllib.request.urlopen(req, timeout=20) as response:
-        if response.status != 200:
-            raise ValueError("GitHub upstream revision lookup failed")
-        content = response.read(16385)
-    if len(content) > 16384:
-        raise ValueError("Unexpectedly large GitHub revision response")
-    return parse_upstream_revision(content)
+    if len(result.stdout) > 1024:
+        raise ValueError("Unexpectedly large upstream Git ref response")
+    return parse_git_revision(result.stdout)
+
+
+def parse_upstream_commit_date(blob, revision):
+    """Extract a stable Unix timestamp from a patch for the pinned commit."""
+    if not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("Invalid upstream revision")
+    header = blob.decode("utf-8").split("\n\n", 1)[0].splitlines()
+    if not header or header[0] != "From " + revision + " Mon Sep 17 00:00:00 2001":
+        raise ValueError("Commit patch does not match upstream revision")
+    dates = [line[6:] for line in header if line.startswith("Date: ")]
+    if len(dates) != 1:
+        raise ValueError("Commit patch has no unique date")
+    parsed = parsedate_to_datetime(dates[0])
+    if parsed.tzinfo is None:
+        raise ValueError("Commit patch date has no timezone")
+    return str(int(parsed.timestamp()))
+
+
+def upstream_commit_date(revision):
+    """Read immutable commit metadata without using GitHub's API endpoint."""
+    if not re.fullmatch(r"[0-9a-f]{40}", revision):
+        raise ValueError("Invalid upstream revision")
+    url = "https://github.com/DigneZzZ/routing/commit/" + revision + ".patch"
+    request = urllib.request.Request(url, headers={"User-Agent": "Garasu-Routing/1.0"})
+    with urllib.request.urlopen(request, timeout=20) as response:
+        if response.status != 200 or response.url != url:
+            raise ValueError("Upstream commit patch lookup failed")
+        header = response.read(8192)
+    return parse_upstream_commit_date(header, revision)
 
 
 def fetch(path, revision):
@@ -242,7 +287,9 @@ def quantumultx_ips(blob, policy):
 
 
 def policy_for(name):
-    return "reject" if name == "ads" else ("direct" if name in ("games", "direct", "direct-ips", "ru-ips") else "proxy")
+    # The source's games/direct categories contain foreign services. Native
+    # resources may be imported independently, so never label them DIRECT.
+    return "reject" if name == "ads" else ("direct" if name in ("ru-tlds", "ru-ips") else "proxy")
 
 
 def _protobuf_varint(data, index):
@@ -282,6 +329,118 @@ def _protobuf_fields(data):
             raise ValueError("Invalid protobuf wire type " + str(wire))
         if pos > len(data):
             raise ValueError("Truncated protobuf scalar")
+
+
+def _protobuf_number(value):
+    result = bytearray()
+    while value >= 128:
+        result.append((value & 127) | 128)
+        value >>= 7
+    result.append(value)
+    return bytes(result)
+
+
+def _protobuf_bytes(number, payload):
+    return _protobuf_number(number << 3 | 2) + _protobuf_number(len(payload)) + payload
+
+
+def replace_geodata_category(name, geodata, category, canonical):
+    """Replace a binary category with the exact validated canonical rule set."""
+    wanted = category.upper().encode("ascii")
+    if name == "geosite.dat":
+        values = [line[2:] for line in canonical.decode("utf-8").splitlines()
+                  if line and not line.startswith("#")]
+        if not values or any(not _safe_domain_set_entry("+." + value) for value in values):
+            raise ValueError("Invalid canonical GeoSite source")
+        # v2ray Domain.Type=2 means suffix, which includes the root domain.
+        items = [b"\x08\x02" + _protobuf_bytes(2, value.encode("ascii"))
+                 for value in values]
+    elif name == "geoip.dat":
+        values = [line for line in canonical.decode("utf-8").splitlines()
+                  if line and not line.startswith("#")]
+        networks = [ipaddress.ip_network(value, strict=True) for value in values]
+        if not networks:
+            raise ValueError("Empty canonical GeoIP source")
+        items = [_protobuf_bytes(1, network.network_address.packed)
+                 + _protobuf_number(2 << 3) + _protobuf_number(network.prefixlen)
+                 for network in networks]
+    else:
+        raise ValueError("Unknown geodata file " + name)
+    replacement = _protobuf_bytes(1, wanted) + b"".join(_protobuf_bytes(2, item) for item in items)
+    output = bytearray()
+    replaced = False
+    for number, entry in _protobuf_fields(geodata):
+        if number != 1:
+            raise ValueError("Unexpected top-level geodata field")
+        code = next((value for field, value in _protobuf_fields(entry) if field == 1), None)
+        if code == wanted:
+            if replaced:
+                raise ValueError("Duplicate geodata category " + category)
+            entry = replacement
+            replaced = True
+        output.extend(_protobuf_bytes(1, entry))
+    if not replaced:
+        raise ValueError("Missing geodata category " + category)
+    return bytes(output)
+
+
+def add_native_geosite_categories(geodata, proxy_categories=NATIVE_PROXY_GEOSITES,
+                                  block_categories=("category-ads", "win-spy"),
+                                  ru_suffixes=RU_SUFFIXES):
+    """Add RU suffixes and ads that cannot override a PROXY GeoSite entry.
+
+    All consumed entries must use v2ray Domain.Type=2 (suffix). A different
+    upstream encoding needs review before it can be safely subtracted.
+    """
+    categories = {}
+    for number, entry in _protobuf_fields(geodata):
+        if number != 1:
+            raise ValueError("Unexpected top-level GeoSite field")
+        fields = list(_protobuf_fields(entry))
+        code = next((value.decode("ascii").lower() for field, value in fields
+                     if field == 1), None)
+        if not code or code in categories:
+            raise ValueError("Missing or duplicate GeoSite category")
+        categories[code] = [value for field, value in fields if field == 2]
+    if "garasu-ru" in categories or "garasu-ads" in categories:
+        raise ValueError("Unexpected pre-existing Garasu GeoSite category")
+
+    def suffixes(names):
+        values = set()
+        for name in names:
+            if name not in categories:
+                raise ValueError("Missing GeoSite category " + name)
+            for item in categories[name]:
+                if not item.startswith(b"\x08\x02"):
+                    raise ValueError("Unsupported GeoSite domain type in " + name)
+                domain = dict(_protobuf_fields(item)).get(2, b"").decode("ascii").lower()
+                if not domain or not _safe_domain_set_entry("+." + domain):
+                    raise ValueError("Invalid GeoSite domain in " + name)
+                values.add(domain)
+        return values
+
+    proxy = suffixes(proxy_categories)
+    ads = suffixes(block_categories)
+    # Both directions matter: an ad child of a proxy suffix and an ad parent
+    # of a proxy child would defeat proxy-first routing under block-first mode.
+    proxy_parents = {".".join(parts[i:])
+                     for domain in proxy for parts in [domain.split(".")]
+                     for i in range(len(parts) - 1)}
+    def has_proxy_parent(domain):
+        parts = domain.split(".")
+        return any(".".join(parts[i:]) in proxy for i in range(len(parts) - 1))
+    safe_ads = sorted(domain for domain in ads
+                      if domain not in proxy_parents and not has_proxy_parent(domain))
+    if not safe_ads:
+        raise ValueError("No non-overlapping native ad domains")
+    def category(code, values):
+        items = (b"\x08\x02" + _protobuf_bytes(2, value.encode("ascii"))
+                 for value in values)
+        entry = _protobuf_bytes(1, code.encode("ascii"))
+        entry += b"".join(_protobuf_bytes(2, item) for item in items)
+        return _protobuf_bytes(1, entry)
+    return (geodata + category("GARASU-RU", ru_suffixes)
+            + category("GARASU-ADS", safe_ads))
 
 
 GEODATA_REQUIRED = {
@@ -330,6 +489,8 @@ def validate_update_budget(records, previous):
         then = old.get(path)
         if not then:
             continue
+        if is_complete_source_migration(path, then, now):
+            continue
         before, after = then.get("entries"), now.get("entries")
         if isinstance(before, int) and before > 0 and isinstance(after, int):
             # Allow routine RKN churn, reject an abrupt 45% shrink or >2.5x growth.
@@ -337,6 +498,16 @@ def validate_update_budget(records, previous):
             if after < before * 0.55 or after > before * 2.5:
                 raise ValueError("Source drift requires review: " + path
                                  + " before=" + str(before) + " after=" + str(after))
+
+
+def is_complete_source_migration(path, previous, current):
+    filename = path.rsplit("/", 1)[-1]
+    stem = ("refilter-domain" if path.startswith("rules/") and filename in
+            ("rkn-domains.list", "rkn-domains.json") else
+            "refilter-ip" if path.startswith("rules/") and filename in
+            ("rkn-ips.list", "rkn-ips.json", "rkn-ips.cidr") else None)
+    return bool(stem and previous.get("source", "").endswith("/release/" + stem + ".list")
+                and current.get("source", "").endswith("/release/" + stem + "-full.list"))
 
 
 def validate_source_churn(path, previous_blob, current_blob, max_churn=0.5):
@@ -362,29 +533,91 @@ def validate_source_churn(path, previous_blob, current_blob, max_churn=0.5):
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
+
+def promote_staged(root, stage, generated):
+    """Promote all files with prepared backups; restore on a write failure."""
+    changed = {relative for relative, data in generated.items()
+               if not (root / relative).is_file() or (root / relative).read_bytes() != data}
+    if not changed:
+        return
+    with tempfile.TemporaryDirectory(prefix=".garasu-publish-", dir=root) as workspace:
+        workspace = Path(workspace)
+        incoming = workspace / "incoming"
+        backups = workspace / "backups"
+        existed = set()
+        for relative in sorted(changed):
+            prepared = incoming / relative
+            prepared.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(stage / relative, prepared)
+            target = root / relative
+            if target.is_file():
+                saved = backups / relative
+                saved.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(target, saved)
+                existed.add(relative)
+        promoted = []
+        try:
+            for relative in sorted(changed):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(incoming / relative, target)
+                promoted.append(relative)
+        except OSError:
+            failures = []
+            for relative in reversed(promoted):
+                target = root / relative
+                try:
+                    if relative in existed:
+                        os.replace(backups / relative, target)
+                    else:
+                        target.unlink()
+                except OSError as error:
+                    failures.append(str(error))
+            if failures:
+                raise RuntimeError("Promotion failed and rollback was incomplete: "
+                                   + "; ".join(failures))
+            raise
+
 def run():
     if not re.fullmatch(r"[\w.-]+/[\w.-]+", REPO):
         raise ValueError("Invalid GITHUB_REPOSITORY")
     revision = resolve_upstream_revision()
+    last_updated = upstream_commit_date(revision)
     upstream_origin = "https://raw.githubusercontent.com/DigneZzZ/routing/" + revision
+    previous_path = ROOT / "install/manifest.json"
+    previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
     with tempfile.TemporaryDirectory(prefix="garasu-") as tmp:
         temp = Path(tmp)
         records = {}
         generated = {}
-        def add(path, data, source=None, count=None):
+        source_metadata = {}
+        source_bytes = {}
+        def add(path, data, source=None, count=None, source_blob=None):
             if path.startswith("rules/") and path.count("/") == 1:
                 current = ROOT / path
                 previous_blob = current.read_bytes() if current.is_file() else None
                 threshold = 0.60 if "rkn-" in path else 0.50
-                validate_source_churn(path, previous_blob, data, max_churn=threshold)
+                candidate = {"source": upstream_raw_url(revision, source)} if source else {}
+                if not is_complete_source_migration(path, previous.get("files", {}).get(path, {}), candidate):
+                    validate_source_churn(path, previous_blob, data, max_churn=threshold)
             generated[path] = data
             if source is not None:
                 entry = {"source": upstream_raw_url(revision, source), "sha256": digest(data), "bytes": len(data)}
+                if source_blob is not None:
+                    entry["source_sha256"] = digest(source_blob)
+                    entry["source_bytes"] = len(source_blob)
                 if count is not None:
                     entry["entries"] = count
                 records[path] = entry
         for name, (source, minimum) in DOMAIN.items():
-            blob, count = domains(fetch(source, revision), minimum)
+            original = fetch(source, revision)
+            blob, count = domains(original, minimum)
+            if name == "rkn-domains":
+                source_bytes["blocked_domains"] = original
+                source_metadata["blocked_domains"] = {
+                    "dataset": "refilter-domain-full", "url": upstream_raw_url(revision, source),
+                    "revision": revision, "sha256": digest(original),
+                    "bytes": len(original), "entries": count}
             add("rules/" + name + ".list", blob, source, count)
             add("rules/singbox/" + name + ".json", singbox_domains(blob), source, count)
             add("rules/surge/" + name + ".list", surge_domains(blob), source, count)
@@ -393,44 +626,87 @@ def run():
         for name, (source, minimum) in IP.items():
             original = fetch(source, revision)
             sr, mihomo, count = ip_data(original, minimum, name=name)
+            if name == "rkn-ips":
+                source_bytes["blocked_ips"] = original
+                source_metadata["blocked_ips"] = {
+                    "dataset": "refilter-ip-full", "url": upstream_raw_url(revision, source),
+                    "revision": revision, "sha256": digest(original),
+                    "bytes": len(original), "entries": count}
             add("rules/" + name + ".list", sr, source, count)
             add("rules/" + name + ".cidr", mihomo, source, count)
             add("rules/singbox/" + name + ".json", singbox_ips(mihomo), source, count)
             add("rules/surge/" + name + ".list", surge_ips(mihomo), source, count)
             add("rules/quantumultx/" + name + ".list",
                 quantumultx_ips(mihomo, policy_for(name)), source, count)
+        ru_tlds = quantumultx_domains(
+            ("\n".join("+." + suffix for suffix in RU_SUFFIXES) + "\n").encode(),
+            "direct")
+        add("rules/quantumultx/ru-tlds.list", ru_tlds)
+        records["rules/quantumultx/ru-tlds.list"] = {
+            "source": "garasu:routing-policy:ru-suffixes",
+            "sha256": digest(ru_tlds), "bytes": len(ru_tlds),
+            "entries": len(RU_SUFFIXES),
+        }
+        validate_source_metadata(source_metadata)
+        for key, info in source_metadata.items():
+            if len(source_bytes[key]) != info["bytes"] or digest(source_bytes[key]) != info["sha256"]:
+                raise ValueError("Blocked input integrity mismatch: " + key)
         for name, (source, minimum) in GEO.items():
-            blob = fetch(source, revision)
+            original = fetch(source, revision)
+            blob = original
             if len(blob) < minimum or blob.startswith(b"<html"):
                 raise ValueError("Invalid geodata " + name)
             validate_geodata(name, blob)
-            add("geo/" + name, blob, source)
-        previous_path = ROOT / "install/manifest.json"
-        previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
-        validate_update_budget(records, previous)
-        changed = previous.get("files") != records
-        manifest = {"name": "Garasu MAX", "upstream": upstream_origin,
-                    "upstream_revision": revision, "files": records}
-        add("install/manifest.json", (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode())
+            if name == "geosite.dat":
+                blob = replace_geodata_category(name, blob, "banned-ru",
+                                                generated["rules/rkn-domains.list"])
+                blob = add_native_geosite_categories(blob)
+                required_category = "banned-ru"
+                required_count = source_metadata["blocked_domains"]["entries"]
+            else:
+                blob = replace_geodata_category(name, blob, "blocked-ru",
+                                                generated["rules/rkn-ips.cidr"])
+                required_category = "blocked-ru"
+                required_count = source_metadata["blocked_ips"]["entries"]
+            if validate_geodata(name, blob)[required_category] != required_count:
+                raise ValueError("Geodata blocked category differs from complete source")
+            if name == "geosite.dat":
+                derived = validate_geodata(name, blob)
+                if derived["garasu-ru"] != len(RU_SUFFIXES) or derived["garasu-ads"] < 100:
+                    raise ValueError("Incomplete native GeoSite categories")
+            add("geo/" + name, blob, source, source_blob=original)
         base = "https://raw.githubusercontent.com/" + REPO + "/main"
-        last_updated = str(int(time.time())) if changed else None
         for app in ("incy", "happ"):
             profile = json.loads((ROOT / "clients" / (app + ".json")).read_text())
             profile["Name"] = "Garasu MAX"
             profile["GlobalProxy"] = "true"
             profile["Geoipurl"] = base + "/geo/geoip.dat"
             profile["Geositeurl"] = base + "/geo/geosite.dat"
-            if last_updated:
-                profile["LastUpdated"] = last_updated
+            profile["LastUpdated"] = last_updated
             encoded = (json.dumps(profile, ensure_ascii=False, indent=2) + "\n").encode()
-            add("clients/" + app + ".json", encoded)
+            relative = "clients/" + app + ".json"
+            add(relative, encoded)
+            records[relative] = {"source": "garasu:profile-template:" + app,
+                                 "sha256": digest(encoded), "bytes": len(encoded)}
             if app == "happ":
                 happ_link = "happ://routing/onadd/" + base64.b64encode(json.dumps(
                     profile, ensure_ascii=False, separators=(",", ":")).encode()).decode()
+        shadowrocket = (ROOT / "clients/shadowrocket.conf").read_bytes()
+        add("clients/shadowrocket.conf", shadowrocket)
+        records["clients/shadowrocket.conf"] = {
+            "source": "garasu:managed-config:shadowrocket",
+            "sha256": digest(shadowrocket), "bytes": len(shadowrocket)}
+        validate_update_budget(records, previous)
+        changed = previous.get("files") != records
+        manifest = {"name": "Garasu MAX", "upstream": upstream_origin,
+                    "upstream_revision": revision, "sources": source_metadata,
+                    "files": records}
+        manifest_blob = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode()
+        add("install/manifest.json", manifest_blob)
         qx_filters = []
-        rule_order = ("rkn-domains", "rkn-ips", "youtube", "discord", "ai",
-                      "crypto", "proxy", "proxy-ips", "ads", "games", "direct",
-                      "direct-ips", "ru-ips")
+        surge_order = ("rkn-domains", "rkn-ips", "youtube", "discord", "ai",
+                       "crypto", "proxy", "proxy-ips", "ads", "ru-ips")
+        rule_order = surge_order[:-1] + ("ru-tlds", "ru-ips")
         for name in rule_order:
             qx_filters.append(
                 base + "/rules/quantumultx/" + name + ".list, tag=Garasu-" + name
@@ -447,14 +723,16 @@ def run():
             "singbox_template": base + "/clients/singbox-remnawave.json",
             "xray_advanced_template": base + "/clients/xray-advanced-remnawave.json",
             "quantumultx": quantumultx_link,
+            "manifest_url": base + "/install/manifest.json",
+            "manifest_sha256": digest(manifest_blob),
             "surge_rulesets": {n: base + "/rules/surge/" + n + ".list"
-                               for n in rule_order},
+                               for n in surge_order},
         }
         add("install/links.json", (json.dumps(links, ensure_ascii=False, indent=2) + "\n").encode())
         # Validate all dependent artifacts before any persistent file write.
         assert "geoip:blocked-ru" in profile["ProxyIp"]
         assert "geosite:banned-ru" in profile["ProxySites"]
-        assert len(records) == 58, len(records)
+        assert len(records) == 62, len(records)
         assert json.loads(generated["clients/incy.json"])["Name"] == "Garasu MAX"
         for relative, data in generated.items():
             target = temp / relative
@@ -469,11 +747,7 @@ def run():
         )
         for relative in ("reports/quality.json", "reports/quality.md"):
             generated[relative] = (temp / relative).read_bytes()
-        for relative, data in generated.items():
-            target = ROOT / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            if not target.exists() or target.read_bytes() != data:
-                shutil.copyfile(temp / relative, target)
+        promote_staged(ROOT, temp, generated)
         print("Garasu MAX: " + str(len(records)) + " validated datasets; changed=" + str(changed))
 
 if __name__ == "__main__":

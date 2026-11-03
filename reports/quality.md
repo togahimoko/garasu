@@ -4,11 +4,11 @@
 Пересечения не удаляются: конкретные PROXY-правила имеют приоритет
 перед общими DIRECT-суффиксами. Это диагностические показатели.
 
-Идентификатор снимка: b54c463fb0dbfc3283ee67a80edb68edec0a99894ac342b7bd4a1f6d55c7437f
+Идентификатор снимка: 28997bad609ab15b0c46c98149fe43180ef83a73795eec894ec06a9a6c328755
 
 | Доменные категории | Записей |
 |---|---:|
-| rkn-domains | 21989 |
+| rkn-domains | 75306 |
 | youtube | 176 |
 | discord | 28 |
 | ai | 215 |
@@ -20,7 +20,7 @@
 
 | IP-категории | Всего | IPv4 | IPv6 |
 |---|---:|---:|---:|
-| rkn-ips | 1141 | 1141 | 0 |
+| rkn-ips | 25391 | 25391 | 0 |
 | proxy-ips | 6 | 6 | 0 |
 | direct-ips | 28 | 16 | 12 |
 | ru-ips | 25157 | 12987 | 12170 |
@@ -29,8 +29,8 @@
 
 | PROXY | Общий DIRECT | Количество | Примеры |
 |---|---|---:|---|
-| rkn-domains | games | 3 | blaper.artstation.com / artstation.com, digitalfly.artstation.com / artstation.com, tr.rbxcdn.com / rbxcdn.com |
-| rkn-domains | direct | 58 | alko-scherbinka.at.ua / at.ua, antago.at.ua / at.ua, anwap.ru.com / ru.com |
+| rkn-domains | games | 5 | blaper.artstation.com / artstation.com, digitalfly.artstation.com / artstation.com, rbxcdn.com / rbxcdn.com |
+| rkn-domains | direct | 76 | alko-scherbinka.at.ua / at.ua, antago.at.ua / at.ua, anwap.ru.com / ru.com |
 | ai | direct | 7 | coderabbit.gallery.vsassets.io / vsassets.io, copilot.microsoft.com / microsoft.com, openaiapi-site.azureedge.net / azureedge.net |
 | proxy | direct | 25 | ads.twitch.tv / twitch.tv, copilotprodattachments.blob.core.windows.net / windows.net, gql.twitch.tv / twitch.tv |
 
@@ -45,6 +45,8 @@
 
 ## Точные конфликты доменов
 
-Точных совпадений между категориями с разными действиями нет.
+- rkn-domains / ads: 4
+- rkn-domains / games: 3
+- rkn-domains / direct: 4
 
 Расширенный машинный отчёт: quality.json.

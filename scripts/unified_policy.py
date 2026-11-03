@@ -331,11 +331,16 @@ def _render_singbox(root, policy, lock):
 def _render_xray(root, policy):
     config = json.loads((root / "clients/xray-advanced-remnawave.json").read_text())
     rules = config["routing"]["rules"]
-    # Existing geodata is pinned to the same upstream revision, but its
-    # banned-ru category is NOT a full-refilter substitute. No RU DIRECT here.
-    # Service PROXY must win over optional advertisement REJECT.
-    config["routing"]["rules"] = [rules[0], rules[1], rules[3], rules[4],
-                                   rules[2], rules[-1]]
+    # Keep the LAN and public-hostname rebinding guards from the source
+    # profile, while withholding the broad RU fallback in this candidate.
+    # Service PROXY must precede the optional advertisement block rule.
+    config["routing"]["rules"] = [
+        rule for rule in rules
+        if not (rule.get("outboundTag") == "direct" and (
+            rule.get("ip") == ["geoip:ru"] or
+            any(value.startswith("regexp:(?i)")
+                for value in rule.get("domain", []))))
+    ]
     return json.dumps(config, ensure_ascii=False, indent=2) + "\n"
 
 
@@ -384,7 +389,8 @@ def build_ru_tld_mihomo_candidate(root, policy):
     """
     root = Path(root)
     lock = load_release_lock(root / "policy/unified-release-lock.json", policy)
-    verify_release_assets(root, lock)
+    from scripts import verify_unified_git_objects
+    verify_unified_git_objects.verify_history(root, lock)
     if policy["ru_bypass_enabled"] is not False:
         raise ValueError("Unexpected production-wide RU bypass")
     domains = [line for line in

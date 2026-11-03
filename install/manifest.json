@@ -2,6 +2,24 @@
   "name": "Garasu MAX",
   "upstream": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28",
   "upstream_revision": "29115cbf9a00c65aea80977a73a18f27511a0e28",
+  "sources": {
+    "blocked_domains": {
+      "dataset": "refilter-domain-full",
+      "url": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain-full.list",
+      "revision": "29115cbf9a00c65aea80977a73a18f27511a0e28",
+      "sha256": "bab0cc53c15dd5f287e45b8463142ade480fa282b5d4ee03ecf7be7d48cd07c9",
+      "bytes": 1340975,
+      "entries": 75306
+    },
+    "blocked_ips": {
+      "dataset": "refilter-ip-full",
+      "url": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip-full.list",
+      "revision": "29115cbf9a00c65aea80977a73a18f27511a0e28",
+      "sha256": "d2f3d57f86c716371e5a1b27b38af3f0e0ff817553851119a4ef18f954b31f52",
+      "bytes": 437484,
+      "entries": 25391
+    }
+  },
   "files": {
     "rules/ads.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/reject.list",
@@ -95,8 +113,8 @@
     },
     "rules/quantumultx/direct.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct.list",
-      "sha256": "9dbfd0d195c1bbad99b1abd4e51d74bc8e7055246d2e8da7e5818eeddda39e83",
-      "bytes": 122755,
+      "sha256": "84f314efb2028859574981930ecbb54037754b6d508f758253d71e1811c1026a",
+      "bytes": 119472,
       "entries": 3283
     },
     "rules/discord.list": {
@@ -143,8 +161,8 @@
     },
     "rules/quantumultx/games.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/games.list",
-      "sha256": "d62ab1a47482601f1cb280776a45bfa5d403c6976388edeb2cd1d165b52138dd",
-      "bytes": 4626,
+      "sha256": "603a4c033395e694fbcaf0e28a29082ac03f1070b15983f738e1ae05ddd2bc6a",
+      "bytes": 4509,
       "entries": 117
     },
     "rules/proxy.list": {
@@ -172,28 +190,28 @@
       "entries": 154
     },
     "rules/rkn-domains.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain.list",
-      "sha256": "e38521e98264c75c23b1bef8ffee75627e3ceb516cae31785bf1280b8511cda5",
-      "bytes": 393752,
-      "entries": 21989
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain-full.list",
+      "sha256": "fd82b27a16f7792afcf8e4e97c060f1dfd4aeaae1c52e94f3b4dc35addbf3c21",
+      "bytes": 1340856,
+      "entries": 75306
     },
     "rules/singbox/rkn-domains.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain.list",
-      "sha256": "8247565f7d987731650fec18ffd1a45013e19512a18a28d89c6ae7183f69e4d2",
-      "bytes": 393741,
-      "entries": 21989
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain-full.list",
+      "sha256": "71d456bb2dfdba76f77ae0617ac319afc7e5c01fbb95d46ad1b7e4d2f6396e99",
+      "bytes": 1340845,
+      "entries": 75306
     },
     "rules/surge/rkn-domains.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain.list",
-      "sha256": "dbc9c0c9e5433fa44ac3d46f85ec196bb97c9478c06518b5f2dfbd2095bd279a",
-      "bytes": 657611,
-      "entries": 21989
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain-full.list",
+      "sha256": "0af097f8ff8ede1560f5e03ecab950b85e1b07d9713b9f9a3854cc4a9c40092e",
+      "bytes": 2244519,
+      "entries": 75306
     },
     "rules/quantumultx/rkn-domains.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain.list",
-      "sha256": "922d6fa9dbedabed8e1e1992318928852e8c69a99accda07e87bb96e3452c5a4",
-      "bytes": 789535,
-      "entries": 21989
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-domain-full.list",
+      "sha256": "b1abb009baa1f36e6fe68ac4dfd5428b3b8267f33f1499c051ff8a679f68a1f7",
+      "bytes": 2696345,
+      "entries": 75306
     },
     "rules/youtube.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/youtube.list",
@@ -220,34 +238,34 @@
       "entries": 176
     },
     "rules/rkn-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
-      "sha256": "c70f447d9f5cad0c5a957974cf53f40dbc0714a6d4fe8e07bb09968a57cdfd83",
-      "bytes": 28564,
-      "entries": 1141
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip-full.list",
+      "sha256": "d69cf23bfa9159c8fa0123d80903054e36dd433ee2f61ff519c8f05486ebc2a8",
+      "bytes": 640567,
+      "entries": 25391
     },
     "rules/rkn-ips.cidr": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
-      "sha256": "6f008b2e263d1b51316c3bc09faa637197110a296d6f3ba1aae8d850a089d6b7",
-      "bytes": 19436,
-      "entries": 1141
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip-full.list",
+      "sha256": "063660c2161134ed322b8be204eab2c87b65b84eab4cbe4e37f4d780b2c099fe",
+      "bytes": 437439,
+      "entries": 25391
     },
     "rules/singbox/rkn-ips.json": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
-      "sha256": "c8f3544e72faa8db0d994200add69e5b7a7468cb7033b34ec5eb2a627265d1f2",
-      "bytes": 21701,
-      "entries": 1141
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip-full.list",
+      "sha256": "b04b2cc142a8d044cc7f9f4fc3c8503769daddd55ea523de56762f303597d1d4",
+      "bytes": 488204,
+      "entries": 25391
     },
     "rules/surge/rkn-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
-      "sha256": "198e2426fad0203ba76256dcbdd923dd4f7a932b6655cc7a60eb00ad2023a18c",
-      "bytes": 28558,
-      "entries": 1141
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip-full.list",
+      "sha256": "ebe84e3a64d33aa9be9af5cc0b76d0867c4b7fc30e56e47ccfbfe991a1f6b7bf",
+      "bytes": 640561,
+      "entries": 25391
     },
     "rules/quantumultx/rkn-ips.list": {
-      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip.list",
-      "sha256": "b5561b9beeb89f395fd76a8772c8ede254882464529090d0c38ba20b99c1a791",
-      "bytes": 37676,
-      "entries": 1141
+      "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/refilter-ip-full.list",
+      "sha256": "1dc4c50b314c8cd7bb1817a43083fb67d1d0a678c5487f46e5e233d8f0e6c907",
+      "bytes": 843679,
+      "entries": 25391
     },
     "rules/proxy-ips.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/proxy-ip.list",
@@ -305,8 +323,8 @@
     },
     "rules/quantumultx/direct-ips.list": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/release/direct-ip.list",
-      "sha256": "037e2d2523f73fb3129592cda59ec4638c8772f40a151d9e9d39a22a79e98765",
-      "bytes": 882,
+      "sha256": "c9190f70f7f93c2dda7ea166bda06e56e8bdabdfd750c52fc609a2c5bf283b37",
+      "bytes": 854,
       "entries": 28
     },
     "rules/ru-ips.list": {
@@ -341,13 +359,38 @@
     },
     "geo/geoip.dat": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/v2ray/geoip.dat",
-      "sha256": "1bd2cefb1e4d108c88c19dc463ec6cd854539ef5a90cb7aa431525c04d722dcd",
-      "bytes": 807285
+      "sha256": "d231316c3c43b9805c35f07179cf9672bdbf588da5e38a98a1434113d7ca49f1",
+      "bytes": 1049786,
+      "source_sha256": "1bd2cefb1e4d108c88c19dc463ec6cd854539ef5a90cb7aa431525c04d722dcd",
+      "source_bytes": 807285
     },
     "geo/geosite.dat": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/29115cbf9a00c65aea80977a73a18f27511a0e28/v2ray/geosite.dat",
-      "sha256": "9b380c4c27e5eec8efc42a0634b83dafa1d3d590045752edaf2e69d5f02dbed7",
-      "bytes": 623393
+      "sha256": "67747bab524b72ff4c60a1cf7b76ec3f598e7dc8ba5f612c627b992ef14682f9",
+      "bytes": 2217706,
+      "source_sha256": "9b380c4c27e5eec8efc42a0634b83dafa1d3d590045752edaf2e69d5f02dbed7",
+      "source_bytes": 623393
+    },
+    "rules/quantumultx/ru-tlds.list": {
+      "source": "garasu:routing-policy:ru-suffixes",
+      "sha256": "88d060560a38060f9f2cce84f3d84c88bd36c330f175d0f67efa89b5256e0921",
+      "bytes": 337,
+      "entries": 10
+    },
+    "clients/shadowrocket.conf": {
+      "source": "garasu:managed-config:shadowrocket",
+      "sha256": "ac8907fd44a52a3ff381e907d0b1e1a1cba31b37c069cbc6c72d80a681be3b8e",
+      "bytes": 2325
+    },
+    "clients/happ.json": {
+      "source": "garasu:profile-template:happ",
+      "sha256": "e6c24295f9397b09551ca5c891cc630f86380d85618f71685ef18e1b7b855bb1",
+      "bytes": 1348
+    },
+    "clients/incy.json": {
+      "source": "garasu:profile-template:incy",
+      "sha256": "e6c24295f9397b09551ca5c891cc630f86380d85618f71685ef18e1b7b855bb1",
+      "bytes": 1348
     }
   }
 }

@@ -19,8 +19,9 @@ class VerifiedInlineRussianTLD(unittest.TestCase):
         policy = unified_policy.load_policy(ROOT / "policy/unified-v1.json")
         lock = unified_policy.load_release_lock(
             ROOT / "policy/unified-release-lock.json", policy)
+        from scripts import verify_unified_git_objects
         try:
-            unified_policy.verify_release_assets(ROOT, lock)
+            verify_unified_git_objects.verify_history(ROOT, lock)
         except ValueError:
             if os.environ.get("GARASU_ALLOW_REFRESHED_CANDIDATE_SKIP") == "1":
                 raise unittest.SkipTest("moving data refresh; clean snapshot "
@@ -57,7 +58,8 @@ class VerifiedInlineRussianTLD(unittest.TestCase):
         self.assertNotIn("DIRECT", config["proxy-groups"][0]["proxies"])
 
     def test_refuses_to_generate_if_any_pinned_asset_is_unverified(self):
-        with patch.object(unified_policy, "verify_release_assets",
+        from scripts import verify_unified_git_objects
+        with patch.object(verify_unified_git_objects, "verify_history",
                           side_effect=ValueError("integrity")):
             with self.assertRaisesRegex(ValueError, "integrity"):
                 unified_policy.build_ru_tld_mihomo_candidate(ROOT, self.policy)

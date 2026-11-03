@@ -39,8 +39,8 @@ class GarasuTests(unittest.TestCase):
 
     def test_shadowrocket_rule_order(self):
         conf = (ROOT / "clients/shadowrocket.conf").read_text()
-        self.assertLess(conf.index("rkn-domains.list,PROXY"), conf.index("direct.list,DIRECT"))
-        self.assertLess(conf.index("rkn-ips.list,PROXY"), conf.index("direct-ips.list,DIRECT"))
+        self.assertLess(conf.index("rkn-domains.list,PROXY"), conf.index("DOMAIN-SUFFIX,ru,DIRECT"))
+        self.assertLess(conf.index("rkn-ips.list,PROXY"), conf.index("ru-ips.list,DIRECT"))
         self.assertIn("FINAL,PROXY", conf)
         self.assertNotIn("DST-PORT,443,REJECT", conf)
         self.assertNotIn("*.ru,DIRECT", conf)
@@ -48,7 +48,7 @@ class GarasuTests(unittest.TestCase):
     def test_mihomo_rule_order(self):
         conf = (ROOT / "clients/mihomo-remnawave.yaml").read_text()
         self.assertLess(conf.index("RULE-SET,rkn-domains,Garasu"),
-                        conf.index("RULE-SET,direct,DIRECT"))
+                        conf.index("DOMAIN-SUFFIX,ru,DIRECT"))
         self.assertIn("include-all: true", conf)
         self.assertIn("MATCH,Garasu", conf)
         self.assertNotIn("dialer-proxy", conf)
@@ -82,7 +82,7 @@ class GarasuTests(unittest.TestCase):
             return  # first repo bootstrap before initial scheduled build
         manifest = json.loads(path.read_text())
         self.assertEqual(manifest["name"], "Garasu MAX")
-        self.assertEqual(len(manifest["files"]), 58)
+        self.assertEqual(len(manifest["files"]), 62)
         for filename, record in manifest["files"].items():
             data = (ROOT / filename).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"], filename)
@@ -103,7 +103,7 @@ class GarasuTests(unittest.TestCase):
         if "quantumultx" in links:
             self.assertTrue(links["quantumultx"].startswith(
                 "quantumult-x:///add-resource?remote-resource="))
-            self.assertEqual(len(links["surge_rulesets"]), 13)
+            self.assertEqual(len(links["surge_rulesets"]), 10)
 
 
     def test_srr_preserves_live_clients_until_promotion(self):
@@ -176,15 +176,16 @@ class GarasuTests(unittest.TestCase):
         data = yaml.safe_load(conf)
         self.assertIsNone(data["proxies"])
         self.assertEqual(data["proxy-groups"][0]["name"], "Garasu")
-        self.assertIsNone(data["proxy-groups"][0]["proxies"])
+        self.assertEqual(data["proxy-groups"][0]["proxies"], ["REJECT"])
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         for name in ("rkn-domains", "rkn-ips", "ads", "direct"):
             self.assertIn(name, data["rule-providers"])
         rules = data["rules"]
         self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
-                        rules.index("RULE-SET,direct,DIRECT"))
-        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
-                        rules.index("GEOIP,RU,DIRECT"))
+                        rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
+        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
+                        rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
+        self.assertNotIn("RULE-SET,direct,DIRECT", rules)
 
     def test_singbox_remnawave_template(self):
         config = json.loads((ROOT / "clients/singbox-remnawave.json").read_text())
@@ -202,7 +203,7 @@ class GarasuTests(unittest.TestCase):
         proxi = next(i for i, r in enumerate(rules) if
                      "garasu-rkn-domains" in r.get("rule_set", []))
         direct = next(i for i, r in enumerate(rules) if
-                      "garasu-direct" in r.get("rule_set", []))
+                      "garasu-ru-ips" in r.get("rule_set", []))
         self.assertLess(proxi, direct)
         self.assertEqual(rules[proxi]["outbound"], "→ Remnawave")
         self.assertEqual(rules[direct]["outbound"], "direct")
@@ -212,10 +213,16 @@ class GarasuTests(unittest.TestCase):
         self.assertTrue(xray["remnawave"]["addVirtualHostAsOutbound"])
         self.assertEqual(xray["routing"]["rules"][-1]["outboundTag"], "proxy")
         self.assertEqual(xray["routing"]["rules"][-1]["network"], "tcp,udp")
-        self.assertIn("geosite:banned-ru", xray["routing"]["rules"][3]["domain"])
-        self.assertIn("geoip:blocked-ru", xray["routing"]["rules"][4]["ip"])
-        self.assertEqual(xray["routing"]["rules"][5]["outboundTag"], "direct")
-        self.assertEqual(xray["routing"]["rules"][6]["outboundTag"], "direct")
+        routes = xray["routing"]["rules"]
+        proxy_domain = next(i for i, r in enumerate(routes)
+                            if "geosite:banned-ru" in r.get("domain", []))
+        blocked_ip = next(i for i, r in enumerate(routes)
+                          if "geoip:blocked-ru" in r.get("ip", []))
+        ru_ip = next(i for i, r in enumerate(routes)
+                     if "geoip:ru" in r.get("ip", []))
+        self.assertLess(proxy_domain, blocked_ip)
+        self.assertLess(blocked_ip, ru_ip)
+        self.assertEqual(xray["routing"]["domainStrategy"], "IpOnDemand")
         self.assertEqual([o["tag"] for o in xray["outbounds"]], ["direct", "block"])
 
     def test_all_singbox_rule_sets_are_published(self):
@@ -249,7 +256,7 @@ class GarasuTests(unittest.TestCase):
         self.assertIn("ip-cidr, 192.0.2.1/32, direct", qx_ip)
         self.assertIn("ip6-cidr, 2001:db8::/32, direct", qx_ip)
         self.assertEqual(mod.policy_for("ads"), "reject")
-        self.assertEqual(mod.policy_for("direct"), "direct")
+        self.assertEqual(mod.policy_for("direct"), "proxy")
         self.assertEqual(mod.policy_for("rkn-domains"), "proxy")
 
     def test_extended_rule_catalog(self):

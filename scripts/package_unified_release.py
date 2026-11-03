@@ -14,7 +14,7 @@ import re
 import tempfile
 import zipfile
 
-from scripts import unified_policy
+from scripts import unified_policy, verify_unified_git_objects
 
 ROOT = Path(__file__).resolve().parents[1]
 CURRENT = "CURRENT.json"
@@ -37,14 +37,18 @@ def _source_entries(root):
     policy = unified_policy.load_policy(root / "policy/unified-v1.json")
     lock = unified_policy.load_release_lock(root / "policy/unified-release-lock.json",
                                             policy)
-    unified_policy.verify_release_assets(root, lock)
+    verify_unified_git_objects.verify_history(root, lock)
     paths = ("policy/unified-v1.json", "policy/unified-release-lock.json")
     result = {}
     for path in sorted(set(paths) | set(lock["assets"])):
         source = (root / path).resolve()
         if not source.is_relative_to(root) or not source.is_file():
             raise ValueError("Unsafe or missing candidate input path")
-        result[path] = source.read_bytes()
+        if path in lock["assets"]:
+            result[path] = verify_unified_git_objects._git(
+                root, "cat-file", "blob", lock["assets"][path]["git_blob"])
+        else:
+            result[path] = source.read_bytes()
     candidates = unified_policy.build_candidates(root, policy)
     candidates["clients/unified/mihomo-ru-tld-verified.yaml"] = (
         unified_policy.build_ru_tld_mihomo_candidate(root, policy))

@@ -14,9 +14,13 @@ from urllib.request import Request, ProxyHandler, build_opener
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PATHS = (
+    "clients/shadowrocket.conf",
+    "clients/happ.json",
+    "clients/incy.json",
     "rules/youtube.list",
     "rules/rkn-domains.list",
     "rules/singbox/youtube.json",
+    "rules/quantumultx/ru-tlds.list",
     "geo/geoip.dat",
     "geo/geosite.dat",
 )
@@ -41,6 +45,15 @@ def verify_asset(path, payload, manifest):
         raise ValueError("Length mismatch for " + path)
     if hashlib.sha256(payload).hexdigest() != record.get("sha256"):
         raise ValueError("SHA256 mismatch for " + path)
+    return True
+
+
+def verify_manifest_digest(manifest_bytes, links, base):
+    """Bind the local manifest to the delivery links before probing assets."""
+    if links.get("manifest_url") != validate_base_url(base) + "/install/manifest.json":
+        raise ValueError("Manifest URL differs from the selected delivery base")
+    if hashlib.sha256(manifest_bytes).hexdigest() != links.get("manifest_sha256"):
+        raise ValueError("Manifest SHA256 differs from delivery links")
     return True
 
 
@@ -69,6 +82,8 @@ def main():
     p = argparse.ArgumentParser(description="Test Garasu HTTPS rule integrity from this network")
     p.add_argument("--base-url", default="https://raw.githubusercontent.com/togahimoko/garasu/main")
     p.add_argument("--manifest", type=Path, default=ROOT / "install/manifest.json")
+    p.add_argument("--links", type=Path,
+                   help="Check manifest SHA256 against install/links.json before probing")
     p.add_argument("--timeout", type=float, default=15)
     p.add_argument("--json-output", type=Path)
     mode = p.add_mutually_exclusive_group()
@@ -78,7 +93,11 @@ def main():
     base = validate_base_url(args.base_url)
     if args.timeout <= 0 or args.timeout > 120:
         p.error("timeout must be in (0, 120] seconds")
-    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+    manifest_bytes = args.manifest.read_bytes()
+    if args.links:
+        verify_manifest_digest(manifest_bytes,
+                               json.loads(args.links.read_text(encoding="utf-8")), base)
+    manifest = json.loads(manifest_bytes)
     if args.direct:
         opener = build_opener(ProxyHandler({}))
         mode_label = "direct"

@@ -4,15 +4,15 @@ Garasu maintains one MAX routing policy and exports engine-specific rule sets fo
 
 | Engine / client | Main resource | Integration |
 | --- | --- | --- |
-| Shadowrocket | `clients/shadowrocket.conf` | Independent managed routing configuration; personal node subscription separate |
-| INCY | `clients/incy.json` | Optional `autorouting` header or direct import link |
-| Happ | `clients/happ.json` | Optional `routing` import; GeoIP/GeoSite served separately |
+| Shadowrocket | `clients/shadowrocket.conf` | Managed routing candidate; personal node subscription and device VPN separate; app import unverified |
+| INCY | `clients/incy.json` | `autorouting` candidate header or direct import link; app import unverified |
+| Happ | `clients/happ.json` | `routing` candidate import with separate GeoIP/GeoSite; app import unverified |
 | Mihomo, Clash Verge, FlClash | `clients/mihomo-remnawave.yaml` | Template with Remnawave node injection |
 | Stash | `clients/stash-remnawave.yaml` | Template with Remnawave node injection |
 | Modern sing-box and compatible clients | `clients/singbox-remnawave.json` | Template using 13 remotely updated JSON rule sets |
 | Xray-core advanced | `clients/xray-advanced-remnawave.json` | **Opt-in:** requires Remnawave virtual-host injection and Garasu GeoIP/GeoSite |
-| Surge and Loon | `rules/surge/*.list` | Rule-set URLs; append them to an existing profile with the correct policy group |
-| Quantumult X | `rules/quantumultx/*.list` | Remote filter resources; optional add-resource URL from `install/links.json` |
+| Surge and Loon | `rules/surge/*.list` | Candidate integration instructions in [native routing candidates](native-routing-candidates.md); app import unverified |
+| Quantumult X | `rules/quantumultx/*.list` | Candidate resource link and final-rule instructions in [native routing candidates](native-routing-candidates.md); app import unverified |
 | Legacy Clash / old sing-box | Not claimed compatible | Use supported modern engine or create a version-specific adapter |
 
 Automatic node selection varies by client: Mihomo canary uses URLTest, Stash canary uses URLTest, sing-box stable uses a manual selector. For supported and unverified failover behavior see [multi-node reliability](multi-node-reliability.md).
@@ -22,11 +22,11 @@ Automatic node selection varies by client: Mihomo canary uses URLTest, Stash can
 1. LAN/private addresses: DIRECT.
 2. Blocked Russian domains/IP, YouTube, Discord, AI, and special proxy categories: VPN.
 3. Advertising/tracking domains: REJECT when the engine supports it.
-4. Known Russian banking, domestic and game categories: DIRECT.
+4. Russian suffixes: DIRECT after blocked exceptions. Broad foreign game and service categories are excluded.
 5. Other RU IPs: DIRECT after all blocked-IP exceptions.
 6. Unmatched traffic: VPN.
 
-No blanket `*.ru` bypass rule, no automatic ban on UDP/443.
+Russian suffix fallback requires the complete validated blocked snapshot. No automatic ban on UDP/443.
 
 ## Source and update process
 

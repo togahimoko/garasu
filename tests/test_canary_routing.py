@@ -13,11 +13,12 @@ C=ROOT/"clients"/"canary"
 
 
 class CanaryRoutingTests(unittest.TestCase):
-    def test_existing_published_templates_untouched(self):
-        self.assertIn("GEOIP,RU,DIRECT",
-                      (ROOT/"clients/mihomo-remnawave.yaml").read_text())
-        self.assertIn("GEOIP,RU,DIRECT",
-                      (ROOT/"clients/shadowrocket.conf").read_text())
+    def test_stable_mihomo_uses_full_blocked_before_ru_direct(self):
+        rules = yaml.safe_load((ROOT/"clients/mihomo-remnawave.yaml").read_text())["rules"]
+        self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
+                        rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
+        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
+                        rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
 
     def test_mihomo_and_stash_have_same_russian_ip_override(self):
         for name in ("mihomo-remnawave.yaml","stash-remnawave.yaml"):
@@ -26,7 +27,7 @@ class CanaryRoutingTests(unittest.TestCase):
                 self.assertEqual(d["proxies"],None)
                 rules=d["rules"]
                 self.assertNotIn("GEOIP,RU,DIRECT",rules)
-                self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+                self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
                                 rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
                 self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
                                 rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
@@ -49,7 +50,7 @@ class CanaryRoutingTests(unittest.TestCase):
         rkn=next(i for i,r in enumerate(rules) if "garasu-rkn-domains" in r.get("rule_set",[]))
         rknip=next(i for i,r in enumerate(rules) if "garasu-rkn-ips" in r.get("rule_set",[]))
         direct=next(i for i,r in enumerate(rules) if "garasu-ru-ips" in r.get("rule_set",[]))
-        russian=next(i for i,r in enumerate(rules) if "ru" in r.get("domain_suffix",[]))
+        russian=next(i for i,r in enumerate(rules) if "ru" in r.get("domain_suffix",[]) and r.get("action")=="route")
         self.assertLess(rkn,direct)
         self.assertLess(rknip,direct)
         self.assertLess(rkn,russian)

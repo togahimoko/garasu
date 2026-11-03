@@ -1,0 +1,24 @@
+# Garasu Quantumult X integration CANDIDATE; import/OS behavior unverified.
+# Replace {{PERSONAL_PROXY_POLICY}} with the personal Remnawave policy name.
+# Configure node-hostname bootstrap DNS and local/LAN DNS in app settings.
+# Enable system VPN in the app; refresh remote filters every six hours.
+[filter_remote]
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/rkn-domains.list, tag=Garasu-rkn-domains, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/rkn-ips.list, tag=Garasu-rkn-ips, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/youtube.list, tag=Garasu-youtube, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/discord.list, tag=Garasu-discord, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/ai.list, tag=Garasu-ai, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/crypto.list, tag=Garasu-crypto, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/proxy.list, tag=Garasu-proxy, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/proxy-ips.list, tag=Garasu-proxy-ips, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/ads.list, tag=Garasu-ads, force-policy=reject, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/ru-tlds.list, tag=Garasu-ru-tlds, force-policy=direct, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/ru-ips.list, tag=Garasu-ru-ips, force-policy=direct, enabled=true
+[filter_local]
+host-suffix, local, direct
+host-suffix, lan, direct
+host-suffix, home.arpa, direct
+ip-cidr, 10.0.0.0/8, direct
+ip-cidr, 172.16.0.0/12, direct
+ip-cidr, 192.168.0.0/16, direct
+FINAL, {{PERSONAL_PROXY_POLICY}}

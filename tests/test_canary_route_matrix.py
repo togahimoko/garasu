@@ -28,7 +28,7 @@ GOLDEN = {
     "www.4pda.ru": PROXY,
     "blaper.artstation.com": PROXY,  # specific RKN entry overrides games
     "ads.twitch.tv": PROXY,          # explicit proxy overrides general ads
-    "steampowered.com": DIRECT,      # known CURRENT exception; review later
+    "steampowered.com": PROXY,       # foreign games have no blanket DIRECT exception
     "unknown.example.org": PROXY,
 }
 
@@ -108,6 +108,9 @@ class CanaryRouteMatrix(unittest.TestCase):
     @classmethod
     def singbox_route(cls, host):
         for rule in cls.singbox["route"]["rules"]:
+            if rule.get("action") == "resolve":
+                # Resolution continues to later routing rules; this is a domain-only oracle.
+                continue
             if rule.get("domain_suffix") and suffix_matches(host, rule["domain_suffix"]):
                 return DIRECT if rule.get("outbound") == "direct" else PROXY
             if rule.get("rule_set"):

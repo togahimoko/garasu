@@ -172,6 +172,25 @@ class UnifiedPolicyContract(unittest.TestCase):
                          ["clients/unified/shadowrocket.conf"])
         self.assertFalse(unified.check_candidates(ROOT, self.policy))
 
+    def test_xray_candidate_keeps_rebinding_guard_without_ru_fallback(self):
+        candidate = json.loads(unified.build_candidates(ROOT, self.policy)[
+            "clients/unified/xray-advanced-remnawave.json"])
+        rules = candidate["routing"]["rules"]
+        guard = next(i for i, rule in enumerate(rules)
+                     if rule.get("domain") == ["regexp:.+"] and
+                     rule.get("ip") == ["geoip:private"])
+        private = next(i for i, rule in enumerate(rules)
+                       if rule.get("ip") == ["geoip:private"] and
+                       "domain" not in rule)
+        self.assertLess(guard, private)
+        self.assertEqual(rules[guard]["outboundTag"], "proxy")
+        self.assertFalse(any(rule.get("ip") == ["geoip:ru"]
+                             for rule in rules))
+        self.assertFalse(any(any(value.startswith("regexp:(?i)")
+                                 for value in rule.get("domain", []))
+                             and rule.get("outboundTag") == "direct"
+                             for rule in rules))
+
     def test_data_quality_ci_does_not_confuse_new_upstream_with_candidate_drift(self):
         workflow = (ROOT / ".github/workflows/data-quality.yml").read_text()
         self.assertLess(workflow.index("Check committed snapshot quality"),

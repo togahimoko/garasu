@@ -9,8 +9,11 @@
     "rules": [
       {
         "type": "field",
-        "ip": [
-          "geoip:private"
+        "domain": [
+          "domain:localhost",
+          "domain:local",
+          "domain:lan",
+          "domain:home.arpa"
         ],
         "outboundTag": "direct"
       },
@@ -55,11 +58,28 @@
       },
       {
         "type": "field",
+        "domain": [
+          "regexp:.+"
+        ],
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "proxy"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
         "network": "tcp,udp",
         "outboundTag": "proxy"
       }
     ],
-    "domainStrategy": "IPIfNonMatch",
+    "domainStrategy": "IpOnDemand",
     "domainMatcher": "hybrid"
   },
   "inbounds": [

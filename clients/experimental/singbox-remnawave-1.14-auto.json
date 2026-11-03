@@ -23,7 +23,8 @@
       {
         "tag": "cf-dns",
         "type": "tls",
-        "server": "1.1.1.1"
+        "server": "1.1.1.1",
+        "detour": "→ Remnawave"
       },
       {
         "tag": "local",
@@ -63,19 +64,79 @@
         "outbound": "direct"
       },
       {
+        "rule_set": [
+          "garasu-rkn-domains",
+          "garasu-youtube",
+          "garasu-discord",
+          "garasu-ai",
+          "garasu-crypto",
+          "garasu-proxy"
+        ],
+        "action": "route",
+        "outbound": "→ Remnawave"
+      },
+      {
+        "ip_cidr": [
+          "100.64.0.0/10",
+          "169.254.0.0/16"
+        ],
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
         "ip_is_private": true,
         "action": "route",
         "outbound": "direct"
       },
       {
+        "domain_suffix": [
+          "ru",
+          "su",
+          "moscow",
+          "xn--p1ai",
+          "xn--p1acf",
+          "xn--80asehdb",
+          "xn--c1avg",
+          "xn--80aswg",
+          "xn--80adxhks",
+          "xn--d1acj3b"
+        ],
+        "action": "resolve",
+        "server": "local"
+      },
+      {
+        "action": "resolve",
+        "server": "cf-dns",
+        "domain_suffix": [
+          "ru",
+          "su",
+          "moscow",
+          "xn--p1ai",
+          "xn--p1acf",
+          "xn--80asehdb",
+          "xn--c1avg",
+          "xn--80aswg",
+          "xn--80adxhks",
+          "xn--d1acj3b"
+        ],
+        "invert": true
+      },
+      {
+        "ip_is_private": true,
+        "action": "route",
+        "outbound": "→ Remnawave"
+      },
+      {
+        "ip_cidr": [
+          "100.64.0.0/10",
+          "169.254.0.0/16"
+        ],
+        "action": "route",
+        "outbound": "→ Remnawave"
+      },
+      {
         "rule_set": [
-          "garasu-rkn-domains",
           "garasu-rkn-ips",
-          "garasu-youtube",
-          "garasu-discord",
-          "garasu-ai",
-          "garasu-crypto",
-          "garasu-proxy",
           "garasu-proxy-ips"
         ],
         "action": "route",
@@ -106,9 +167,6 @@
       },
       {
         "rule_set": [
-          "garasu-games",
-          "garasu-direct",
-          "garasu-direct-ips",
           "garasu-ru-ips"
         ],
         "action": "route",

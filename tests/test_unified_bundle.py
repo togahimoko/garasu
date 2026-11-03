@@ -20,12 +20,12 @@ class ImmutableUnifiedBundle(unittest.TestCase):
         # refresh before their common unit suite, mutating base assets. This
         # immutable-release test instead runs in the clean unified CI job.
         # Do NOT skip on a normal clean checkout: integrity failure is fatal.
-        from scripts import unified_policy
+        from scripts import unified_policy, verify_unified_git_objects
         policy = unified_policy.load_policy(ROOT / "policy/unified-v1.json")
         lock = unified_policy.load_release_lock(
             ROOT / "policy/unified-release-lock.json", policy)
         try:
-            unified_policy.verify_release_assets(ROOT, lock)
+            verify_unified_git_objects.verify_history(ROOT, lock)
         except ValueError:
             if os.environ.get("GARASU_ALLOW_REFRESHED_CANDIDATE_SKIP") == "1":
                 raise unittest.SkipTest(

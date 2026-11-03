@@ -86,14 +86,15 @@ class CrossClientMultiNodeContract(unittest.TestCase):
         remote_idx = next(i for i, r in enumerate(sb)
                           if "garasu-rkn-domains" in r.get("rule_set", []))
         self.assertLess(local_idx, remote_idx)
-        self.assertLess(private_idx, remote_idx)
+        # Explicit blocked domains must win even if their DNS answer is private.
+        self.assertLess(remote_idx, private_idx)
 
     def test_exception_priority_before_ru_direct(self):
         for name in ("mihomo-remnawave.yaml", "stash-remnawave.yaml"):
             rules = yaml_client(name)["rules"]
             self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
                             rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
-            self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+            self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
                             rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
             self.assertLess(rules.index("RULE-SET,ads,REJECT"),
                             rules.index("MATCH,Garasu"))
@@ -135,7 +136,10 @@ class CrossClientMultiNodeContract(unittest.TestCase):
             with self.subTest(client="Shadowrocket", cat=cat):
                 suffix = ".list"
                 link = BASE + "rules/" + cat + suffix
-                self.assertIn(link, shadow)
+                if cat in ("games", "direct", "direct-ips"):
+                    self.assertNotIn(link, shadow)
+                else:
+                    self.assertIn(link, shadow)
                 assert_public_asset(self, link)
 
     def test_dns_bootstrap_paths_explicit_on_mihomo_and_singbox(self):

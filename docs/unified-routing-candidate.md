@@ -59,6 +59,12 @@ contents. CURRENT.json is the atomic same-filesystem pointer; the
 previous verified ZIP is retained for rollback. File tampering, corrupted
 archives or missing previous releases block promotion/rollback.
 
+The ZIP reads the 22 pinned rule and geodata assets from their verified
+historical Git blobs. Scheduled updates to the ordinary production files
+therefore do not change the candidate release or break local packaging.
+The candidate profiles are generated from the current client templates and
+must pass the candidate drift tests before publication.
+
 This makes local candidate packaging reproducible; it does **not** provide
 a remotely atomic HTTP cache, live Remnawave subscription update, or an
 installer for proprietary mobile clients. The CI workflow publishes the

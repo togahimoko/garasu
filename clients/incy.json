@@ -10,7 +10,7 @@
   "DomesticDNSType": "DoH",
   "DomesticDNSDomain": "https://common.dot.dns.yandex.net/dns-query",
   "DomesticDNSIP": "77.88.8.8",
-  "LastUpdated": "1793735179",
+  "LastUpdated": "1793718266",
   "DnsHosts": {
     "dns.google": "8.8.8.8",
     "common.dot.dns.yandex.net": "77.88.8.8"
@@ -19,19 +19,7 @@
   "DirectSites": [
     "geosite:private",
     "geosite:category-ru",
-    "geosite:apple",
-    "geosite:microsoft",
-    "geosite:google-play",
-    "geosite:twitch",
-    "geosite:steam",
-    "geosite:epicgames",
-    "geosite:origin",
-    "geosite:riot",
-    "geosite:roblox",
-    "geosite:faceit",
-    "geosite:escapefromtarkov",
-    "geosite:ip-check",
-    "geosite:vpndetect"
+    "geosite:garasu-ru"
   ],
   "DirectIp": [
     "geoip:private",
@@ -55,8 +43,7 @@
     "geoip:blocked-ru"
   ],
   "BlockSites": [
-    "geosite:category-ads",
-    "geosite:win-spy"
+    "geosite:garasu-ads"
   ],
   "BlockIp": [],
   "DomainStrategy": "IPIfNonMatch",

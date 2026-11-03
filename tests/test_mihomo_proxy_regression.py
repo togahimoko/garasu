@@ -22,7 +22,7 @@ class MihomoRuntimeRegressions(unittest.TestCase):
         self.assertEqual(self.groups["Garasu"]["proxies"], ["Garasu Auto"])
         self.assertIs(self.profile["profile"]["store-selected"], False)
         self.assertEqual(self.profile["rules"][-1], "MATCH,Garasu")
-        self.assertIn("RULE-SET,direct,DIRECT", self.profile["rules"])
+        self.assertNotIn("RULE-SET,direct,DIRECT", self.profile["rules"])
 
     def test_url_test_group_probes_nodes_even_without_a_saved_selection(self):
         auto = self.groups["Garasu Auto"]

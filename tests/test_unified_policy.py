@@ -105,6 +105,16 @@ class UnifiedPolicyContract(unittest.TestCase):
                          ["clients/unified/shadowrocket.conf"])
         self.assertFalse(unified.check_candidates(ROOT, self.policy))
 
+    def test_data_quality_ci_does_not_confuse_new_upstream_with_candidate_drift(self):
+        workflow = (ROOT / ".github/workflows/data-quality.yml").read_text()
+        self.assertLess(workflow.index("Check committed snapshot quality"),
+                        workflow.index("Build full Garasu release"))
+        self.assertLess(workflow.index("Build full Garasu release"),
+                        workflow.index("Check freshly fetched snapshot quality"))
+        # A fresh external upstream revision may differ from the pinned branch.
+        # Verify each stage independently, never diff after the moving refresh.
+        self.assertEqual(workflow.count("git diff --exit-code -- reports/quality.json"), 1)
+
     def test_full_registry_and_every_format_are_from_same_verified_rows(self):
         rules = ROOT / "rules/unified"
         raw_domains = (rules / "refilter-domain-full.list").read_text(encoding="utf-8")

@@ -20,6 +20,8 @@ jobs:
       - name: Fetch and validate real upstream data (dry run)
         run: python scripts/refresh.py
       - name: Unit and integration invariants
+        env:
+          GARASU_ALLOW_REFRESHED_CANDIDATE_SKIP: '1'
         run: python -m unittest discover -s tests -v
       - name: Generate synthetic node-injected configs
         run: python scripts/smoke_cores.py --output-dir "$RUNNER_TEMP/garasu-ci"

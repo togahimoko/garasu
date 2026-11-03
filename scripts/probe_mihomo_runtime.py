@@ -42,6 +42,18 @@ class MockProxy(socketserver.BaseRequestHandler):
             buf += chunk
         first = buf.split(b"\r\n", 1)[0].decode("ascii", errors="replace")
         self.server.seen.append(first)
+        # Mihomo opens an HTTP CONNECT tunnel even when the health-check
+        # URL itself is plain HTTP. The mock must speak both proxy protocols.
+        if first.startswith("CONNECT "):
+            self.request.sendall(b"HTTP/1.1 200 Connection Established\r\n\r\n")
+            buf = b""
+            while b"\r\n\r\n" not in buf and len(buf) < 16384:
+                chunk = self.request.recv(4096)
+                if not chunk:
+                    return
+                buf += chunk
+            first = buf.split(b"\r\n", 1)[0].decode("ascii", errors="replace")
+            self.server.seen.append(first)
         if "/generate_204" in first:
             payload = b"HTTP/1.1 204 No Content\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
         else:

@@ -373,6 +373,31 @@ class GarasuTests(unittest.TestCase):
                 for provider in sbd["route"]["rule_set"]
             ))
 
+    def test_ru_tld_exceptions_are_after_rkn(self):
+        for path in ("clients/mihomo-remnawave.yaml",
+                     "clients/stash-remnawave.yaml",
+                     "clients/shadowrocket.conf"):
+            body = (ROOT / path).read_text(encoding="utf-8")
+            self.assertNotIn("GEOIP,RU,DIRECT", body, path)
+            self.assertLess(body.index("rkn-domains"), body.index("DOMAIN-SUFFIX,ru,DIRECT"), path)
+            self.assertLess(body.index("rkn-ips"), body.index("DOMAIN-SUFFIX,ru,DIRECT"), path)
+            self.assertIn("DOMAIN-SUFFIX,xn--p1ai,DIRECT", body, path)
+        desktop = (ROOT / "clients/mihomo-remnawave.yaml").read_text()
+        self.assertIn("RULE-SET,ru-ips,DIRECT,no-resolve", desktop)
+        self.assertIn("rules/ru-ips.cidr", desktop)
+        self.assertLess(desktop.index("RULE-SET,rkn-ips,Garasu"),
+                        desktop.index("RULE-SET,ru-ips,DIRECT"))
+        for path in ("clients/singbox-remnawave.json",
+                     "clients/singbox-remnawave-1.14.json"):
+            doc = json.loads((ROOT / path).read_text())
+            rules = doc["route"]["rules"]
+            blocked = next(i for i, r in enumerate(rules) if
+                           "garasu-rkn-domains" in r.get("rule_set", []))
+            suffix = next(i for i, r in enumerate(rules) if
+                          "ru" in r.get("domain_suffix", []))
+            self.assertLess(blocked, suffix)
+            self.assertEqual(rules[suffix]["outbound"], "direct")
+
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():
             content = path.read_text()

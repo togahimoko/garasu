@@ -30,6 +30,9 @@ class MihomoRuntimeRegressions(unittest.TestCase):
         self.assertTrue(auto["include-all"])
         self.assertFalse(auto.get("lazy", True))
         self.assertGreaterEqual(auto.get("timeout", 0), 5000)
+        self.assertLessEqual(auto.get("max-failed-times", 999), 2)
+        self.assertEqual(auto.get("expected-status"), 204)
+        self.assertGreater(auto.get("interval", 0), 0)
         self.assertEqual(auto["remnawave"]["include-proxies"], False)
         self.assertEqual(self.text.count("proxies: # LEAVE THIS LINE!"), 2)
 

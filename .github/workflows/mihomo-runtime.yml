@@ -20,3 +20,5 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_mihomo_proxy_regression.py' -v
       - name: Assert real proxy listener, node selection, HTTP routing, and delay
         run: python scripts/probe_mihomo_runtime.py
+      - name: Verify dynamic three-node failover with real Mihomo
+        run: python scripts/probe_mihomo_failover.py

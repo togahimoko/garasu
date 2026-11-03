@@ -43,6 +43,12 @@ GEO = {
     "geoip.dat": ("v2ray/geoip.dat", 200000),
     "geosite.dat": ("v2ray/geosite.dat", 200000),
 }
+RU_SUFFIXES = ("ru", "su", "moscow", "xn--p1ai", "xn--p1acf",
+               "xn--80asehdb", "xn--c1avg", "xn--80aswg",
+               "xn--80adxhks", "xn--d1acj3b")
+NATIVE_PROXY_GEOSITES = ("telegram", "github", "discord", "whatsapp",
+                         "banned-ru", "hosting", "youtube", "ai", "crypto",
+                         "category-geoblock-ru", "twitch-ads")
 
 def parse_upstream_revision(blob):
     """GitHub API commit SHA; never trust a moving tag for a multi-file release."""
@@ -283,7 +289,7 @@ def quantumultx_ips(blob, policy):
 def policy_for(name):
     # The source's games/direct categories contain foreign services. Native
     # resources may be imported independently, so never label them DIRECT.
-    return "reject" if name == "ads" else ("direct" if name == "ru-ips" else "proxy")
+    return "reject" if name == "ads" else ("direct" if name in ("ru-tlds", "ru-ips") else "proxy")
 
 
 def _protobuf_varint(data, index):
@@ -376,6 +382,65 @@ def replace_geodata_category(name, geodata, category, canonical):
     if not replaced:
         raise ValueError("Missing geodata category " + category)
     return bytes(output)
+
+
+def add_native_geosite_categories(geodata, proxy_categories=NATIVE_PROXY_GEOSITES,
+                                  block_categories=("category-ads", "win-spy"),
+                                  ru_suffixes=RU_SUFFIXES):
+    """Add RU suffixes and ads that cannot override a PROXY GeoSite entry.
+
+    All consumed entries must use v2ray Domain.Type=2 (suffix). A different
+    upstream encoding needs review before it can be safely subtracted.
+    """
+    categories = {}
+    for number, entry in _protobuf_fields(geodata):
+        if number != 1:
+            raise ValueError("Unexpected top-level GeoSite field")
+        fields = list(_protobuf_fields(entry))
+        code = next((value.decode("ascii").lower() for field, value in fields
+                     if field == 1), None)
+        if not code or code in categories:
+            raise ValueError("Missing or duplicate GeoSite category")
+        categories[code] = [value for field, value in fields if field == 2]
+    if "garasu-ru" in categories or "garasu-ads" in categories:
+        raise ValueError("Unexpected pre-existing Garasu GeoSite category")
+
+    def suffixes(names):
+        values = set()
+        for name in names:
+            if name not in categories:
+                raise ValueError("Missing GeoSite category " + name)
+            for item in categories[name]:
+                if not item.startswith(b"\x08\x02"):
+                    raise ValueError("Unsupported GeoSite domain type in " + name)
+                domain = dict(_protobuf_fields(item)).get(2, b"").decode("ascii").lower()
+                if not domain or not _safe_domain_set_entry("+." + domain):
+                    raise ValueError("Invalid GeoSite domain in " + name)
+                values.add(domain)
+        return values
+
+    proxy = suffixes(proxy_categories)
+    ads = suffixes(block_categories)
+    # Both directions matter: an ad child of a proxy suffix and an ad parent
+    # of a proxy child would defeat proxy-first routing under block-first mode.
+    proxy_parents = {".".join(parts[i:])
+                     for domain in proxy for parts in [domain.split(".")]
+                     for i in range(len(parts) - 1)}
+    def has_proxy_parent(domain):
+        parts = domain.split(".")
+        return any(".".join(parts[i:]) in proxy for i in range(len(parts) - 1))
+    safe_ads = sorted(domain for domain in ads
+                      if domain not in proxy_parents and not has_proxy_parent(domain))
+    if not safe_ads:
+        raise ValueError("No non-overlapping native ad domains")
+    def category(code, values):
+        items = (b"\x08\x02" + _protobuf_bytes(2, value.encode("ascii"))
+                 for value in values)
+        entry = _protobuf_bytes(1, code.encode("ascii"))
+        entry += b"".join(_protobuf_bytes(2, item) for item in items)
+        return _protobuf_bytes(1, entry)
+    return (geodata + category("GARASU-RU", ru_suffixes)
+            + category("GARASU-ADS", safe_ads))
 
 
 GEODATA_REQUIRED = {
@@ -573,6 +638,15 @@ def run():
             add("rules/surge/" + name + ".list", surge_ips(mihomo), source, count)
             add("rules/quantumultx/" + name + ".list",
                 quantumultx_ips(mihomo, policy_for(name)), source, count)
+        ru_tlds = quantumultx_domains(
+            ("\n".join("+." + suffix for suffix in RU_SUFFIXES) + "\n").encode(),
+            "direct")
+        add("rules/quantumultx/ru-tlds.list", ru_tlds)
+        records["rules/quantumultx/ru-tlds.list"] = {
+            "source": "garasu:routing-policy:ru-suffixes",
+            "sha256": digest(ru_tlds), "bytes": len(ru_tlds),
+            "entries": len(RU_SUFFIXES),
+        }
         validate_source_metadata(source_metadata)
         for key, info in source_metadata.items():
             if len(source_bytes[key]) != info["bytes"] or digest(source_bytes[key]) != info["sha256"]:
@@ -586,6 +660,7 @@ def run():
             if name == "geosite.dat":
                 blob = replace_geodata_category(name, blob, "banned-ru",
                                                 generated["rules/rkn-domains.list"])
+                blob = add_native_geosite_categories(blob)
                 required_category = "banned-ru"
                 required_count = source_metadata["blocked_domains"]["entries"]
             else:
@@ -595,13 +670,11 @@ def run():
                 required_count = source_metadata["blocked_ips"]["entries"]
             if validate_geodata(name, blob)[required_category] != required_count:
                 raise ValueError("Geodata blocked category differs from complete source")
+            if name == "geosite.dat":
+                derived = validate_geodata(name, blob)
+                if derived["garasu-ru"] != len(RU_SUFFIXES) or derived["garasu-ads"] < 100:
+                    raise ValueError("Incomplete native GeoSite categories")
             add("geo/" + name, blob, source, source_blob=original)
-        validate_update_budget(records, previous)
-        changed = previous.get("files") != records
-        manifest = {"name": "Garasu MAX", "upstream": upstream_origin,
-                    "upstream_revision": revision, "sources": source_metadata,
-                    "files": records}
-        add("install/manifest.json", (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode())
         base = "https://raw.githubusercontent.com/" + REPO + "/main"
         for app in ("incy", "happ"):
             profile = json.loads((ROOT / "clients" / (app + ".json")).read_text())
@@ -611,13 +684,29 @@ def run():
             profile["Geositeurl"] = base + "/geo/geosite.dat"
             profile["LastUpdated"] = last_updated
             encoded = (json.dumps(profile, ensure_ascii=False, indent=2) + "\n").encode()
-            add("clients/" + app + ".json", encoded)
+            relative = "clients/" + app + ".json"
+            add(relative, encoded)
+            records[relative] = {"source": "garasu:profile-template:" + app,
+                                 "sha256": digest(encoded), "bytes": len(encoded)}
             if app == "happ":
                 happ_link = "happ://routing/onadd/" + base64.b64encode(json.dumps(
                     profile, ensure_ascii=False, separators=(",", ":")).encode()).decode()
+        shadowrocket = (ROOT / "clients/shadowrocket.conf").read_bytes()
+        add("clients/shadowrocket.conf", shadowrocket)
+        records["clients/shadowrocket.conf"] = {
+            "source": "garasu:managed-config:shadowrocket",
+            "sha256": digest(shadowrocket), "bytes": len(shadowrocket)}
+        validate_update_budget(records, previous)
+        changed = previous.get("files") != records
+        manifest = {"name": "Garasu MAX", "upstream": upstream_origin,
+                    "upstream_revision": revision, "sources": source_metadata,
+                    "files": records}
+        manifest_blob = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode()
+        add("install/manifest.json", manifest_blob)
         qx_filters = []
-        rule_order = ("rkn-domains", "rkn-ips", "youtube", "discord", "ai",
-                      "crypto", "proxy", "proxy-ips", "ads", "ru-ips")
+        surge_order = ("rkn-domains", "rkn-ips", "youtube", "discord", "ai",
+                       "crypto", "proxy", "proxy-ips", "ads", "ru-ips")
+        rule_order = surge_order[:-1] + ("ru-tlds", "ru-ips")
         for name in rule_order:
             qx_filters.append(
                 base + "/rules/quantumultx/" + name + ".list, tag=Garasu-" + name
@@ -634,14 +723,16 @@ def run():
             "singbox_template": base + "/clients/singbox-remnawave.json",
             "xray_advanced_template": base + "/clients/xray-advanced-remnawave.json",
             "quantumultx": quantumultx_link,
+            "manifest_url": base + "/install/manifest.json",
+            "manifest_sha256": digest(manifest_blob),
             "surge_rulesets": {n: base + "/rules/surge/" + n + ".list"
-                               for n in rule_order},
+                               for n in surge_order},
         }
         add("install/links.json", (json.dumps(links, ensure_ascii=False, indent=2) + "\n").encode())
         # Validate all dependent artifacts before any persistent file write.
         assert "geoip:blocked-ru" in profile["ProxyIp"]
         assert "geosite:banned-ru" in profile["ProxySites"]
-        assert len(records) == 58, len(records)
+        assert len(records) == 62, len(records)
         assert json.loads(generated["clients/incy.json"])["Name"] == "Garasu MAX"
         for relative, data in generated.items():
             target = temp / relative

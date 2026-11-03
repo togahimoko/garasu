@@ -86,7 +86,8 @@ class CrossClientMultiNodeContract(unittest.TestCase):
         remote_idx = next(i for i, r in enumerate(sb)
                           if "garasu-rkn-domains" in r.get("rule_set", []))
         self.assertLess(local_idx, remote_idx)
-        self.assertLess(private_idx, remote_idx)
+        # Explicit blocked domains must win even if their DNS answer is private.
+        self.assertLess(remote_idx, private_idx)
 
     def test_exception_priority_before_ru_direct(self):
         for name in ("mihomo-remnawave.yaml", "stash-remnawave.yaml"):

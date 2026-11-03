@@ -27,6 +27,18 @@ class DeliveryProbeTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     check_delivery.validate_base_url(url)
 
+    def test_manifest_digest_binds_links_to_checked_release(self):
+        manifest = b'{"files":{}}\n'
+        base = "https://raw.githubusercontent.com/togahimoko/garasu/main"
+        links = {"manifest_url": base + "/install/manifest.json",
+                 "manifest_sha256": hashlib.sha256(manifest).hexdigest()}
+        self.assertTrue(check_delivery.verify_manifest_digest(manifest, links, base))
+        with self.assertRaises(ValueError):
+            check_delivery.verify_manifest_digest(manifest + b" ", links, base)
+        with self.assertRaises(ValueError):
+            check_delivery.verify_manifest_digest(manifest, {
+                **links, "manifest_url": "https://other.example/install/manifest.json"}, base)
+
 
 if __name__=="__main__":
     unittest.main()

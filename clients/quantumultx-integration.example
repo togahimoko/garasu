@@ -12,6 +12,7 @@ https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/crypt
 https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/proxy.list, tag=Garasu-proxy, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
 https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/proxy-ips.list, tag=Garasu-proxy-ips, force-policy={{PERSONAL_PROXY_POLICY}}, enabled=true
 https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/ads.list, tag=Garasu-ads, force-policy=reject, enabled=true
+https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/ru-tlds.list, tag=Garasu-ru-tlds, force-policy=direct, enabled=true
 https://raw.githubusercontent.com/togahimoko/garasu/main/rules/quantumultx/ru-ips.list, tag=Garasu-ru-ips, force-policy=direct, enabled=true
 [filter_local]
 host-suffix, local, direct
@@ -20,14 +21,4 @@ host-suffix, home.arpa, direct
 ip-cidr, 10.0.0.0/8, direct
 ip-cidr, 172.16.0.0/12, direct
 ip-cidr, 192.168.0.0/16, direct
-host-suffix, ru, direct
-host-suffix, su, direct
-host-suffix, moscow, direct
-host-suffix, xn--p1ai, direct
-host-suffix, xn--p1acf, direct
-host-suffix, xn--80asehdb, direct
-host-suffix, xn--c1avg, direct
-host-suffix, xn--80aswg, direct
-host-suffix, xn--80adxhks, direct
-host-suffix, xn--d1acj3b, direct
 FINAL, {{PERSONAL_PROXY_POLICY}}

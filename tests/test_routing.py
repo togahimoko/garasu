@@ -82,7 +82,7 @@ class GarasuTests(unittest.TestCase):
             return  # first repo bootstrap before initial scheduled build
         manifest = json.loads(path.read_text())
         self.assertEqual(manifest["name"], "Garasu MAX")
-        self.assertEqual(len(manifest["files"]), 58)
+        self.assertEqual(len(manifest["files"]), 62)
         for filename, record in manifest["files"].items():
             data = (ROOT / filename).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"], filename)

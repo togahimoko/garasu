@@ -48,7 +48,9 @@ def _target_rules(rules):
             if key in result:
                 raise ValueError("Ambiguous duplicate rules for " + key)
             result[key] = rule
-    missing = set(TEST_AGENTS) - set(result)
+    # The six-rule panel uses one XRAY_BASE64 fallback for INCY and Happ.
+    # Dedicated client rules are optional, but core templates are required.
+    missing = {k.lower() for k in TEMPLATES} - set(result)
     if missing:
         raise ValueError("Missing existing client rules: " + ", ".join(sorted(missing)))
     return result
@@ -58,8 +60,8 @@ def _full(current, links):
     if not isinstance(current, dict) or current.get("version") != "1":
         raise ValueError("Not a supported Remnawave SRR export")
     raw = current.get("rules")
-    if not isinstance(raw, list) or len(raw) < 8:
-        raise ValueError("Expected an 8+ rule SRR export")
+    if not isinstance(raw, list) or len(raw) < 6:
+        raise ValueError("Expected at least six SRR rules")
     rules = [r for r in raw if r.get("name") not in PREVIEW_NAMES]
     if not rules or rules[0].get("responseType") != "BROWSER":
         raise ValueError("First rule must remain BROWSER")
@@ -71,6 +73,9 @@ def _full(current, links):
     targets = _target_rules(result["rules"])
     for key, label, header_name in [("incy", "INCY + Garasu MAX", "autorouting"),
                                     ("happ", "Happ + Garasu MAX", "routing")]:
+        # Do not attach client-specific headers to a shared unconditional fallback.
+        if key not in targets:
+            continue
         rule = targets[key]
         mod = rule.setdefault("responseModifications", {})
         mod["headers"] = [{"key": header_name, "value": links[key]}]
@@ -102,7 +107,18 @@ def patch(current, links, mode="test"):
               "mihomo": "Garasu Mihomo preview", "stash": "Garasu Stash preview",
               "singbox": "Garasu Singbox preview"}
     for key, agent in TEST_AGENTS.items():
-        rule = copy.deepcopy(targets[key])
+        if key in targets:
+            rule = copy.deepcopy(targets[key])
+        elif key in ("incy", "happ"):
+            # Clone the fallback only for a test User-Agent; live fallback stays intact.
+            rule = copy.deepcopy(full["rules"][-1])
+            header_name = "autorouting" if key == "incy" else "routing"
+            mod = rule.setdefault("responseModifications", {})
+            mod["headers"] = [{"key": header_name, "value": links[key]}]
+            mod["applyHeadersToEnd"] = True
+            mod["ignoreServeJsonAtBaseSubscription"] = True
+        else:
+            raise ValueError("Missing client rule for " + key)
         rule["name"] = labels[key]
         rule["description"] = "TEST ONLY: matches custom diagnostic User-Agent; existing customer rules unchanged"
         rule["conditions"] = [{"headerName": "user-agent", "operator": "STARTS_WITH",

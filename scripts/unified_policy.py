@@ -374,6 +374,63 @@ def build_candidates(root, policy):
     return result
 
 
+def build_ru_tld_mihomo_candidate(root, policy):
+    """Opt-in self-contained RU-TLD DIRECT candidate for offline core review.
+
+    Unlike remote HTTP providers, the complete blocked-domain and blocked-IP
+    registries are embedded *inside* this profile. There is no provider cache
+    that can silently be absent during cold start. It remains a candidate:
+    we do not claim native multi-A/AAAA or real ISP acceptance.
+    """
+    root = Path(root)
+    lock = load_release_lock(root / "policy/unified-release-lock.json", policy)
+    verify_release_assets(root, lock)
+    if policy["ru_bypass_enabled"] is not False:
+        raise ValueError("Unexpected production-wide RU bypass")
+    domains = [line for line in
+               (root / "rules/unified/refilter-domain-full.list").read_text(
+                   encoding="utf-8").splitlines() if line.startswith("+.")]
+    ips = [line for line in
+           (root / "rules/unified/refilter-ip-full.cidr").read_text(
+               encoding="utf-8").splitlines()
+           if line and not line.startswith("#")]
+    if len(domains) != policy["snapshot"]["domain_count"] or len(ips) != policy["snapshot"]["ip_count"]:
+        raise ValueError("Incomplete full blocked registry; refuse RU DIRECT")
+    source = build_candidates(root, policy)["clients/unified/mihomo-remnawave.yaml"]
+    for category, behavior, rows in (
+            ("rkn-domains-full", "domain", domains),
+            ("rkn-ips-full", "ipcidr", ips)):
+        regex = re.compile(r"(?m)^  " + re.escape(category) +
+                           r":\n(?:^    [^\n]*\n)+")
+        matches = list(regex.finditer(source))
+        if len(matches) != 1:
+            raise ValueError("Cannot bind full inline registry unambiguously")
+        payload = "".join("      - '" + row.replace("'", "''") + "'\n"
+                          for row in rows)
+        replacement = ("  " + category + ":\n"
+                       "    type: inline\n"
+                       "    behavior: " + behavior + "\n"
+                       "    payload:\n" + payload)
+        source = (source[:matches[0].start()] + replacement +
+                  source[matches[0].end():])
+    ip_rule = "  - RULE-SET,rkn-ips-full,Garasu,no-resolve\n"
+    if source.count(ip_rule) != 1:
+        raise ValueError("Missing blocked-IP routing decision")
+    source = source.replace(ip_rule,
+                            "  - RULE-SET,rkn-ips-full,Garasu\n")
+    final = "  - MATCH,Garasu\n"
+    if source.count(final) != 1:
+        raise ValueError("Expected fail-closed PROXY final decision")
+    direct = "".join("  - DOMAIN-SUFFIX," + tld + ",DIRECT\n"
+                     for tld in policy["ru_tlds"])
+    return (
+        "# Optional VERIFIED-SNAPSHOT RU TLD DIRECT candidate only.\n"
+        "# Full blockers are embedded in this YAML; not live Remnawave.\n"
+        "# Real DNS / multi-A/AAAA/ISP testing still required.\n"
+        + source.replace(final, direct + final)
+    )
+
+
 def candidate_drift(root, policy):
     expected = build_candidates(root, policy)
     return sorted(path for path, contents in expected.items()

@@ -303,6 +303,76 @@ class GarasuTests(unittest.TestCase):
         for domain, expected in cases.items():
             self.assertEqual(route(domain), expected, domain)
 
+    def test_v2ray_protobuf_geodata_rejects_missing_categories(self):
+        def vi(n):
+            out = bytearray()
+            while n > 127:
+                out.append((n & 127) | 128)
+                n >>= 7
+            out.append(n)
+            return bytes(out)
+        def field(n, body):
+            return vi((n << 3) | 2) + vi(len(body)) + body
+        def entry(code, count):
+            return field(1, code.encode()) + (field(2, b"test") * count)
+        payload = field(1, entry("ru", 2)) + field(1, entry("blocked-ru", 1))
+        categories = mod.validate_geodata(
+            "geoip.dat", payload, {"ru": 2, "blocked-ru": 1})
+        self.assertEqual(categories["ru"], 2)
+        with self.assertRaises(ValueError):
+            mod.validate_geodata(
+                "geoip.dat", payload, {"ru": 3, "blocked-ru": 1})
+        with self.assertRaises(ValueError):
+            mod.validate_geodata("geoip.dat", payload[:-1], {"ru": 2})
+        with self.assertRaises(ValueError):
+            mod.validate_geodata("geoip.dat", b"<html>invalid", {"ru": 1})
+
+    def test_large_upstream_drift_is_rejected(self):
+        original = {"files": {"rules/direct.list": {"entries": 3200}}}
+        mod.validate_update_budget(
+            {"rules/direct.list": {"entries": 3100}}, original)
+        with self.assertRaises(ValueError):
+            mod.validate_update_budget(
+                {"rules/direct.list": {"entries": 1000}}, original)
+        with self.assertRaises(ValueError):
+            mod.validate_update_budget(
+                {"rules/direct.list": {"entries": 10000}}, original)
+
+    def test_singbox_114_rule_set_downloader(self):
+        old = json.loads((ROOT / "clients/singbox-remnawave.json").read_text())
+        cur = json.loads((ROOT / "clients/singbox-remnawave-1.14.json").read_text())
+        self.assertEqual(len(cur["http_clients"]), 1)
+        self.assertEqual(cur["http_clients"][0]["detour"], "→ Remnawave")
+        self.assertEqual(cur["route"]["default_http_client"], "garasu-rules")
+        self.assertEqual(len(cur["route"]["rule_set"]), len(old["route"]["rule_set"]))
+        self.assertEqual(cur["route"]["final"], old["route"]["final"])
+        for r in cur["route"]["rule_set"]:
+            self.assertEqual(r["http_client"], "garasu-rules")
+
+    def test_core_smoke_fixture_generation(self):
+        import tempfile
+        spec = importlib.util.spec_from_file_location(
+            "garasu_smoke", ROOT / "scripts/smoke_cores.py")
+        plugin = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(plugin)
+        with tempfile.TemporaryDirectory(prefix="garasu-audit-") as temp:
+            out = Path(temp)
+            mihomo = plugin.prepare_mihomo("clients/mihomo-remnawave.yaml", out)
+            doc = yaml.safe_load(mihomo.read_text())
+            self.assertEqual(len(doc["proxies"]), 1)
+            self.assertIn("garasu-ci-node", doc["proxies"][0]["name"])
+            self.assertTrue(all(
+                p["type"] == "file" and Path(p["path"]).is_file()
+                for p in doc["rule-providers"].values()
+            ))
+            sb = plugin.prepare_singbox("clients/singbox-remnawave-1.14.json", out)
+            sbd = json.loads(sb.read_text())
+            self.assertEqual(sbd["outbounds"][0]["outbounds"], ["garasu-ci-node"])
+            self.assertTrue(all(
+                provider["type"] == "local" and Path(provider["path"]).is_file()
+                for provider in sbd["route"]["rule_set"]
+            ))
+
     def test_no_secrets(self):
         for path in (ROOT / "clients").iterdir():
             content = path.read_text()

@@ -43,7 +43,12 @@ GEO = {
 def parse_upstream_revision(blob):
     """GitHub API commit SHA; never trust a moving tag for a multi-file release."""
     response = json.loads(blob.decode("utf-8"))
-    revision = response["sha"]
+    if "object" in response:
+        if response.get("ref") != "refs/heads/main" or response["object"].get("type") != "commit":
+            raise ValueError("GitHub revision lookup did not return a branch commit")
+        revision = response["object"]["sha"]
+    else:
+        revision = response["sha"]
     if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Invalid immutable upstream commit SHA")
     return revision
@@ -59,7 +64,7 @@ def upstream_raw_url(revision, path):
 
 def resolve_upstream_revision():
     req = urllib.request.Request(
-        "https://api.github.com/repos/DigneZzZ/routing/commits/main",
+        "https://api.github.com/repos/DigneZzZ/routing/git/ref/heads/main",
         headers={"User-Agent": "Garasu-Routing/1.0",
                  "Accept": "application/vnd.github+json"},
     )

@@ -98,7 +98,7 @@
         "format": "source",
         "update_interval": "6h",
         "http_client": "garasu-rules",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/feature/unified-routing-astra-2026-11-03/rules/unified/refilter-domain-full.singbox.json"
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/eae553c8eea684d96b83de964c949104ee9acc23/rules/unified/refilter-domain-full.singbox.json"
       },
       {
         "type": "remote",
@@ -106,13 +106,13 @@
         "format": "source",
         "update_interval": "6h",
         "http_client": "garasu-rules",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/feature/unified-routing-astra-2026-11-03/rules/unified/refilter-ip-full.singbox.json"
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/eae553c8eea684d96b83de964c949104ee9acc23/rules/unified/refilter-ip-full.singbox.json"
       },
       {
         "type": "remote",
         "tag": "garasu-youtube",
         "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/youtube.json",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/singbox/youtube.json",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
@@ -120,7 +120,7 @@
         "type": "remote",
         "tag": "garasu-discord",
         "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/discord.json",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/singbox/discord.json",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
@@ -128,7 +128,7 @@
         "type": "remote",
         "tag": "garasu-ai",
         "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/ai.json",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/singbox/ai.json",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
@@ -136,7 +136,7 @@
         "type": "remote",
         "tag": "garasu-crypto",
         "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/crypto.json",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/singbox/crypto.json",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
@@ -144,7 +144,7 @@
         "type": "remote",
         "tag": "garasu-proxy",
         "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/proxy.json",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/singbox/proxy.json",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
@@ -152,7 +152,7 @@
         "type": "remote",
         "tag": "garasu-proxy-ips",
         "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/proxy-ips.json",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/singbox/proxy-ips.json",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
@@ -160,7 +160,7 @@
         "type": "remote",
         "tag": "garasu-ads",
         "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/ads.json",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/d5c5b908bac93aaa38203ff46574c0fe2b14bbbc/rules/singbox/ads.json",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       }

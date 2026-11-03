@@ -1,27 +1,30 @@
 # Garasu
 
-**Garasu** is a collection of routing profiles and maintained rule sets for network clients.
+**Garasu** is a collection of maintained routing profiles and interoperable rule sets.
 
-## Supported clients
+## Clients
 
 - Shadowrocket
 - Happ
 - INCY
-- Mihomo
+- Mihomo / Clash-compatible clients
+- Stash
+- Sing-box compatible clients
+- Xray-core (advanced opt-in)
+- Surge / Loon rule sets
+- Quantumult X filter resources
 
 ## Repository
 
 | Directory | Contents |
 | --- | --- |
-| [clients](clients/) | Client-specific routing profiles |
-| [rules](rules/) | Curated domain and IP rule sets |
-| [geo](geo/) | Geolocation data |
-| [install](install/) | Configuration resources |
+| [clients](clients/) | Client-specific profiles and templates |
+| [rules](rules/) | Domain/IP rules in multiple engine formats |
+| [geo](geo/) | Xray GeoIP / GeoSite assets |
+| [install](install/) | Installation links and integrity metadata |
 
-## Updates
+## Updates and compatibility
 
-Routing resources are periodically checked and refreshed. Published data includes integrity metadata for verification.
+Rule sets are validated before scheduled publication. See [compatibility](docs/compatibility.md) for supported formats and limitations, and [sources](SOURCES.md) for third-party attribution.
 
-## Attribution
-
-Garasu configurations incorporate data from external open-source projects. See [SOURCES.md](SOURCES.md) for source attribution and redistribution considerations.
+Garasu does not distribute access credentials or personal VPN subscriptions.

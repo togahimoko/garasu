@@ -66,6 +66,28 @@ class GarasuPublicExposureTests(unittest.TestCase):
             "[Proxy]\nprivate-server = vless, edge.example, 443\n",
         ))
 
+    def test_dns_and_loopback_inbound_are_not_private_exit_nodes(self):
+        data = {
+            "dns": {"servers": [{"type": "tls", "server": "1.1.1.1"}]},
+            "inbounds": [{"type": "mixed", "listen": "127.0.0.1",
+                          "platform": {"http_proxy": {
+                              "server": "127.0.0.1", "server_port": 2412}}}],
+            "outbounds": [{"type": "direct", "tag": "direct"}],
+        }
+        self.assertEqual(
+            audit_public_exposure.find_exposures(
+                "clients/singbox-remnawave.json", json.dumps(data)), [])
+
+    def test_detects_actual_singbox_outbound_endpoint(self):
+        data = {
+            "dns": {"servers": [{"type": "tls", "server": "1.1.1.1"}]},
+            "outbounds": [{"type": "vless", "server": "edge.example",
+                           "server_port": 443, "uuid": "test-user-id"}],
+        }
+        self.assertTrue(
+            audit_public_exposure.find_exposures(
+                "clients/singbox-remnawave.json", json.dumps(data)))
+
     def test_no_full_subscription_urls_in_install_links(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

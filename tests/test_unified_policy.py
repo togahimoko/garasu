@@ -117,6 +117,23 @@ class UnifiedPolicyContract(unittest.TestCase):
         self.assertNotIn("garasu-games", json.dumps(sb["route"]["rules"]))
         self.assertEqual(sb["route"]["final"], "→ Remnawave")
 
+    def test_services_are_not_rejected_by_adblock_priority(self):
+        outputs = unified.build_candidates(ROOT, self.policy)
+        xray = json.loads(outputs["clients/unified/xray-advanced-remnawave.json"])
+        rules = xray["routing"]["rules"]
+        index_proxy = next(i for i, rule in enumerate(rules)
+                           if rule.get("outboundTag") == "proxy")
+        index_block = next(i for i, rule in enumerate(rules)
+                           if rule.get("outboundTag") == "block")
+        self.assertLess(index_proxy, index_block)
+        for client in ("incy", "happ"):
+            mobile = json.loads(outputs["clients/unified/" + client + ".json"])
+            if mobile["RouteOrder"].startswith("block-"):
+                # Do not enable an unsafe adblock when a native client forces
+                # blocking before necessary PROXY services.
+                self.assertEqual(mobile["BlockSites"], [])
+                self.assertEqual(mobile["BlockIp"], [])
+
     def test_candidate_outputs_do_not_overwrite_published_paths(self):
         outputs = unified.build_candidates(ROOT, self.policy)
         self.assertGreaterEqual(len(outputs), 7)

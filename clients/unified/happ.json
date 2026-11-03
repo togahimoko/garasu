@@ -38,10 +38,7 @@
     "geoip:telegram",
     "geoip:blocked-ru"
   ],
-  "BlockSites": [
-    "geosite:category-ads",
-    "geosite:win-spy"
-  ],
+  "BlockSites": [],
   "BlockIp": [],
   "DomainStrategy": "IPIfNonMatch",
   "FakeDNS": "false",

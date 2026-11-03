@@ -11,6 +11,7 @@ import shutil
 import tempfile
 import time
 import urllib.request
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM = "https://raw.githubusercontent.com/DigneZzZ/routing/main"
@@ -240,6 +241,17 @@ def run():
             if app == "happ":
                 happ_link = "happ://routing/onadd/" + base64.b64encode(json.dumps(
                     profile, ensure_ascii=False, separators=(",", ":")).encode()).decode()
+        qx_filters = []
+        rule_order = ("rkn-domains", "rkn-ips", "youtube", "discord", "ai",
+                      "crypto", "proxy", "proxy-ips", "ads", "games", "direct",
+                      "direct-ips", "ru-ips")
+        for name in rule_order:
+            qx_filters.append(
+                base + "/rules/quantumultx/" + name + ".list, tag=Garasu-" + name
+                + ", force-policy=" + policy_for(name) + ", enabled=true")
+        quantumultx_link = ("quantumult-x:///add-resource?remote-resource="
+                           + quote(json.dumps({"filter_remote": qx_filters},
+                                              separators=(",", ":")), safe=""))
         links = {
             "shadowrocket": "shadowrocket://config/add/" + base + "/clients/shadowrocket.conf",
             "incy": "incy://autorouting/onadd/" + base + "/clients/incy.json",
@@ -248,6 +260,9 @@ def run():
             "stash_template": base + "/clients/stash-remnawave.yaml",
             "singbox_template": base + "/clients/singbox-remnawave.json",
             "xray_advanced_template": base + "/clients/xray-advanced-remnawave.json",
+            "quantumultx": quantumultx_link,
+            "surge_rulesets": {n: base + "/rules/surge/" + n + ".list"
+                               for n in rule_order},
         }
         add("install/links.json", (json.dumps(links, ensure_ascii=False, indent=2) + "\n").encode())
         # Validate all dependent artifacts before any persistent file write.

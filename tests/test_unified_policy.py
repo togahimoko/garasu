@@ -58,6 +58,31 @@ class UnifiedPolicyContract(unittest.TestCase):
                     blocked_domains=set(), blocked_ips=set(), ru_ips=set(),
                     verified_full_refilter=False), "PROXY")
 
+    def test_multi_address_blocked_ip_overrides_russian_domain(self):
+        blocked = {ipaddress.ip_network("95.2.2.0/24"),
+                   ipaddress.ip_network("2001:db8:100::/48")}
+        checks = [
+            ("bank.example.ru", ["95.1.1.1", "95.2.2.2"], "PROXY"),
+            ("bank.example.ru", ["95.1.1.1", "2001:db8:100::5"], "PROXY"),
+            ("bank.example.ru", ["95.1.1.1", "95.3.3.3"], "DIRECT"),
+            ("foreign.example.org", ["95.1.1.1", "95.3.3.3"], "PROXY"),
+            ("bank.example.ru", [], "PROXY"),
+            ("bank.example.ru", ["invalid-dns"], "PROXY"),
+            ("foreign.example.org", ["10.2.1.4", "95.1.1.1"], "PROXY"),
+        ]
+        for host, addresses, expected in checks:
+            with self.subTest(host=host, addresses=addresses):
+                self.assertEqual(unified.decide_answers(
+                    self.policy, host, addresses,
+                    blocked_domains={"blocked.example.ru"},
+                    blocked_ips=blocked,
+                    verified_full_refilter=True), expected)
+
+    def test_multi_address_cold_start_does_not_downgrade_to_direct(self):
+        self.assertEqual(unified.decide_answers(
+            self.policy, "bank.example.ru", ["95.1.1.1"],
+            blocked_ips=set(), verified_full_refilter=False), "PROXY")
+
     def test_rendered_mihomo_fail_closed_autonodes_bootstrap(self):
         outputs = unified.build_candidates(ROOT, self.policy)
         config = outputs["clients/unified/mihomo-remnawave.yaml"]

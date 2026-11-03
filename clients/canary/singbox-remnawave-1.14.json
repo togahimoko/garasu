@@ -2,6 +2,16 @@
   "dns": {
     "rules": [
       {
+        "domain_suffix": [
+          "localhost",
+          "local",
+          "lan",
+          "home.arpa"
+        ],
+        "action": "route",
+        "server": "local"
+      },
+      {
         "server": "remote",
         "query_type": [
           "A",

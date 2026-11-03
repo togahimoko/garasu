@@ -6,6 +6,7 @@ pinned to the same DigneZzZ upstream revision as install/manifest.json.
 Published main templates and Remnawave SRR are intentionally unchanged.
 """
 import argparse
+import hashlib
 import ipaddress
 import json
 import re
@@ -100,6 +101,31 @@ def validate_release_lock(lock, policy):
 def load_release_lock(path, policy):
     lock = json.loads(Path(path).read_text(encoding="utf-8"))
     return validate_release_lock(lock, policy)
+
+
+def verify_release_assets(root, lock, *, paths=None):
+    """Verify the exact on-disk Git blobs and lengths recorded in the lock.
+
+    Call on a clean checkout before the rolling source-refresh CI job, not
+    after it has intentionally regenerated the mutable production rules.
+    """
+    root = Path(root).resolve()
+    assets = lock["assets"]
+    selected = sorted(assets) if paths is None else list(paths)
+    for relative in selected:
+        if relative not in assets:
+            raise ValueError("Unknown release asset integrity path: " + relative)
+        path = (root / relative).resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            raise ValueError("Missing or unsafe release asset integrity path: " + relative)
+        data = path.read_bytes()
+        metadata = assets[relative]
+        git_blob = hashlib.sha1(
+            b"blob " + str(len(data)).encode("ascii") + b"\x00" + data
+        ).hexdigest()
+        if len(data) != metadata["bytes"] or git_blob != metadata["git_blob"]:
+            raise ValueError("Failed asset integrity check: " + relative)
+    return len(selected)
 
 
 def asset_url(lock, category, engine):
@@ -326,9 +352,13 @@ def main():
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--write", action="store_true")
     group.add_argument("--check", action="store_true")
+    group.add_argument("--verify-assets", action="store_true")
     args = p.parse_args()
     policy = load_policy(ROOT / "policy/unified-v1.json")
-    if args.check:
+    if args.verify_assets:
+        lock = load_release_lock(ROOT / "policy/unified-release-lock.json", policy)
+        print("Verified pinned release asset integrity:", verify_release_assets(ROOT, lock))
+    elif args.check:
         if not check_candidates(ROOT, policy):
             p.error("Generated candidate files missing or differ; run --write in branch")
         print("Unified candidate profiles match one policy snapshot")

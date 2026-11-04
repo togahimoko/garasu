@@ -23,13 +23,7 @@ AGENTS = {
     "happ": "happ/1.0",
     "incy": "incy/1.0",
     "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36",
-    "preview_incy": "garasu-test-incy",
-    "preview_happ": "garasu-test-happ",
-    "preview_mihomo": "garasu-test-mihomo",
-    "preview_stash": "garasu-test-stash",
-    "preview_singbox": "garasu-test-singbox",
-    "preview_xray": "garasu-test-xray",
-    "xray_json": "garasu-xray-json",
+    "xray": "v2rayN/7.0",
 }
 DEFAULT_AGENTS = ("mihomo", "clash", "stash", "singbox", "happ", "incy", "browser")
 MAX_BYTES = 4_000_000  # Inline RKN/RU templates are approximately 2–3 MB.

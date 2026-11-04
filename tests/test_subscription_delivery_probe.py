@@ -38,13 +38,14 @@ class FakeOpener:
 
 
 class DeliveryProbe(unittest.TestCase):
-    def test_preview_agents_use_isolated_srr_user_agents(self):
+    def test_real_clients_use_production_user_agents(self):
+        self.assertFalse(any("preview" in name for name in probe.AGENTS))
         for name in ("incy", "happ", "mihomo", "stash", "singbox", "xray"):
-            client = "preview_" + name
             opener = FakeOpener(b"proxies:\n")
-            probe.request_once(SECRET, client, "direct", opener=opener)
+            probe.request_once(SECRET, name, "direct", opener=opener)
             self.assertEqual(opener.seen_request.get_header("User-agent"),
-                             "garasu-test-" + name)
+                             probe.AGENTS[name])
+            self.assertNotIn("garasu-test-", probe.AGENTS[name])
 
     def test_detects_independently_each_client_format_without_outputting_secret(self):
         cases = [

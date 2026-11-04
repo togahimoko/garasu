@@ -32,7 +32,9 @@ class GarasuTests(unittest.TestCase):
     def test_profiles_and_brand(self):
         for name in ("incy", "happ"):
             doc = json.loads((ROOT / "clients" / (name + ".json")).read_text())
-            self.assertEqual(doc["Name"], "Garasu MAX")
+            self.assertEqual(doc["Name"], "Garasu")
+            self.assertEqual(doc, json.loads(
+                (ROOT / "release" / name / "config.json").read_text()))
             self.assertIn("geoip:blocked-ru", doc["ProxyIp"])
             self.assertIn("geosite:youtube", doc["ProxySites"])
             self.assertIn("/togahimoko/garasu/main/geo/", doc["Geositeurl"])
@@ -99,7 +101,16 @@ class GarasuTests(unittest.TestCase):
         self.assertTrue(links["happ"].startswith("happ://routing/onadd/"))
         encoded = links["happ"].removeprefix("happ://routing/onadd/")
         happ = json.loads(base64.b64decode(encoded, validate=True))
-        self.assertEqual(happ, json.loads((ROOT / "clients/happ.json").read_text()))
+        self.assertEqual(happ, json.loads((ROOT / "release/happ/config.json").read_text()))
+        for key, path in (
+            ("incy", "release/incy/config.json"),
+            ("mihomo_template", "release/mihomo/config.yaml"),
+            ("stash_template", "release/stash/config.yaml"),
+            ("singbox_template", "release/singbox/config.json"),
+            ("shadowrocket", "release/shadowrocket/config.conf"),
+            ("xray_advanced_template", "release/xray/config.json"),
+        ):
+            self.assertIn("/main/" + path, links[key])
         if "quantumultx" in links:
             self.assertTrue(links["quantumultx"].startswith(
                 "quantumult-x:///add-resource?remote-resource="))
@@ -108,18 +119,14 @@ class GarasuTests(unittest.TestCase):
 
     def test_srr_release_preserves_client_fallback(self):
         full = json.loads((ROOT / "release/remnawave/srr.json").read_text())
-        preview = json.loads((ROOT / "release/remnawave/srr-test.json").read_text())
         self.assertEqual(full["version"], "1")
         self.assertEqual(full["rules"][0]["responseType"], "BROWSER")
         self.assertEqual(full["rules"][-1]["name"], "Fallback Base64")
         self.assertEqual(full["rules"][-1]["responseType"], "XRAY_BASE64")
         self.assertEqual(full["rules"][-1]["conditions"], [])
-        self.assertEqual(preview["rules"][1]["name"], "Garasu Test")
-        self.assertEqual(preview["rules"][1]["conditions"][0]["value"],
-                         "garasu-test-mihomo")
-        self.assertEqual(preview["rules"][1]["responseType"], "MIHOMO")
-        self.assertEqual(preview["rules"][1]["responseModifications"]["subscriptionTemplate"],
-                         "Default")
+        self.assertFalse((ROOT / "release/remnawave/srr-test.json").exists())
+        self.assertFalse(any("garasu-test-" in json.dumps(rule).lower()
+                             for rule in full["rules"]))
         self.assertTrue(all(rule["responseModifications"]["subscriptionTemplate"] == "Default"
                             for rule in full["rules"]
                             if rule["responseType"] == "MIHOMO"))

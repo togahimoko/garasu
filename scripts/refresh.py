@@ -589,7 +589,6 @@ def run():
     if not re.fullmatch(r"[\w.-]+/[\w.-]+", REPO):
         raise ValueError("Invalid GITHUB_REPOSITORY")
     revision = resolve_upstream_revision()
-    last_updated = upstream_commit_date(revision)
     upstream_origin = "https://raw.githubusercontent.com/DigneZzZ/routing/" + revision
     previous_path = ROOT / "install/manifest.json"
     previous = json.loads(previous_path.read_text()) if previous_path.exists() else {}
@@ -684,12 +683,10 @@ def run():
             add("geo/" + name, blob, source, source_blob=original)
         base = "https://raw.githubusercontent.com/" + REPO + "/main"
         for app in ("incy", "happ"):
-            profile = json.loads((ROOT / "clients" / (app + ".json")).read_text())
-            profile["Name"] = "Garasu MAX"
-            profile["GlobalProxy"] = "true"
+            # Compatibility URLs mirror the canonical production profile.
+            profile = json.loads((ROOT / "release" / app / "config.json").read_text())
             profile["Geoipurl"] = base + "/geo/geoip.dat"
             profile["Geositeurl"] = base + "/geo/geosite.dat"
-            profile["LastUpdated"] = last_updated
             encoded = (json.dumps(profile, ensure_ascii=False, indent=2) + "\n").encode()
             relative = "clients/" + app + ".json"
             add(relative, encoded)
@@ -722,13 +719,13 @@ def run():
                            + quote(json.dumps({"filter_remote": qx_filters},
                                               separators=(",", ":")), safe=""))
         links = {
-            "shadowrocket": "shadowrocket://config/add/" + base + "/clients/shadowrocket.conf",
-            "incy": "incy://autorouting/onadd/" + base + "/clients/incy.json",
+            "shadowrocket": "shadowrocket://config/add/" + base + "/release/shadowrocket/config.conf",
+            "incy": "incy://autorouting/onadd/" + base + "/release/incy/config.json",
             "happ": happ_link,
-            "mihomo_template": base + "/clients/mihomo-remnawave.yaml",
-            "stash_template": base + "/clients/stash-remnawave.yaml",
-            "singbox_template": base + "/clients/singbox-remnawave.json",
-            "xray_advanced_template": base + "/clients/xray-advanced-remnawave.json",
+            "mihomo_template": base + "/release/mihomo/config.yaml",
+            "stash_template": base + "/release/stash/config.yaml",
+            "singbox_template": base + "/release/singbox/config.json",
+            "xray_advanced_template": base + "/release/xray/config.json",
             "quantumultx": quantumultx_link,
             "manifest_url": base + "/install/manifest.json",
             "manifest_sha256": digest(manifest_blob),
@@ -740,7 +737,7 @@ def run():
         assert "geoip:blocked-ru" in profile["ProxyIp"]
         assert "geosite:banned-ru" in profile["ProxySites"]
         assert len(records) == 62, len(records)
-        assert json.loads(generated["clients/incy.json"])["Name"] == "Garasu MAX"
+        assert json.loads(generated["clients/incy.json"])["Name"] == "Garasu"
         for relative, data in generated.items():
             target = temp / relative
             target.parent.mkdir(parents=True, exist_ok=True)

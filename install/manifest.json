@@ -380,13 +380,13 @@
     },
     "clients/incy.json": {
       "source": "garasu:profile-template:incy",
-      "sha256": "a0337ea279b475b058a481c3eb96e9be50d37d6e94dc97187be14a6f1cf4d14c",
-      "bytes": 1348
+      "sha256": "b04031063a319396d78ac709847fedb51547e73acfa8d68270c36d7d33f02a59",
+      "bytes": 1616
     },
     "clients/happ.json": {
       "source": "garasu:profile-template:happ",
-      "sha256": "a0337ea279b475b058a481c3eb96e9be50d37d6e94dc97187be14a6f1cf4d14c",
-      "bytes": 1348
+      "sha256": "b04031063a319396d78ac709847fedb51547e73acfa8d68270c36d7d33f02a59",
+      "bytes": 1616
     },
     "clients/shadowrocket.conf": {
       "source": "garasu:managed-config:shadowrocket",

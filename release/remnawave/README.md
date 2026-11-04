@@ -4,7 +4,7 @@
 
 ## Template names
 
-- MIHOMO: `Garasu` — `../mihomo/config.yaml`
+- MIHOMO: `Default` — the existing installed Remnawave template. To ship the new Garasu YAML, explicitly update this template after a test, or create a separate named `Garasu` template and then change SSR accordingly.
 - STASH: `Garasu Stash` — `../stash/config.yaml`
 - SINGBOX: `Garasu Singbox` — `../singbox/config.json`
 - XRAY_JSON opt-in: `Garasu Xray JSON` — where explicitly supported.
@@ -20,3 +20,5 @@ INCY receives personal XRAY_BASE64 nodes and an `autorouting` header pointing to
 Export the actual active SSR and all template bodies first. Test `srr-test.json` with a dedicated subscription and User-Agent `garasu-test-mihomo/1.0`. Compare its normal-client rules with the real current configuration: the test file originated from a repository export and may differ from panel state. Verify every client type and a fallback before applying the full SSR. Restore the backed-up SSR and templates on failure.
 
 Do not overwrite templates used by paying customers for a test. No server ports, nodes or Xray settings need changing.
+
+**Verified on the active panel:** only `Default` templates exist. A `subscriptionTemplate` name that does not exist falls back to the default template. The repository MIHOMO response rules therefore point to `Default` until a separately named Garasu record is actually created. The same concern remains to be addressed for Stash, sing-box and Xray JSON templates before production cutover.

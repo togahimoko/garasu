@@ -17,7 +17,7 @@
       "responseType": "BROWSER"
     },
     {
-      "name": "Garasu Mihomo canary",
+      "name": "Garasu Test",
       "description": "Test-only response; other users preserve existing rules",
       "enabled": true,
       "operator": "AND",

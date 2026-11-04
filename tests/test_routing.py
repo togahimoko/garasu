@@ -106,55 +106,26 @@ class GarasuTests(unittest.TestCase):
             self.assertEqual(len(links["surge_rulesets"]), 10)
 
 
-    def test_srr_preserves_live_clients_until_promotion(self):
-        spec = importlib.util.spec_from_file_location("garasu_srr", ROOT / "scripts/build_srr.py")
-        plugin = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(plugin)
-        agent = lambda value: [{"headerName": "user-agent", "operator": "STARTS_WITH",
-                                "value": value, "caseSensitive": False}]
-        base = {
-            "version": "1",
-            "settings": {"disableSubscriptionAccessByPath": False},
-            "rules": [
-                {"name": "Browser", "responseType": "BROWSER", "conditions": [1]},
-                {"name": "Existing INCY", "responseType": "XRAY_BASE64", "conditions": agent("incy/"),
-                 "responseModifications": {"headers": [{"key": "autorouting", "value": "old"}]}},
-                {"name": "Existing Happ", "responseType": "XRAY_BASE64", "conditions": agent("happ"),
-                 "responseModifications": {"headers": [{"key": "routing", "value": "old"}]}},
-                {"name": "Mihomo Clients", "responseType": "MIHOMO", "conditions": agent("mihomo")},
-                {"name": "Stash Clients", "responseType": "STASH", "conditions": agent("stash")},
-                {"name": "Sing-box Clients", "responseType": "SINGBOX", "conditions": agent("singbox")},
-                {"name": "Clash Core Clients", "responseType": "CLASH", "conditions": agent("clash")},
-                {"name": "Fallback", "responseType": "XRAY_BASE64", "conditions": []},
-            ],
-        }
-        old = json.dumps(base, sort_keys=True)
-        payload = base64.b64encode(json.dumps({"Name": "Garasu MAX"}).encode()).decode()
-        links = {"incy": "incy://autorouting/onadd/https://example.com/incy.json",
-                 "happ": "happ://routing/onadd/" + payload}
-        staged = plugin.patch(base, links, mode="test")
-        self.assertEqual(len(staged["rules"]), 13)
-        self.assertEqual(staged["rules"][6:], base["rules"][1:])
-        self.assertEqual(staged["rules"][0], base["rules"][0])
-        self.assertEqual(json.dumps(base, sort_keys=True), old)
-        self.assertEqual(plugin.patch(staged, links, mode="test"), staged)
-        full = plugin.patch(base, links, mode="full")
-        self.assertEqual(len(full["rules"]), 8)
-        self.assertEqual([r["name"] for r in full["rules"][:3]],
-                         ["Browser", "INCY + Garasu MAX", "Happ + Garasu MAX"])
-        self.assertEqual(full["rules"][3]["responseModifications"]["subscriptionTemplate"],
-                         "Garasu Mihomo")
-        self.assertEqual(full["rules"][4]["responseModifications"]["subscriptionTemplate"],
-                         "Garasu Stash")
-        self.assertEqual(full["rules"][5]["responseModifications"]["subscriptionTemplate"],
-                         "Garasu Singbox")
-        self.assertEqual(full["rules"][6:], base["rules"][6:])
-        self.assertEqual(plugin.patch(full, links, mode="full"), full)
-        self.assertEqual(plugin.patch(staged, links, mode="full"), full)
-        with self.assertRaises(ValueError):
-            plugin.patch({**base, "rules": base["rules"][:-1]}, links)
-        with self.assertRaises(ValueError):
-            plugin.patch(base, {**links, "happ": "happ://routing/onadd/" + "a" * 5000})
+    def test_srr_release_preserves_client_fallback(self):
+        full = json.loads((ROOT / "release/remnawave/srr.json").read_text())
+        preview = json.loads((ROOT / "release/remnawave/srr-test.json").read_text())
+        self.assertEqual(full["version"], "1")
+        self.assertEqual(full["rules"][0]["responseType"], "BROWSER")
+        self.assertEqual(full["rules"][-1]["name"], "Fallback Base64")
+        self.assertEqual(full["rules"][-1]["responseType"], "XRAY_BASE64")
+        self.assertEqual(full["rules"][-1]["conditions"], [])
+        self.assertEqual(preview["rules"][1]["name"], "Garasu Test")
+        self.assertEqual(preview["rules"][1]["conditions"][0]["value"],
+                         "garasu-test-mihomo")
+        self.assertEqual(preview["rules"][1]["responseType"], "MIHOMO")
+        self.assertEqual(preview["rules"][1]["responseModifications"]["subscriptionTemplate"],
+                         "Garasu")
+        self.assertTrue(all(rule["responseModifications"]["subscriptionTemplate"] == "Garasu"
+                            for rule in full["rules"]
+                            if rule["responseType"] == "MIHOMO"))
+        self.assertIn("INCY Garasu", [r["name"] for r in full["rules"]])
+        self.assertIn("Happ Garasu", [r["name"] for r in full["rules"]])
+        self.assertIn("Shadowrocket Garasu", [r["name"] for r in full["rules"]])
 
 
     def test_singbox_source_conversion(self):

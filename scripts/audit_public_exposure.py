@@ -47,7 +47,7 @@ def find_exposures(path, content):
         for key, value in parse_qsl(query):
             if key.lower() in SENSITIVE_QUERY and value and len(value) >= 8:
                 findings.add("credential in URL query")
-    if path.startswith("clients/"):
+    if path.startswith(("clients/", "release/")):
         if path.endswith((".yaml", ".yml")):
             if re.search(r"(?m)^\s*server\s*:\s*\S+", content):
                 findings.add("static proxy server in YAML template")

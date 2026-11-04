@@ -109,8 +109,8 @@ class GarasuPublicExposureTests(unittest.TestCase):
             file = root / "release" / "mihomo" / "unsafe.yaml"
             file.parent.mkdir(parents=True)
             file.write_text(
-                "proxies:\\n  - name: Subscriber\\n    type: vless\\n"
-                "    server: private.example\\n    port: 443\\n",
+                "proxies:\n  - name: Subscriber\n    type: vless\n"
+                "    server: private.example\n    port: 443\n",
                 encoding="utf-8",
             )
             self.assertTrue(audit_public_exposure.scan_release(root))

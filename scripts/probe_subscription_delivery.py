@@ -22,7 +22,7 @@ AGENTS = {
     "singbox": "singbox/1.14.2",
     "happ": "happ/1.0",
     "incy": "incy/1.0",
-    "browser": "browser/1.0",
+    "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36",
     "preview_incy": "garasu-test-incy",
     "preview_happ": "garasu-test-happ",
     "preview_mihomo": "garasu-test-mihomo",
@@ -51,10 +51,13 @@ def _format(body, mime):
     sample = body.lstrip()
     if mime == "text/html" or sample[:1] == b"<":
         return "html"
+    while sample.startswith(b"#"):
+        sample = sample.partition(b"\n")[2].lstrip()
     if sample[:1] in (b"{", b"["):
         return "json"
     if sample.startswith((b"proxies:", b"proxy-groups:", b"mixed-port:",
-                          b"port:", b"rules:")):
+                          b"port:", b"rules:", b"mode:", b"dns:",
+                          b"rule-providers:")):
         return "yaml"
     compact = b"".join(sample.split())
     if compact and len(compact) % 4 == 0 and len(compact) < MAX_BYTES + 1:
@@ -100,12 +103,16 @@ def request_once(url, client, transport, *, opener=None, timeout=8):
         "format": "unknown",
         "read_bytes": 0,
         "truncated": False,
+        "has_routing_header": False,
+        "has_autorouting_header": False,
         "error": None,
     }
     try:
         with opener.open(req, timeout=timeout) as response:
             result["status"] = response.status
             result["mime"] = _mime(response.headers)
+            result["has_routing_header"] = bool(response.headers.get("routing"))
+            result["has_autorouting_header"] = bool(response.headers.get("autorouting"))
             data = response.read(MAX_BYTES + 1)
             result["truncated"] = len(data) > MAX_BYTES
             data = data[:MAX_BYTES]

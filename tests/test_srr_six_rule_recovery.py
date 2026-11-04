@@ -42,6 +42,21 @@ def stub_links():
 
 
 class SixRuleSRRRecovery(unittest.TestCase):
+    def test_full_six_rule_export_adds_mobile_routing_headers_before_fallback(self):
+        full = build_srr.patch(minimal_srr(), stub_links(), mode="full",
+                               include_mobile=True, include_xray=True)
+        self.assertEqual(full["rules"][-1], minimal_srr()["rules"][-1])
+        self.assertEqual(len(full["rules"]), 9)
+        routes = {r["name"]: r for r in full["rules"]}
+        for name, key in (("INCY + Garasu MAX", "autorouting"),
+                          ("Happ + Garasu MAX", "routing")):
+            rule = routes[name]
+            self.assertEqual(rule["responseType"], "XRAY_BASE64")
+            self.assertEqual(rule["responseModifications"]["headers"][0]["key"], key)
+            self.assertTrue(rule["responseModifications"]["headers"][0]["value"])
+        self.assertEqual(build_srr.patch(full, stub_links(), mode="full",
+                                         include_mobile=True, include_xray=True), full)
+
     def test_xray_json_is_opt_in_and_preserves_base64_fallback(self):
         original = minimal_srr()
         full = build_srr.patch(original, stub_links(), mode="full",

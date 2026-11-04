@@ -36,8 +36,10 @@ unset GARASU_SUBSCRIPTION_URL
 приложениях подготовлен [полный вариант шести правил](remnawave-six-rule-full.json).
 Он переключает Mihomo, Stash и Singbox на три названных шаблона, исправляет
 совпадение sing-box User-Agent и добавляет **отдельное** правило Xray JSON
-только для User-Agent `garasu-xray-json`. Browser, CLASH и безусловный
-XRAY_BASE64 fallback сохранены. Это файл для импорта в раздел «Правила ответов»,
+только для User-Agent `garasu-xray-json`. Дополнительные правила Happ и INCY
+выдают персональные узлы в формате XRAY_BASE64 **вместе с** заголовками
+`routing` и `autorouting`, которые передают маршруты Garasu. Browser, CLASH и
+безусловный XRAY_BASE64 fallback сохранены. Это файл для импорта в раздел «Правила ответов»,
 а не замена содержимого отдельного клиентского шаблона.
 
 Новый Xray JSON шаблон сохраняет DNS, FakeDNS и дополнительные входы из

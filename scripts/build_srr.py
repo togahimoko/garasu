@@ -60,7 +60,7 @@ def _target_rules(rules):
     return result
 
 
-def _full(current, links, *, include_xray=False):
+def _full(current, links, *, include_xray=False, include_mobile=False):
     if not isinstance(current, dict) or current.get("version") != "1":
         raise ValueError("Not a supported Remnawave SRR export")
     raw = current.get("rules")
@@ -76,6 +76,20 @@ def _full(current, links, *, include_xray=False):
     result = copy.deepcopy(current)
     result["rules"] = copy.deepcopy(rules)
     targets = _target_rules(result["rules"])
+    if include_mobile:
+        for key, value in (("incy", "incy/"), ("happ", "happ")):
+            if key not in targets:
+                result["rules"].insert(-1, {
+                    "name": "Garasu " + key.upper() + " routing",
+                    "description": "Personal XRAY_BASE64 nodes with Garasu routing header",
+                    "enabled": True,
+                    "operator": "AND",
+                    "conditions": [{"headerName": "user-agent",
+                                    "operator": "STARTS_WITH",
+                                    "value": value, "caseSensitive": False}],
+                    "responseType": "XRAY_BASE64",
+                })
+        targets = _target_rules(result["rules"])
     for key, label, header_name in [("incy", "INCY + Garasu MAX", "autorouting"),
                                     ("happ", "Happ + Garasu MAX", "routing")]:
         # Do not attach client-specific headers to a shared unconditional fallback.
@@ -113,11 +127,13 @@ def _full(current, links, *, include_xray=False):
     return result
 
 
-def patch(current, links, mode="test", *, include_xray=False):
+def patch(current, links, mode="test", *, include_xray=False,
+          include_mobile=False):
     """test: real client UAs remain unchanged; full: switch five client rules."""
     if mode not in ("test", "full"):
         raise ValueError("Choose test or full")
-    full = _full(current, links, include_xray=include_xray)
+    full = _full(current, links, include_xray=include_xray,
+                 include_mobile=include_mobile)
     if mode == "full":
         return full
     orig = copy.deepcopy(current)
@@ -163,6 +179,8 @@ def main():
     p.add_argument("--mode", choices=["test", "full"], default="test")
     p.add_argument("--with-xray-json", action="store_true",
                    help="add an explicit Xray JSON rule before BASE64 fallback")
+    p.add_argument("--with-mobile-routing", action="store_true",
+                   help="add dedicated INCY and Happ routing headers before BASE64 fallback")
     a = p.parse_args()
     source, dest = Path(a.source), Path(a.destination)
     if source.resolve() == dest.resolve():
@@ -170,7 +188,8 @@ def main():
     current = json.loads(source.read_text(encoding="utf-8"))
     links = json.loads((ROOT / "install/links.json").read_text(encoding="utf-8"))
     result = patch(current, links, mode=a.mode,
-                   include_xray=a.with_xray_json)
+                   include_xray=a.with_xray_json,
+                   include_mobile=a.with_mobile_routing)
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("Garasu mode=" + a.mode, "rules=" + str(len(result["rules"])))

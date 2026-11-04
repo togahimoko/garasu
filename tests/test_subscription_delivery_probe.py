@@ -48,6 +48,7 @@ class DeliveryProbe(unittest.TestCase):
     def test_detects_independently_each_client_format_without_outputting_secret(self):
         cases = [
             ("mihomo", b"proxies:\n- name: node\n", "yaml"),
+            ("mihomo", b"# generated template\nmode: rule\nproxies:\n- name: node\n", "yaml"),
             ("singbox", b'{"outbounds":[]}', "json"),
             ("stash", b"proxy-groups:\n- name: group\n", "yaml"),
             ("happ", b"dmxlc3M6Ly90ZXN0Cg==", "base64"),
@@ -63,7 +64,28 @@ class DeliveryProbe(unittest.TestCase):
                 self.assertNotIn("body", result)
                 self.assertNotIn("SECRET", json.dumps(result))
                 self.assertNotIn(SECRET, json.dumps(result))
-                self.assertIn(name.lower(), opener.seen_request.get_header("User-agent").lower())
+                if name != "browser":
+                    self.assertIn(name.lower(), opener.seen_request.get_header("User-agent").lower())
+
+    def test_browser_probe_uses_a_real_browser_user_agent(self):
+        opener = FakeOpener(b"<html></html>", kind="text/html")
+        probe.request_once(SECRET, "browser", "proxy", opener=opener)
+        self.assertIn("Mozilla/5.0", opener.seen_request.get_header("User-agent"))
+        self.assertEqual(opener.seen_request.get_header("Accept"), "text/html")
+
+    def test_reports_mobile_routing_headers_without_exposing_values(self):
+        class HeaderOpener(FakeOpener):
+            def open(self, request, timeout=8):
+                response = super().open(request, timeout)
+                response.headers["routing"] = "happ://private-routing-value"
+                response.headers["autorouting"] = "incy://private-routing-value"
+                return response
+
+        result = probe.request_once(SECRET, "happ", "proxy",
+                                    opener=HeaderOpener(b"dmxlc3M6Ly90ZXN0Cg=="))
+        self.assertTrue(result["has_routing_header"])
+        self.assertTrue(result["has_autorouting_header"])
+        self.assertNotIn("private-routing-value", json.dumps(result))
 
     def test_network_errors_do_not_expose_sensitive_subscription_url(self):
         class Fail:

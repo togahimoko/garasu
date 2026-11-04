@@ -32,9 +32,10 @@ types because Mihomo precedes CLASH in the supplied order.
 
 The [full candidate](remnawave-six-rule-full.json) is available for
 review, but has not been imported into the panel. It selects the three named
-templates, adds one explicit `garasu-xray-json` Xray JSON rule, and retains
-Browser, CLASH, and the unconditional BASE64 fallback. To
+templates, adds dedicated Happ/INCY BASE64 responses with routing headers and
+one explicit `garasu-xray-json` Xray JSON rule, and retains Browser, CLASH,
+and the unconditional BASE64 fallback. To
 regenerate it from the original export, run
-`python3 scripts/build_srr.py original.json full.json --mode full --with-xray-json`. See the
+`python3 scripts/build_srr.py original.json full.json --mode full --with-xray-json --with-mobile-routing`. See the
 [installation guide](remnawave-six-rule-install.md) for the template files and
 preview probe. The script writes files locally; it does not modify the panel.

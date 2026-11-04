@@ -77,111 +77,112 @@ proxy-groups:
     proxies: # LEAVE THIS LINE!
       # Personal nodes are selected automatically by include-all.
 rule-providers:
+  # Real compiled MRS rule assets, generated from Garasu source sets.
   # Rule updates deliberately use DIRECT, avoiding a bootstrap loop when VPN
   # is down. A blocked GitHub endpoint may prevent refresh; cached sets remain.
   rkn-domains:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-domains.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/rkn-domains.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-rkn-domains.list
+    path: ./rule-providers/garasu-rkn-domains.mrs
     interval: 21600
   youtube:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/youtube.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/youtube.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-youtube.list
+    path: ./rule-providers/garasu-youtube.mrs
     interval: 21600
   discord:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/discord.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/discord.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-discord.list
+    path: ./rule-providers/garasu-discord.mrs
     interval: 21600
   ai:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ai.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/ai.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-ai.list
+    path: ./rule-providers/garasu-ai.mrs
     interval: 21600
   crypto:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/crypto.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/crypto.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-crypto.list
+    path: ./rule-providers/garasu-crypto.mrs
     interval: 21600
   proxy:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/proxy.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-proxy.list
+    path: ./rule-providers/garasu-proxy.mrs
     interval: 21600
   ads:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ads.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/ads.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-ads.list
+    path: ./rule-providers/garasu-ads.mrs
     interval: 21600
   games:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/games.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/games.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-games.list
+    path: ./rule-providers/garasu-games.mrs
     interval: 21600
   direct:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/direct.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-direct.list
+    path: ./rule-providers/garasu-direct.mrs
     interval: 21600
   rkn-ips:
     type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-ips.cidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/rkn-ips.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-rkn-ips.cidr
+    path: ./rule-providers/garasu-rkn-ips.mrs
     interval: 21600
   proxy-ips:
     type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy-ips.cidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/proxy-ips.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-proxy-ips.cidr
+    path: ./rule-providers/garasu-proxy-ips.mrs
     interval: 21600
   direct-ips:
     type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct-ips.cidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/direct-ips.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-direct-ips.cidr
+    path: ./rule-providers/garasu-direct-ips.mrs
     interval: 21600
   ru-ips:
     type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.cidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/ru-ips.mrs
     proxy: DIRECT
-    path: ./rule-providers/garasu-ru-ips.cidr
+    path: ./rule-providers/garasu-ru-ips.mrs
     interval: 21600
 rules:
   # Private destinations must not fall through to the Czech proxy, even

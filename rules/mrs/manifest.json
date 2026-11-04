@@ -1,0 +1,113 @@
+{
+  "source_commit": "c7c17d2d5d57d2f50aa63a90b85abdaede36fa68",
+  "files": [
+    {
+      "name": "rkn-domains",
+      "kind": "domain",
+      "source": "rules/rkn-domains.list",
+      "src_bytes": 1340856,
+      "mrs_bytes": 540857,
+      "sha256": "d8da3e2f0647cae72abb9ebe2c8096e8639a572d695f604a5b7884cfc5ae4a00"
+    },
+    {
+      "name": "youtube",
+      "kind": "domain",
+      "source": "rules/youtube.list",
+      "src_bytes": 2773,
+      "mrs_bytes": 1332,
+      "sha256": "edf6856fda88a0bce1879febc71338ba2d3729a908943dbababc659f09c72233"
+    },
+    {
+      "name": "discord",
+      "kind": "domain",
+      "source": "rules/discord.list",
+      "src_bytes": 602,
+      "mrs_bytes": 451,
+      "sha256": "10f9478b352f961327d611c4c503b3b53ad4f20af0914849d5df533a9275db46"
+    },
+    {
+      "name": "ai",
+      "kind": "domain",
+      "source": "rules/ai.list",
+      "src_bytes": 4037,
+      "mrs_bytes": 2250,
+      "sha256": "f57fc203d75705d8458636f9c5c6cda4d9c89747e61ed2dce479b348b6a505ae"
+    },
+    {
+      "name": "crypto",
+      "kind": "domain",
+      "source": "rules/crypto.list",
+      "src_bytes": 1398,
+      "mrs_bytes": 879,
+      "sha256": "9da53d4e58421dbea6037f8d33254eb68d68f794d896e37758e2929b05af2b51"
+    },
+    {
+      "name": "proxy",
+      "kind": "domain",
+      "source": "rules/proxy.list",
+      "src_bytes": 3222,
+      "mrs_bytes": 1699,
+      "sha256": "53074f28fbb5b190d505708e22eb4a85ad815c9176003e844328d5b9d1665ef7"
+    },
+    {
+      "name": "ads",
+      "kind": "domain",
+      "source": "rules/ads.list",
+      "src_bytes": 27040,
+      "mrs_bytes": 11107,
+      "sha256": "9598cfec91e90697579f62c604d7370da0fa33dfd30fcc52a4edb4a766ba290f"
+    },
+    {
+      "name": "games",
+      "kind": "domain",
+      "source": "rules/games.list",
+      "src_bytes": 2422,
+      "mrs_bytes": 1439,
+      "sha256": "a7077189540308c5a9f5e5a971e6d4e516a61d4e5a4f21485954900d6ca49d40"
+    },
+    {
+      "name": "direct",
+      "kind": "domain",
+      "source": "rules/direct.list",
+      "src_bytes": 60411,
+      "mrs_bytes": 30971,
+      "sha256": "c0860271cfce4652e4f787531397aa63047b63ed7677d21cce2228446ede5894"
+    },
+    {
+      "name": "rkn-ips",
+      "kind": "ipcidr",
+      "source": "rules/rkn-ips.cidr",
+      "src_bytes": 437439,
+      "mrs_bytes": 51444,
+      "sha256": "89ce824f9deb539c8fe73cd9e10a90c53b9f91a6a510be9952fd32db750ab575"
+    },
+    {
+      "name": "proxy-ips",
+      "kind": "ipcidr",
+      "source": "rules/proxy-ips.cidr",
+      "src_bytes": 149,
+      "mrs_bytes": 92,
+      "sha256": "d26763e945c0c04b9b6990ec32e2cb8036dd1e71eee1f92270a2974a4f416467"
+    },
+    {
+      "name": "direct-ips",
+      "kind": "ipcidr",
+      "source": "rules/direct-ips.cidr",
+      "src_bytes": 410,
+      "mrs_bytes": 236,
+      "sha256": "65027bee3076ec49024935c0eb9e4b85a447687db384d4b8d2763b6c2566ec1f"
+    },
+    {
+      "name": "ru-ips",
+      "kind": "ipcidr",
+      "source": "rules/ru-ips.cidr",
+      "src_bytes": 446953,
+      "mrs_bytes": 119656,
+      "sha256": "442fc9debeaa18f8f0afdbb1fd23f46964dc3eb8bbe3b79f403217369f507ffb"
+    }
+  ],
+  "format": "mihomo-mrs",
+  "compiler": "Mihomo Meta v1.19.33 darwin arm64",
+  "command": "mihomo convert-ruleset <domain|ipcidr> text <source> <target.mrs>",
+  "note": "Compiled from immutable Garasu source commit, not auto-synced with moving main branch; refresh MRS alongside source changes."
+}

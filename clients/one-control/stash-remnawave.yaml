@@ -1,4 +1,5 @@
 # Garasu ONE CONTROL | Stash Remnawave template — STAGING ONLY.
+# Native MRS rule sets (domain and ipcidr); verified format per Stash docs.
 # One visible Garasu group; Stash handles url-test internally.
 # Never auto-fallback to DIRECT on foreign traffic.
 # User nodes are inserted at the two Remnawave anchors below.
@@ -31,93 +32,93 @@ rule-providers:
   rkn-domains:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-domains.list
-    path: ./garasu/rkn-domains.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/rkn-domains.mrs
+    path: ./garasu/rkn-domains.mrs
     interval: 21600
   youtube:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/youtube.list
-    path: ./garasu/youtube.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/youtube.mrs
+    path: ./garasu/youtube.mrs
     interval: 21600
   discord:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/discord.list
-    path: ./garasu/discord.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/discord.mrs
+    path: ./garasu/discord.mrs
     interval: 21600
   ai:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ai.list
-    path: ./garasu/ai.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/ai.mrs
+    path: ./garasu/ai.mrs
     interval: 21600
   crypto:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/crypto.list
-    path: ./garasu/crypto.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/crypto.mrs
+    path: ./garasu/crypto.mrs
     interval: 21600
   proxy:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy.list
-    path: ./garasu/proxy.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/proxy.mrs
+    path: ./garasu/proxy.mrs
     interval: 21600
   ads:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ads.list
-    path: ./garasu/ads.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/ads.mrs
+    path: ./garasu/ads.mrs
     interval: 21600
   games:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/games.list
-    path: ./garasu/games.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/games.mrs
+    path: ./garasu/games.mrs
     interval: 21600
   direct:
     type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct.list
-    path: ./garasu/direct.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/direct.mrs
+    path: ./garasu/direct.mrs
     interval: 21600
   rkn-ips:
     type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-ips.cidr
-    path: ./garasu/rkn-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/rkn-ips.mrs
+    path: ./garasu/rkn-ips.mrs
     interval: 21600
   proxy-ips:
     type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy-ips.cidr
-    path: ./garasu/proxy-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/proxy-ips.mrs
+    path: ./garasu/proxy-ips.mrs
     interval: 21600
   direct-ips:
     type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct-ips.cidr
-    path: ./garasu/direct-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/direct-ips.mrs
+    path: ./garasu/direct-ips.mrs
     interval: 21600
   ru-ips:
     type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.cidr
-    path: ./garasu/ru-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/garasu-one-control-20261104/rules/mrs/ru-ips.mrs
+    path: ./garasu/ru-ips.mrs
     interval: 21600
 rules:
   # Local device/network domains must bypass the VPN at first match.

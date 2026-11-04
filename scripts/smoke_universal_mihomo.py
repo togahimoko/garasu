@@ -19,6 +19,8 @@ import time
 
 import yaml
 
+from scripts.sync_universal_routing import offline_mihomo_fixture
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -116,14 +118,15 @@ def main() -> None:
             threads.append(thread)
         root = Path(folder)
         config = yaml.safe_load((ROOT / "release/mihomo/config.yaml").read_text())
-        providers = config.get("rule-providers", {})
-        if any(item.get("type") == "http" for item in providers.values()):
-            raise AssertionError("Universal profile still has an HTTP rule-provider")
-        required = {"ads", "rkn-domains", "rkn-ips", "ru-ips"}
-        if not required.issubset(providers) or len(providers["ads"]["payload"]) < 1000:
-            raise AssertionError("Inline routing provider missing or truncated")
-        if any(item.get("type") != "inline" for item in providers.values()):
-            raise AssertionError("Cannot depend on remote rule-provider at boot")
+        # Only the temporary LOCAL TEST fixture is inline. Actual release
+        # uses HTTP providers and needs available/cached GitHub rule sets.
+        if any(item.get("type") != "http"
+               for item in config["rule-providers"].values()):
+            raise AssertionError("Production provider must be remote")
+        config = offline_mihomo_fixture(config, ROOT)
+        providers = config["rule-providers"]
+        if len(providers["ads"]["payload"]) < 1000:
+            raise AssertionError("Downloaded rules fixture truncated")
         ads_domain = providers["ads"]["payload"][0].removeprefix("+.")
 
         config["mixed-port"] = allocate_port()
@@ -192,7 +195,7 @@ def main() -> None:
             if "003.su" not in events:
                 raise AssertionError("Blocked Russian domain not seen in native trace")
             print("PASS native offline bank DIRECT / foreign PROXY / blocked RU PROXY / ads REJECT")
-            print("PASS remote rule-provider independence, one subscriber group")
+            print("PASS offline fixture from verified remote assets, one subscriber group")
         finally:
             if process is not None and process.poll() is None:
                 process.terminate()

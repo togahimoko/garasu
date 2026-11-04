@@ -20,9 +20,9 @@ Garasu публикует нативные профили маршрутизац
 
 ## Форматы
 
-- Mihomo: `release/mihomo/config.yaml`, одна видимая группа `Garasu` типа select с ручным выбором узла и скрытая автоматическая группа `Garasu Auto` типа URL-test, встроенные inline RKN/RU для доменов и IP.
-- Stash: `release/stash/config.yaml`, собственная группа URL-test и MRS.
-- sing-box: `release/singbox/config.json`, собственный механизм выбора узлов, тег для вставки Remnawave.
+- Mihomo: `release/mihomo/config.yaml`, одна видимая группа `Garasu` типа select с ручным выбором узла и скрытая автоматическая группа `Garasu Auto` типа URL-test, удалённые RKN/RU списки по URL GitHub.
+- Stash: `release/stash/config.yaml`, URL-test и удалённые текстовые провайдеры.
+- sing-box: `release/singbox/config.json`, 10 remote JSON rule-sets и HTTP-загрузка через Remnawave.
 - INCY/Happ: `release/incy/config.json` и `release/happ/config.json`, нативная политика Xray/geo.
 - Shadowrocket: `release/shadowrocket/config.conf`, отдельная политика при сохранении личной подписки.
 - Xray JSON: `release/xray/config.json`, опциональный шаблон виртуального хоста.
@@ -36,7 +36,7 @@ Garasu публикует нативные профили маршрутизац
 2. Точные исключения для заблокированных доменов и IP обрабатываются до широких российских DIRECT-правил.
 3. По категориям зарубежные сервисы и остальной внешний трафик идут через Garasu.
 4. При отсутствии здорового VPN-узла зарубежный трафик не должен незаметно переходить в DIRECT.
-5. Обновление правил и DNS-загрузка не должны зависеть от работоспособности собственного VPN, если это вызывает цикл загрузки.
+5. Холодный запуск ссылочных списков зависит от доступности GitHub или кэша; перед выпуском проверить отсутствие циклической загрузки и отказов DNS.
 
 Ручной выбор сервера временно отключает автоматическое переключение, пока пользователь не выберет `Garasu Auto`. URL-test измеряет доступность **узлов**, а не перечисляет свойства протокола. VLESS, REALITY, Vision, UDP и XUDP задаются индивидуально для узлов, вставляемых Remnawave.
 

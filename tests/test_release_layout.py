@@ -30,9 +30,12 @@ class ReleaseLayoutTest(unittest.TestCase):
             "mihomo/.mrs/README.md", "mihomo/.mrs/manifest.json",
             "stash/config.yaml", "incy/config.json", "happ/config.json",
             "shadowrocket/config.conf", "singbox/config.json", "xray/config.json",
-            "README.md", "remnawave/srr.json",
-            "remnawave/README.md",
+            "README.md", "remnawave/srr.json", "remnawave/README.md",
         }
+        providers = ("ads", "rkn-domains", "rkn-ips", "proxy-ips", "ru-ips",
+                     "youtube", "discord", "ai", "crypto", "proxy")
+        expected.update("providers/" + name + ".txt" for name in providers)
+        expected.update("singbox/rules/" + name + ".json" for name in providers)
         actual = {p.relative_to(RELEASE).as_posix()
                   for p in RELEASE.rglob("*") if p.is_file()}
         self.assertEqual(actual, expected | {
@@ -48,16 +51,13 @@ class ReleaseLayoutTest(unittest.TestCase):
             blob = (MRS / (name + ".mrs")).read_bytes()
             self.assertEqual(len(blob), item["mrs_bytes"])
             self.assertEqual(hashlib.sha256(blob).hexdigest(), item["sha256"])
-        # MRS remain published/verified as reproducible source artifacts.
-        # The customer-facing universal profile uses an offline inline ad set.
-        for client in ("mihomo", "stash"):
+        for client in ("mihomo","stash"):
             data = load_yaml(client + "/config.yaml")
             providers = data["rule-providers"]
-            self.assertGreater(len(providers["ads"]["payload"]), 1000)
-            self.assertGreater(len(providers["rkn-domains"]["payload"]), 10000)
-            self.assertGreater(len(providers["rkn-ips"]["payload"]), 20000)
-            self.assertGreater(len(providers["ru-ips"]["payload"]), 20000)
-            self.assertTrue(all(p["type"] == "inline" for p in providers.values()))
+            self.assertEqual(len(providers), 10)
+            self.assertTrue(all(p["format"] == "text" and p["url"].startswith(
+                "https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/")
+                and "payload" not in p for p in providers.values()))
 
     def test_mihomo_only_one_visible_policy(self):
         text = (RELEASE / "mihomo/config.yaml").read_text(encoding="utf-8")
@@ -76,7 +76,7 @@ class ReleaseLayoutTest(unittest.TestCase):
         self.assertEqual(data["proxy-groups"][1]["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         self.assertNotIn("tun", data)
-        self.assertTrue(all(p["type"] == "inline"
+        self.assertTrue(all(p["type"] == "http"
                             for p in data["rule-providers"].values()))
         self.assertIn("DOMAIN-SUFFIX,ru,DIRECT", data["rules"])
         self.assertIn("RULE-SET,rkn-domains,Garasu", data["rules"])

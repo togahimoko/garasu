@@ -1,6 +1,6 @@
 # Remnawave: единый рабочий профиль Garasu
 
-Единственный Subscription Response Rules: **[srr.json](srr.json)**. Тестового SSR и Lite/Full-версий нет.
+Единственный Subscription Response Rules: **[srr.json](srr.json)**. Тестового SSR и Lite/Full-версий нет. Правила хранятся по URL на GitHub, а не внутри шаблонов.
 
 ## Одна подписка, нативные форматы
 

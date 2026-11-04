@@ -86,7 +86,7 @@ class UniversalRoutingContract(unittest.TestCase):
             self.assertIn("geoip:ru", cfg["DirectIp"])
             self.assertTrue(cfg["Geoipurl"].endswith("/geo/geoip.dat"))
             self.assertTrue(cfg["Geositeurl"].endswith("/geo/geosite.dat"))
-            self.assertNotIn("domain:xapi.ozon.ru", cfg["BlockSites"])
+            self.assertEqual(cfg["BlockSites"], ["geosite:garasu-ads"])
 
     def test_xray_uses_paired_geo_for_both_actions(self):
         cfg = json.loads((ROOT / "release/xray/config.json").read_text())

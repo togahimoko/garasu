@@ -151,8 +151,10 @@ class NativeReleaseContract(unittest.TestCase):
                      rule["responseModifications"]["headers"]
                      if h["key"].lower() == "routing")
         self.assertTrue(value.startswith("happ://routing/onadd/"))
+        self.assertLess(len(value.encode("ascii")), 3500)
         profile = json.loads(base64.b64decode(value.split("/onadd/", 1)[1]))
         self.assertEqual(profile, target)
+        self.assertEqual(profile["BlockSites"], ["geosite:garasu-ads"])
         self.assertGreater(int(target["LastUpdated"]), 1793761499)
 
     def test_production_srr_has_no_missing_named_templates(self):

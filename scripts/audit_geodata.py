@@ -153,6 +153,10 @@ def audit(root: Path) -> dict:
         match_ip[category] = len(values)
     ads = geosite_values(sites["GARASU-ADS"])
     ad_source = source_values(root, "ads", ".list")
+    policy = json.loads((root / "policy/universal.json").read_text())
+    exempt = set(policy["ad_exempt_domains"])
+    if ads != ad_source - exempt:
+        raise ValueError("GARASU-ADS differs from curated source")
     extras = sorted(ads - ad_source)
     omitted = sorted(ad_source - ads)
     ru_suffixes = geosite_values(sites["GARASU-RU"])
@@ -209,8 +213,8 @@ def markdown(result: dict) -> str:
         "Все категории, на которые ссылаются INCY, Happ и Xray-шаблоны,",
         "**физически присутствуют** в соответствующих .dat.",
         "",
-        "Разные ads-наборы могут быть результатом намеренной очистки пересечений;",
-        "перед унификацией надо проверить целевую политику блокировки.",
+        "GARASU-ADS строго совпадает с основным ads.list за исключением",
+        "четырёх явных API-исключений из policy/universal.json.",
         "",
         "Бинарный GeoSite " + str(result["geosite_bytes"]) + " байт, GeoIP " +
         str(result["geoip_bytes"]) + " байт. Размер на диске не равен памяти",

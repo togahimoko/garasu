@@ -193,7 +193,7 @@ def route_singbox(cfg: dict, p: dict) -> dict:
 def route_incy(cfg: dict, p: dict) -> dict:
     cfg["Name"] = "Garasu"
     # Happ applies updated routing only when LastUpdated increases.
-    cfg["LastUpdated"] = "1793810700"
+    cfg["LastUpdated"] = "1793815000"
     cfg["GlobalProxy"] = "true"
     cfg["RouteOrder"] = "block-proxy-direct"
     cfg["DomainStrategy"] = "IPIfNonMatch"
@@ -205,7 +205,7 @@ def route_incy(cfg: dict, p: dict) -> dict:
                          "geosite:discord", "geosite:ai", "geosite:crypto",
                          "geosite:telegram", "geosite:github"]
     cfg["ProxyIp"] = ["geoip:blocked-ru"]
-    cfg["BlockSites"] = ["domain:" + x for x in p["_ads_domains"]]
+    cfg["BlockSites"] = ["geosite:garasu-ads"]
     cfg["BlockIp"] = []
     cfg["Geoipurl"] = GEO_BASE + "geoip.dat"
     cfg["Geositeurl"] = GEO_BASE + "geosite.dat"
@@ -269,6 +269,8 @@ def expected_srr(root: Path, happ_json: str) -> str:
     payload = json.dumps(json.loads(happ_json), separators=(",", ":"),
                          ensure_ascii=False).encode("utf-8")
     headers[0]["value"] = "happ://routing/onadd/" + base64.b64encode(payload).decode("ascii")
+    if len(headers[0]["value"].encode("ascii")) > 3500:
+        raise ValueError("Happ routing header exceeds safe 3.5KB proxy budget")
     return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
 
 

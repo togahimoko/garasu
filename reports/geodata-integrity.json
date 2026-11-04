@@ -43,31 +43,17 @@
     "xn--p1acf",
     "xn--p1ai"
   ],
-  "garasu_ads": 1107,
+  "garasu_ads": 1217,
   "canonical_ads": 1221,
-  "ads_only_in_binary": 5,
-  "ads_only_in_text": 119,
-  "ads_binary_only_examples": [
-    "a.ads2.msads.net",
-    "ads1.msads.net",
-    "b.ads2.msads.net",
-    "bs.serving-sys.com",
-    "msntest.serving-sys.com"
-  ],
+  "ads_only_in_binary": 0,
+  "ads_only_in_text": 4,
+  "ads_binary_only_examples": [],
   "ads_text_only_examples": [
-    "a.ads2.msn.com",
-    "ac3.msn.com",
-    "ad.browser.qq.com",
-    "ad.qq.com",
-    "ad.qun.qq.com",
-    "ad.weixin.qq.com",
-    "adeventtracker.spotify.com",
-    "adfilter.imtt.qq.com",
-    "adnet.qq.com",
-    "adping.qq.com",
-    "adpm.app.qq.com",
-    "ads.msn.com"
+    "advert-api.wildberries.ru",
+    "advert-media-api.wildberries.ru",
+    "analytics.wildberries.ru",
+    "xapi.ozon.ru"
   ],
-  "geosite_bytes": 2217740,
+  "geosite_bytes": 2220072,
   "geoip_bytes": 1049786
 }

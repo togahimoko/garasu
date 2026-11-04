@@ -386,7 +386,8 @@ def replace_geodata_category(name, geodata, category, canonical):
 
 def add_native_geosite_categories(geodata, proxy_categories=NATIVE_PROXY_GEOSITES,
                                   block_categories=("category-ads", "win-spy"),
-                                  ru_suffixes=RU_SUFFIXES):
+                                  ru_suffixes=RU_SUFFIXES,
+                                  canonical_ads=None, exempt_domains=()):
     """Add RU suffixes and ads that cannot override a PROXY GeoSite entry.
 
     All consumed entries must use v2ray Domain.Type=2 (suffix). A different
@@ -431,6 +432,12 @@ def add_native_geosite_categories(geodata, proxy_categories=NATIVE_PROXY_GEOSITE
         return any(".".join(parts[i:]) in proxy for i in range(len(parts) - 1))
     safe_ads = sorted(domain for domain in ads
                       if domain not in proxy_parents and not has_proxy_parent(domain))
+    if canonical_ads is not None:
+        source_ads = {line[2:] for line in canonical_ads.decode().splitlines()
+                      if line.startswith("+.")}
+        if not set(exempt_domains) <= source_ads:
+            raise ValueError("Missing curated mobile ad exemption")
+        safe_ads = sorted(source_ads - set(exempt_domains))
     if not safe_ads:
         raise ValueError("No non-overlapping native ad domains")
     def category(code, values):
@@ -660,7 +667,7 @@ def run():
             if name == "geosite.dat":
                 blob = replace_geodata_category(name, blob, "banned-ru",
                                                 generated["rules/rkn-domains.list"])
-                blob = add_native_geosite_categories(blob)
+                blob = add_native_geosite_categories(blob, canonical_ads=generated["rules/ads.list"], exempt_domains=json.loads((ROOT / "policy/universal.json").read_text())["ad_exempt_domains"])
                 required_category = "banned-ru"
                 required_count = source_metadata["blocked_domains"]["entries"]
             else:

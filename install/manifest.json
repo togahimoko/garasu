@@ -372,10 +372,11 @@
     },
     "geo/geosite.dat": {
       "source": "https://raw.githubusercontent.com/DigneZzZ/routing/82d104cde92b271f545e1f61a61b1acd079e0aa7/v2ray/geosite.dat",
-      "sha256": "35bb66ef6dd7dff98c692ac5ebcba1bdc22e37807c2c2bd0d9e2d0761166b913",
-      "bytes": 2217740,
+      "sha256": "0d456b35591e1a4ae2f533072637969f267553ab7e0caf2d3dcb0936fbe8c451",
+      "bytes": 2220072,
       "source_sha256": "8b8687256e383def826085967b243cc88260c18e209d74ccb3d39db47e5f42dc",
-      "source_bytes": 623427
+      "source_bytes": 623427,
+      "transformation": "Garasu curated ads minus policy API exclusions"
     },
     "clients/incy.json": {
       "source": "garasu:profile-template:incy",

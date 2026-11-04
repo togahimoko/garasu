@@ -24,8 +24,9 @@ class BinaryGeoTests(unittest.TestCase):
         stored = json.loads(
             (ROOT / "reports/geodata-integrity.json").read_text(encoding="utf-8"))
         self.assertEqual(stored, self.record)
-        self.assertGreaterEqual(self.record["ads_only_in_text"], 0)
-        self.assertGreaterEqual(self.record["ads_only_in_binary"], 0)
+        self.assertEqual(self.record["ads_only_in_text"], 4)
+        self.assertEqual(self.record["ads_only_in_binary"], 0)
+        self.assertEqual(self.record["garasu_ads"], self.record["canonical_ads"] - 4)
 
     def test_malformed_wire_data_fails_closed(self):
         for blob in (b"\x0a\xff", b"\x00", b"\xff" * 11):

@@ -110,6 +110,8 @@ def main() -> None:
          [PYTHON, "scripts/audit_rules.py", "--check"]),
         ("Single universal Garasu routing policy",
          [PYTHON, "scripts/sync_universal_routing.py", "--check"]),
+        ("One production subscription and public install links",
+         [PYTHON, "scripts/sync_public_links.py", "--check"]),
         ("Cross-client routing coverage",
          [PYTHON, "scripts/audit_route_coverage.py", "--check"]),
         ("Binary GeoSite/GeoIP semantic integrity",

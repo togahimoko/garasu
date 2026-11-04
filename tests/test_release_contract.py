@@ -1,7 +1,7 @@
 """Contract tests for the released native profiles and Remnawave responses.
 
-These checks verify serialized policy, routing precedence and test-user-agent
-selection. Native device import and real ISP connectivity are separate tests.
+These checks verify one production policy, routing precedence and real
+client User-Agent selection. Native device import and real ISP connectivity are separate tests.
 """
 import base64
 import copy
@@ -21,7 +21,6 @@ class NativeReleaseContract(unittest.TestCase):
     def setUpClass(cls):
         cls.mihomo = yaml.safe_load((RELEASE / "mihomo/config.yaml").read_text())
         cls.ssr = json.loads((RELEASE / "remnawave/srr.json").read_text())
-        cls.preview = json.loads((RELEASE / "remnawave/srr-test.json").read_text())
 
     def test_one_visible_selector_and_fail_closed_auto(self):
         config = self.mihomo
@@ -170,15 +169,12 @@ class NativeReleaseContract(unittest.TestCase):
         self.assertEqual(len(xray), 1)
         self.assertFalse(xray[0]["enabled"])
 
-    def test_dedicated_test_agent_does_not_replace_normal_clients(self):
-        test = self.preview["rules"]
-        self.assertEqual(test[0]["responseType"], "BROWSER")
-        self.assertEqual(test[1]["name"], "Garasu Test")
-        self.assertTrue(self._match(test[1], "garasu-test-mihomo/1.0"))
-        self.assertFalse(self._match(test[1], "mihomo/1.0"))
-        self.assertEqual(test[1]["responseModifications"]["subscriptionTemplate"],
-                         "Default")
-        self.assertEqual(test[-1]["responseType"], "XRAY_BASE64")
+    def test_only_one_production_srr(self):
+        self.assertEqual([p.name for p in
+                          (RELEASE / "remnawave").glob("*.json")],
+                         ["srr.json"])
+        self.assertFalse(any("garasu-test-" in json.dumps(r).lower()
+                             for r in self.ssr["rules"]))
 
 
 if __name__ == "__main__":

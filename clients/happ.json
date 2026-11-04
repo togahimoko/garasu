@@ -1,5 +1,5 @@
 {
-  "Name": "Garasu MAX",
+  "Name": "Garasu",
   "GlobalProxy": "true",
   "UseChunkFiles": "false",
   "RemoteDns": "8.8.8.8",
@@ -10,7 +10,7 @@
   "DomesticDNSType": "DoH",
   "DomesticDNSDomain": "https://common.dot.dns.yandex.net/dns-query",
   "DomesticDNSIP": "77.88.8.8",
-  "LastUpdated": "1793761499",
+  "LastUpdated": "1793815000",
   "DnsHosts": {
     "dns.google": "8.8.8.8",
     "common.dot.dns.yandex.net": "77.88.8.8"
@@ -19,27 +19,39 @@
   "DirectSites": [
     "geosite:private",
     "geosite:category-ru",
-    "geosite:garasu-ru"
+    "geosite:garasu-ru",
+    "domain:2gis.ru",
+    "domain:alfabank.ru",
+    "domain:avito.ru",
+    "domain:cbr.ru",
+    "domain:gosuslugi.ru",
+    "domain:nalog.gov.ru",
+    "domain:ozon.ru",
+    "domain:pochta.ru",
+    "domain:sber.ru",
+    "domain:sberbank.ru",
+    "domain:tbank.ru",
+    "domain:tinkoff.ru",
+    "domain:vk.com",
+    "domain:vtb.ru",
+    "domain:wildberries.ru",
+    "domain:ya.ru",
+    "domain:yandex.ru"
   ],
   "DirectIp": [
     "geoip:private",
     "geoip:ru"
   ],
   "ProxySites": [
-    "geosite:telegram",
-    "geosite:github",
-    "geosite:discord",
-    "geosite:whatsapp",
     "geosite:banned-ru",
-    "geosite:hosting",
     "geosite:youtube",
+    "geosite:discord",
     "geosite:ai",
     "geosite:crypto",
-    "geosite:category-geoblock-ru",
-    "geosite:twitch-ads"
+    "geosite:telegram",
+    "geosite:github"
   ],
   "ProxyIp": [
-    "geoip:telegram",
     "geoip:blocked-ru"
   ],
   "BlockSites": [

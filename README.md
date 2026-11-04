@@ -6,7 +6,7 @@
 
 Remnawave выдаёт пользователю **его собственные серверы** и подходящий формат подписки. Garasu задаёт правила для Mihomo, Stash, sing-box, INCY, Happ, Shadowrocket и Xray.
 
-Для Mihomo предусмотрена одна видимая группа **Garasu**: в ней можно выбрать конкретный доступный узел либо **Garasu Auto** для автоматической проверки серверов.
+Для Mihomo предусмотрена одна автоматическая группа **Garasu** (`url-test`). При одной ноде используется она, при нескольких автоматически выбирается доступная. Ручных переключателей по сайтам нет.
 
 **Garasu использует одну политику раздельной маршрутизации по принципу RoscomVPN:** локальная сеть и обычные российские сервисы — DIRECT; заблокированные российские ресурсы и весь остальной зарубежный трафик — VPN; реклама — REJECT. В Mihomo/Stash/sing-box/Shadowrocket крупные списки загружаются по ссылкам GitHub, кешируются после загрузки. Первый запуск без доступных источников правил не считается проверенным. Для INCY/Happ используется наш GeoSite/GeoIP. Никаких Lite/Full. [Правила, ограничения и проверки](docs/universal-routing.md).
 
@@ -16,8 +16,8 @@ Remnawave выдаёт пользователю **его собственные 
 | --- | --- |
 | [release/](release/) | Нативные шаблоны клиентов и правила выдачи Remnawave |
 | [release/mihomo/.mrs/](release/mihomo/.mrs/) | 13 бинарных MRS и манифест SHA-256 |
-| [release/providers/](release/providers/) | 10 текстовых URL-провайдеров для Mihomo и Stash |
-| [release/singbox/rules/](release/singbox/rules/) | 10 удалённых JSON rule-sets для sing-box 1.14 |
+| [release/providers/](release/providers/) | 10 исходных текстовых списков для компиляции MRS |
+| [release/singbox/rules/](release/singbox/rules/) | 10 бинарных SRS и исходные JSON для sing-box |
 | [rules/](rules/) | Исходные домены, CIDR и экспортные форматы |
 | [geo/](geo/) | GeoIP и GeoSite для Xray-совместимых клиентов |
 | [scripts/](scripts/) | Обновление источников, сборка, диагностика и аудит |
@@ -40,7 +40,7 @@ python3 scripts/qa.py --branch main
 python3 scripts/qa.py --branch main --core /path/to/mihomo
 ```
 
-После изменений в `release/*` синхронизировать совместимые ссылки `python3 scripts/sync_public_links.py --write` и запустить полный QA. Для новых установок `install/links.json` ссылается на канонические `release/*`, старые пути `clients/*` остаются только для совместимости.
+При изменении списков сначала пересобрать источники и бинарные наборы: `scripts/sync_universal_routing.py --write`, затем `scripts/build_binary_assets.py --write` с путями к двум ядрам; после этого запустить полный QA.
 
 После публикации — сравнение с публичным GitHub Raw:
 
@@ -52,7 +52,7 @@ python3 scripts/probe_release_assets.py --branch main
 
 ## Выпуск и безопасность
 
-**`main` — опубликованные проверенные файлы. `dev` — разработка и тестирование.** Один SSR `release/remnawave/srr.json`, одна политика `policy/universal.json`, отдельных тестовых SSR нет. GitHub Actions не используются. Шаблоны в панели Remnawave обновляются только отдельно, после проверки; публикация коммита не переключает платных подписчиков.
+**`main` — опубликованные проверенные файлы. `dev` — разработка.** Удалённые MRS/SRS загружаются клиентами с интервалом **21600 секунд (6 часов)**. Для публикации новых исходников и бинарных наборов без GitHub Actions добавлены `scripts/update_six_hourly.sh` и macOS `launchd` с таким же интервалом. Расписание исполняется, только когда Mac работает.
 
 Пароли, UUID пользователей, закрытые ключи REALITY и реальные подписки не должны попадать в GitHub. Уже опубликованные пути в `clients/` и `install/` сохраняются для совместимости.
 

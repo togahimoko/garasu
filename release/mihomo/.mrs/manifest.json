@@ -1,61 +1,65 @@
 {
-  "source_commit": "c7c17d2d5d57d2f50aa63a90b85abdaede36fa68",
+  "source_commit": "82d104cde92b271f545e1f61a61b1acd079e0aa7",
+  "format": "mihomo-mrs",
+  "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+  "command": "mihomo convert-ruleset <domain|ipcidr> text <source> <target.mrs>",
+  "note": "Manual release only. Sync compiled binaries with source changes before promotion.",
   "files": [
     {
       "name": "rkn-domains",
       "kind": "domain",
-      "source": "rules/rkn-domains.list",
-      "src_bytes": 1340856,
-      "mrs_bytes": 540857,
-      "sha256": "d8da3e2f0647cae72abb9ebe2c8096e8639a572d695f604a5b7884cfc5ae4a00"
+      "source": "release/providers/rkn-domains.txt",
+      "src_bytes": 392657,
+      "mrs_bytes": 175541,
+      "sha256": "04ddd3b5b538eae617877ae16dac22164fb241761f3b895167e0ab9d3cd3d88e"
     },
     {
       "name": "youtube",
       "kind": "domain",
-      "source": "rules/youtube.list",
-      "src_bytes": 2773,
+      "source": "release/providers/youtube.txt",
+      "src_bytes": 2718,
       "mrs_bytes": 1332,
       "sha256": "edf6856fda88a0bce1879febc71338ba2d3729a908943dbababc659f09c72233"
     },
     {
       "name": "discord",
       "kind": "domain",
-      "source": "rules/discord.list",
-      "src_bytes": 602,
+      "source": "release/providers/discord.txt",
+      "src_bytes": 547,
       "mrs_bytes": 451,
       "sha256": "10f9478b352f961327d611c4c503b3b53ad4f20af0914849d5df533a9275db46"
     },
     {
       "name": "ai",
       "kind": "domain",
-      "source": "rules/ai.list",
-      "src_bytes": 4037,
+      "source": "release/providers/ai.txt",
+      "src_bytes": 3982,
       "mrs_bytes": 2250,
       "sha256": "f57fc203d75705d8458636f9c5c6cda4d9c89747e61ed2dce479b348b6a505ae"
     },
     {
       "name": "crypto",
       "kind": "domain",
-      "source": "rules/crypto.list",
-      "src_bytes": 1398,
+      "source": "release/providers/crypto.txt",
+      "src_bytes": 1343,
       "mrs_bytes": 879,
       "sha256": "9da53d4e58421dbea6037f8d33254eb68d68f794d896e37758e2929b05af2b51"
     },
     {
       "name": "proxy",
       "kind": "domain",
-      "source": "rules/proxy.list",
-      "src_bytes": 3222,
+      "source": "release/providers/proxy.txt",
+      "src_bytes": 3167,
       "mrs_bytes": 1699,
       "sha256": "53074f28fbb5b190d505708e22eb4a85ad815c9176003e844328d5b9d1665ef7"
     },
     {
       "name": "ads",
       "kind": "domain",
-      "source": "rules/ads.list",
-      "src_bytes": 27040,
-      "mrs_bytes": 11107,
-      "sha256": "9598cfec91e90697579f62c604d7370da0fa33dfd30fcc52a4edb4a766ba290f"
+      "source": "release/providers/ads.txt",
+      "src_bytes": 26881,
+      "mrs_bytes": 11057,
+      "sha256": "4d77154a4b0a81b0cb71acc40716468a926b07b2c5188fdc947314ce769c0c8e"
     },
     {
       "name": "games",
@@ -76,16 +80,16 @@
     {
       "name": "rkn-ips",
       "kind": "ipcidr",
-      "source": "rules/rkn-ips.cidr",
-      "src_bytes": 437439,
+      "source": "release/providers/rkn-ips.txt",
+      "src_bytes": 437384,
       "mrs_bytes": 51444,
       "sha256": "89ce824f9deb539c8fe73cd9e10a90c53b9f91a6a510be9952fd32db750ab575"
     },
     {
       "name": "proxy-ips",
       "kind": "ipcidr",
-      "source": "rules/proxy-ips.cidr",
-      "src_bytes": 149,
+      "source": "release/providers/proxy-ips.txt",
+      "src_bytes": 94,
       "mrs_bytes": 92,
       "sha256": "d26763e945c0c04b9b6990ec32e2cb8036dd1e71eee1f92270a2974a4f416467"
     },
@@ -100,14 +104,10 @@
     {
       "name": "ru-ips",
       "kind": "ipcidr",
-      "source": "rules/ru-ips.cidr",
-      "src_bytes": 446953,
+      "source": "release/providers/ru-ips.txt",
+      "src_bytes": 446898,
       "mrs_bytes": 119656,
       "sha256": "442fc9debeaa18f8f0afdbb1fd23f46964dc3eb8bbe3b79f403217369f507ffb"
     }
-  ],
-  "format": "mihomo-mrs",
-  "compiler": "Mihomo Meta v1.19.33 darwin arm64",
-  "command": "mihomo convert-ruleset <domain|ipcidr> text <source> <target.mrs>",
-  "note": "Compiled from immutable Garasu source commit, not auto-synced with moving main branch; refresh MRS alongside source changes."
+  ]
 }

@@ -44,7 +44,8 @@ def build(core: Path, source_root: Path, output: Path, source_commit: str) -> di
     version = subprocess.run([str(core), "-v"], capture_output=True, text=True, check=True)
     entries = []
     for name, kind in CATEGORIES.items():
-        source_rel = Path("rules") / (name + (".list" if kind == "domain" else ".cidr"))
+        provider_rel = Path("release/providers") / (name + ".txt")
+        source_rel = provider_rel if (source_root / provider_rel).exists() else Path("rules") / (name + (".list" if kind == "domain" else ".cidr"))
         source = source_root / source_rel
         if not source.is_file():
             raise FileNotFoundError(source)

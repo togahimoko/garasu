@@ -26,7 +26,7 @@ AGENTS = {
     "xray": "v2rayN/7.0",
 }
 DEFAULT_AGENTS = ("mihomo", "clash", "stash", "singbox", "happ", "incy", "browser")
-MAX_BYTES = 4_000_000  # Inline RKN/RU templates are approximately 2–3 MB.
+MAX_BYTES = 2_000_000  # Bounded diagnostics; large rule sets must not be inline.
 
 
 class RejectRedirect(urllib.request.HTTPRedirectHandler):
@@ -105,6 +105,8 @@ def _yaml_checks(body):
     providers, groups, rule_lines, blocks = set(), set(), [], []
     provider_types = {}
     provider_urls = {}
+    provider_formats = {}
+    provider_intervals = {}
     section, fields = None, None
     current_provider = None
     for line in body.decode("utf-8", errors="replace").splitlines():
@@ -141,10 +143,16 @@ def _yaml_checks(body):
                 else:
                     kind = re.match(r"^    type:\s*(\S+)", line)
                     url = re.match(r"^    url:\s*(\S+)", line)
+                    fmt = re.match(r"^    format:\s*(\S+)", line)
+                    interval = re.match(r"^    interval:\s*(\d+)", line)
                     if kind and current_provider in providers:
                         provider_types[current_provider] = kind.group(1)
                     if url and current_provider in providers:
                         provider_urls[current_provider] = url.group(1)
+                    if fmt and current_provider in providers:
+                        provider_formats[current_provider] = fmt.group(1)
+                    if interval and current_provider in providers:
+                        provider_intervals[current_provider] = int(interval.group(1))
         elif section == "rules" and re.match(r"^  -\s+", line):
             rule_lines.append(line.split("- ", 1)[1].strip().strip("'\""))
     if fields is not None:
@@ -164,11 +172,13 @@ def _yaml_checks(body):
             providers == EXPECTED_GARASU_PROVIDERS
             and all(provider_types.get(name) == "http"
                     and provider_urls.get(name) ==
-                    "https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/"
-                    + name + ".txt" for name in providers)
+                    "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/"
+                    + name + ".mrs"
+                    and provider_formats.get(name) == "mrs"
+                    and provider_intervals.get(name) == 21600 for name in providers)
         ),
         "garasu_route_order_valid": (
-            {"Garasu", "Garasu Auto"} <= groups
+            groups == {"Garasu"}
             and 0 <= rkn_domain < ru and 0 <= rkn_ip < ru
             and final == len(rule_lines) - 1
             and pos("RULE-SET,ads,REJECT") >= 0
@@ -181,8 +191,8 @@ def _clash_ready(report):
     counts = report.get("yaml_counts") or {}
     return (report["client"] == "clash" and report["status"] == 200
             and report["format"] == "yaml" and not report["truncated"]
-            and counts.get("proxies", 0) >= 2
-            and counts.get("proxy_groups", 0) >= 2
+            and counts.get("proxies", 0) >= 1
+            and counts.get("proxy_groups", 0) == 1
             and counts.get("rule_providers", 0) == len(EXPECTED_GARASU_PROVIDERS)
             and counts.get("rules", 0) >= 15
             and all(report.get("yaml_checks", {}).values())

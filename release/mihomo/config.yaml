@@ -1,5 +1,5 @@
 # Garasu | Remnawave Mihomo subscription template.
-# One visible Garasu selector: choose Auto or any authorized node manually.
+# One automatic Garasu route; no manual selectors.
 # Subscriber nodes are injected by Remnawave, not committed to GitHub.
 # TUN lifecycle belongs to the client GUI: never force-toggle an existing session.
 # Import as MIHOMO TEMPLATE in Remnawave; Remnawave injects each user's nodes.
@@ -51,18 +51,9 @@ dns:
 proxies: # LEAVE THIS LINE!
 
 proxy-groups:
-  # Single visible control. Remnawave inserts all authorized nodes here.
+  # One automatic route for any number of available nodes. No manual selectors.
   - name: Garasu
-    type: select
-    default-selected: Garasu Auto
-    proxies: # LEAVE THIS LINE!
-      - Garasu Auto
-      # Remnawave appends all subscriber-authorized nodes.
-
-  # Automatic failover hidden from the top-level group list.
-  - name: Garasu Auto
     type: url-test
-    hidden: true
     url: https://cp.cloudflare.com/generate_204
     interval: 180
     tolerance: 150
@@ -72,92 +63,90 @@ proxy-groups:
     expected-status: 204
     empty-fallback: REJECT
     include-all: true
-    remnawave:
-      include-proxies: false
     proxies: # LEAVE THIS LINE!
-      # Mihomo core includes every subscriber-authorized node.
+      # All available nodes are selected automatically.
 
 rule-providers:
   ads:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/ads.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ads.mrs
     interval: 21600
-    path: ./rule-providers/garasu-ads.txt
+    path: ./rule-providers/garasu-ads.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
   rkn-domains:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/rkn-domains.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/rkn-domains.mrs
     interval: 21600
-    path: ./rule-providers/garasu-rkn-domains.txt
+    path: ./rule-providers/garasu-rkn-domains.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
   rkn-ips:
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/rkn-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/rkn-ips.mrs
     interval: 21600
-    path: ./rule-providers/garasu-rkn-ips.txt
+    path: ./rule-providers/garasu-rkn-ips.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
   proxy-ips:
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/proxy-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/proxy-ips.mrs
     interval: 21600
-    path: ./rule-providers/garasu-proxy-ips.txt
+    path: ./rule-providers/garasu-proxy-ips.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
   ru-ips:
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/ru-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ru-ips.mrs
     interval: 21600
-    path: ./rule-providers/garasu-ru-ips.txt
+    path: ./rule-providers/garasu-ru-ips.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
   youtube:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/youtube.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/youtube.mrs
     interval: 21600
-    path: ./rule-providers/garasu-youtube.txt
+    path: ./rule-providers/garasu-youtube.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
   discord:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/discord.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/discord.mrs
     interval: 21600
-    path: ./rule-providers/garasu-discord.txt
+    path: ./rule-providers/garasu-discord.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
   ai:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/ai.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ai.mrs
     interval: 21600
-    path: ./rule-providers/garasu-ai.txt
+    path: ./rule-providers/garasu-ai.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
   crypto:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/crypto.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/crypto.mrs
     interval: 21600
-    path: ./rule-providers/garasu-crypto.txt
+    path: ./rule-providers/garasu-crypto.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
   proxy:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/proxy.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/proxy.mrs
     interval: 21600
-    path: ./rule-providers/garasu-proxy.txt
+    path: ./rule-providers/garasu-proxy.mrs
     type: http
-    proxy: Garasu Auto
+    proxy: Garasu
 
 rules:
   # GARASU SPLIT: remote RKN before RU, foreign -> VPN.

@@ -119,7 +119,7 @@ def scan_release(root=ROOT):
     for file in sorted(items):
         if not file.is_file():
             continue
-        if file.suffix.lower() in (".mrs", ".dat"):
+        if file.suffix.lower() in (".mrs", ".dat", ".srs"):
             continue
         path = file.relative_to(root).as_posix()
         # Offline RKN lists intentionally enlarge only four documented,

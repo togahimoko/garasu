@@ -68,6 +68,8 @@ def load_policy(root: Path) -> dict:
             raise ValueError("Invalid policy domain: " + name)
     for cidr in p["private_ipv4"] + p["private_ipv6"]:
         ipaddress.ip_network(cidr)
+    manifest = json.loads((root / "install/manifest.json").read_text(encoding="utf-8"))
+    p["_last_updated"] = str(max(1793815000, int(manifest.get("last_updated", "1793815000"))))
     p["_ads_domains"] = [x for x in _domains(root, "ads") if x not in p["ad_exempt_domains"]]
     p["_rkn_domains_all"] = _domains(root, "rkn-domains")
     # Domains outside Russian TLDs or the explicitly DIRECT roots already
@@ -159,15 +161,15 @@ def render_yaml(src: str, p: dict, *, stash: bool = False) -> str:
         parts.extend([
             f"  {key}:",
             "    behavior: " + behavior,
-            "    format: text",
-            "    url: " + PROVIDERS_BASE + key + ".txt",
+            "    format: mrs",
+            "    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/" + key + ".mrs",
             "    interval: 21600",
-            "    path: ./rule-providers/garasu-" + key + ".txt",
+            "    path: ./rule-providers/garasu-" + key + ".mrs",
         ])
         if not stash:
             parts.extend([
                 "    type: http",
-                "    proxy: Garasu Auto",
+                "    proxy: Garasu",
             ])
     parts.extend(["", "rules:"])
     for rule in native_rules(p, "Garasu"):
@@ -208,8 +210,8 @@ def route_singbox(cfg: dict, p: dict) -> dict:
         {
             "type": "remote",
             "tag": "garasu-" + key,
-            "format": "source",
-            "url": SINGBOX_BASE + key + ".json",
+            "format": "binary",
+            "url": SINGBOX_BASE + key + ".srs",
             "update_interval": "6h",
             "http_client": "garasu-rules",
         }
@@ -247,7 +249,7 @@ def route_singbox(cfg: dict, p: dict) -> dict:
 def route_incy(cfg: dict, p: dict) -> dict:
     cfg["Name"] = "Garasu"
     # Happ applies updated routing only when LastUpdated increases.
-    cfg["LastUpdated"] = "1793815000"
+    cfg["LastUpdated"] = p["_last_updated"]
     cfg["GlobalProxy"] = "true"
     cfg["RouteOrder"] = "block-proxy-direct"
     cfg["DomainStrategy"] = "IPIfNonMatch"
@@ -294,8 +296,8 @@ def offline_mihomo_fixture(config: dict, root: Path) -> dict:
     import copy
     cfg = copy.deepcopy(config)
     for key, item in cfg["rule-providers"].items():
-        expected = PROVIDERS_BASE + key + ".txt"
-        if item.get("type") != "http" or item.get("url") != expected or item.get("format") != "text":
+        expected = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/" + key + ".mrs"
+        if item.get("type") != "http" or item.get("url") != expected or item.get("format") != "mrs":
             raise ValueError("Unrecognized remote Garasu provider: " + key)
         text = (root / "release/providers" / (key + ".txt")).read_text()
         payload = [line for line in text.splitlines() if line and not line.startswith("#")]

@@ -64,11 +64,8 @@ def check_native(core: Path) -> None:
                  "server": "127.0.0.1", "port": 29000 + i}
                 for i in range(count)
             ]
-            selector, auto = cfg["proxy-groups"]
-            selector["proxies"] = ["Garasu Auto"] + [
-                proxy["name"] for proxy in cfg["proxies"]
-            ]
-            auto["proxies"] = []
+            auto = cfg["proxy-groups"][0]
+            auto["proxies"] = [proxy["name"] for proxy in cfg["proxies"]]
             # Offline native syntax testing: substitute local exact rule data
             # for HTTP providers. Production YAML remains remote and small.
             cfg = offline_mihomo_fixture(cfg, ROOT)
@@ -95,13 +92,13 @@ def check_singbox_native(core: Path) -> None:
         raise RuntimeError("Unexpected sing-box provider count")
     for item in cfg["route"]["rule_set"]:
         name = item["tag"].removeprefix("garasu-")
-        path = ROOT / "release/singbox/rules" / (name + ".json")
+        path = ROOT / "release/singbox/rules" / (name + ".srs")
         if (item.get("type"), item.get("format"), item.get("url")) != (
-                "remote", "source", SINGBOX_BASE + name + ".json"):
+                "remote", "binary", SINGBOX_BASE + name + ".srs"):
             raise RuntimeError("Unrecognized sing-box remote rule-set: " + name)
         item.clear()
         item.update({"type": "local", "tag": "garasu-" + name,
-                     "format": "source", "path": str(path)})
+                     "format": "binary", "path": str(path)})
 
     # No real node credentials or network services are ever used by this check.
     cfg["outbounds"].append({

@@ -12,8 +12,8 @@
 
 ## Ссылочные наборы правил
 
-- Mihomo и Stash: 10 удалённых текстовых rule-providers из [release/providers/](../release/providers/), обновление каждые 21600 секунд. Для Mihomo указан загрузочный proxy Garasu Auto.
-- sing-box 1.14: 10 удалённых JSON source rule-sets из [release/singbox/rules/](../release/singbox/rules/), HTTP-клиент garasu-rules через Remnawave, кеш и обновление каждые 6 часов.
+- Mihomo и Stash: 10 удалённых бинарных MRS-провайдеров из [release/mihomo/.mrs/](../release/mihomo/.mrs/), обновление каждые 21600 секунд. У Mihomo одна автоматическая группа Garasu, без селекторов.
+- sing-box 1.14: 10 удалённых бинарных SRS-наборов из [release/singbox/rules/](../release/singbox/rules/), кэш и обновление каждые 6 часов.
 - Shadowrocket: ссылки DOMAIN-SET / RULE-SET на GitHub; личные узлы по-прежнему выдаёт отдельная подписка Remnawave.
 - INCY/Happ: компактные заголовки единственного SSR и ссылки на Garasu geo/geosite.dat и geo/geoip.dat.
 - Xray JSON: ссылки на бинарные категории geosite:garasu-ads, geosite:banned-ru, geoip:blocked-ru; Xray требует установки наших файлов GeoSite/GeoIP.
@@ -27,7 +27,7 @@ RU DIRECT до получения RKN-исключений. Отдельно п�
 загрузка всех rule-sets, кеш, DNS, подключение личных узлов и недоступность GitHub.
 
 Публикация GitHub не обновляет уже сохранённые шаблоны в Remnawave.
-Данные обновляются в GitHub только после ручной пересборки/публикации,
+Публикация обновлённых исходников и бинарных MRS/SRS выполняется `scripts/update_six_hourly.sh` после проверок; задача `automation/garasu-six-hourly.plist` имеет интервал 21600 секунд. Если Mac спит или сеть недоступна, обновление откладывается.
 GitHub Actions не используются. Личные ключи серверов не хранятся в репозитории.
 
 ## Проверка

@@ -702,9 +702,13 @@ def run():
             "sha256": digest(shadowrocket), "bytes": len(shadowrocket)}
         validate_update_budget(records, previous)
         changed = previous.get("files") != records
+        # Monotonic client routing revision; unchanged upstream never bumps it.
+        old_updated = int(previous.get("last_updated", "1793815000"))
+        new_upstream = previous.get("upstream_revision") != revision
+        last_updated = max(old_updated + 1, int(time.time())) if new_upstream else old_updated
         manifest = {"name": "Garasu MAX", "upstream": upstream_origin,
-                    "upstream_revision": revision, "sources": source_metadata,
-                    "files": records}
+                    "upstream_revision": revision, "last_updated": str(last_updated),
+                    "sources": source_metadata, "files": records}
         manifest_blob = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode()
         add("install/manifest.json", manifest_blob)
         qx_filters = []

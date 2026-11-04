@@ -32,64 +32,64 @@ proxy-groups:
 rule-providers:
   ads:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/ads.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ads.mrs
     interval: 21600
-    path: ./rule-providers/garasu-ads.txt
+    path: ./rule-providers/garasu-ads.mrs
   rkn-domains:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/rkn-domains.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/rkn-domains.mrs
     interval: 21600
-    path: ./rule-providers/garasu-rkn-domains.txt
+    path: ./rule-providers/garasu-rkn-domains.mrs
   rkn-ips:
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/rkn-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/rkn-ips.mrs
     interval: 21600
-    path: ./rule-providers/garasu-rkn-ips.txt
+    path: ./rule-providers/garasu-rkn-ips.mrs
   proxy-ips:
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/proxy-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/proxy-ips.mrs
     interval: 21600
-    path: ./rule-providers/garasu-proxy-ips.txt
+    path: ./rule-providers/garasu-proxy-ips.mrs
   ru-ips:
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/ru-ips.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ru-ips.mrs
     interval: 21600
-    path: ./rule-providers/garasu-ru-ips.txt
+    path: ./rule-providers/garasu-ru-ips.mrs
   youtube:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/youtube.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/youtube.mrs
     interval: 21600
-    path: ./rule-providers/garasu-youtube.txt
+    path: ./rule-providers/garasu-youtube.mrs
   discord:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/discord.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/discord.mrs
     interval: 21600
-    path: ./rule-providers/garasu-discord.txt
+    path: ./rule-providers/garasu-discord.mrs
   ai:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/ai.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ai.mrs
     interval: 21600
-    path: ./rule-providers/garasu-ai.txt
+    path: ./rule-providers/garasu-ai.mrs
   crypto:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/crypto.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/crypto.mrs
     interval: 21600
-    path: ./rule-providers/garasu-crypto.txt
+    path: ./rule-providers/garasu-crypto.mrs
   proxy:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/proxy.txt
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/proxy.mrs
     interval: 21600
-    path: ./rule-providers/garasu-proxy.txt
+    path: ./rule-providers/garasu-proxy.mrs
 
 rules:
   # GARASU SPLIT: remote RKN before RU, foreign -> VPN.

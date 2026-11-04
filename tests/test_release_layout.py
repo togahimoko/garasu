@@ -36,6 +36,7 @@ class ReleaseLayoutTest(unittest.TestCase):
                      "youtube", "discord", "ai", "crypto", "proxy")
         expected.update("providers/" + name + ".txt" for name in providers)
         expected.update("singbox/rules/" + name + ".json" for name in providers)
+        expected.update("singbox/rules/" + name + ".srs" for name in providers)
         actual = {p.relative_to(RELEASE).as_posix()
                   for p in RELEASE.rglob("*") if p.is_file()}
         self.assertEqual(actual, expected | {
@@ -55,25 +56,20 @@ class ReleaseLayoutTest(unittest.TestCase):
             data = load_yaml(client + "/config.yaml")
             providers = data["rule-providers"]
             self.assertEqual(len(providers), 10)
-            self.assertTrue(all(p["format"] == "text" and p["url"].startswith(
-                "https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/")
+            self.assertTrue(all(p["format"] == "mrs" and p["url"].startswith(
+                "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/")
                 and "payload" not in p for p in providers.values()))
 
-    def test_mihomo_only_one_visible_policy(self):
+    def test_mihomo_only_one_automatic_policy(self):
         text = (RELEASE / "mihomo/config.yaml").read_text(encoding="utf-8")
         data = load_yaml("mihomo/config.yaml")
-        self.assertEqual(text.count("proxies: # LEAVE THIS LINE!"), 3)
+        self.assertEqual(text.count("proxies: # LEAVE THIS LINE!"), 2)
         self.assertIsNone(data["proxies"])
-        self.assertEqual([g["name"] for g in data["proxy-groups"]
-                          if not g.get("hidden")], ["Garasu"])
-        self.assertEqual(len(data["proxy-groups"]), 2)
-        self.assertEqual(data["proxy-groups"][0]["type"], "select")
-        self.assertEqual(data["proxy-groups"][0]["default-selected"], "Garasu Auto")
-        self.assertEqual(data["proxy-groups"][0]["proxies"], ["Garasu Auto"])
-        self.assertNotIn("remnawave", data["proxy-groups"][0])
-        self.assertEqual(data["proxy-groups"][1]["type"], "url-test")
-        self.assertTrue(data["proxy-groups"][1]["hidden"])
-        self.assertEqual(data["proxy-groups"][1]["empty-fallback"], "REJECT")
+        self.assertEqual(len(data["proxy-groups"]), 1)
+        group = data["proxy-groups"][0]
+        self.assertEqual((group["name"], group["type"]), ("Garasu", "url-test"))
+        self.assertTrue(group["include-all"])
+        self.assertEqual(group["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         self.assertNotIn("tun", data)
         self.assertTrue(all(p["type"] == "http"

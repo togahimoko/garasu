@@ -22,26 +22,17 @@ class NativeReleaseContract(unittest.TestCase):
         cls.mihomo = yaml.safe_load((RELEASE / "mihomo/config.yaml").read_text())
         cls.ssr = json.loads((RELEASE / "remnawave/srr.json").read_text())
 
-    def test_one_visible_selector_and_fail_closed_auto(self):
+    def test_one_visible_automatic_group_and_fail_closed(self):
         config = self.mihomo
         self.assertEqual(config["mode"], "rule")
         self.assertEqual(config["rules"][-1], "MATCH,Garasu")
-        select, auto = config["proxy-groups"]
-        self.assertEqual([g["name"] for g in config["proxy-groups"]
-                          if not g.get("hidden")], ["Garasu"])
-        self.assertEqual(select["type"], "select")
-        self.assertEqual(select["proxies"], ["Garasu Auto"])
-        self.assertEqual(select["default-selected"], "Garasu Auto")
-        self.assertNotIn("remnawave", select)
-        self.assertTrue(config["profile"]["store-selected"])
-        self.assertEqual(auto["name"], "Garasu Auto")
-        self.assertEqual(auto["type"], "url-test")
+        self.assertEqual(len(config["proxy-groups"]), 1)
+        auto = config["proxy-groups"][0]
+        self.assertEqual((auto["name"], auto["type"]), ("Garasu", "url-test"))
         self.assertTrue(auto["include-all"])
-        self.assertTrue(auto["hidden"])
-        self.assertFalse(auto["remnawave"]["include-proxies"])
         self.assertFalse(auto["lazy"])
         self.assertEqual(auto["empty-fallback"], "REJECT")
-        self.assertNotIn("DIRECT", select["proxies"])
+        self.assertNotIn("DIRECT", auto.get("proxies") or [])
         self.assertNotIn("tun", config)
 
     def test_dynamic_subscriber_node_counts(self):
@@ -53,17 +44,12 @@ class NativeReleaseContract(unittest.TestCase):
                      "server": "127.0.0.1", "port": 29000 + i}
                     for i in range(count)
                 ]
-                select, auto = data["proxy-groups"]
-                select["proxies"] = ["Garasu Auto"] + [
-                    n["name"] for n in data["proxies"]
-                ]
-                auto["proxies"] = []
-                self.assertEqual(len(select["proxies"]), 1 + count)
-                self.assertEqual(select["proxies"][0], "Garasu Auto")
-                self.assertEqual(select["default-selected"], "Garasu Auto")
-                self.assertTrue(auto["include-all"])
-                self.assertEqual(auto["empty-fallback"], "REJECT")
-                self.assertNotIn("DIRECT", select["proxies"])
+                group = data["proxy-groups"][0]
+                group["proxies"] = [n["name"] for n in data["proxies"]]
+                self.assertEqual(len(group["proxies"]), count)
+                self.assertEqual(group["type"], "url-test")
+                self.assertEqual(group["empty-fallback"], "REJECT")
+                self.assertNotIn("DIRECT", group["proxies"])
                 self.assertEqual(data["rules"][-1], "MATCH,Garasu")
 
     def test_single_universal_policy_uses_remote_provider_links(self):
@@ -79,10 +65,10 @@ class NativeReleaseContract(unittest.TestCase):
         self.assertEqual(rules[-1], "MATCH,Garasu")
         providers = self.mihomo["rule-providers"]
         self.assertEqual(len(providers), 10)
-        self.assertTrue(all(p["type"] == "http" and p["format"] == "text"
+        self.assertTrue(all(p["type"] == "http" and p["format"] == "mrs"
                             and "payload" not in p for p in providers.values()))
         self.assertTrue(all(p["url"].startswith(
-            "https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/")
+            "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/")
                             for p in providers.values()))
         self.assertEqual(self.mihomo["dns"]["proxy-server-nameserver"],
                          ["system"])
@@ -92,7 +78,7 @@ class NativeReleaseContract(unittest.TestCase):
                      RELEASE / "stash/config.yaml"):
             text = path.read_text(encoding="utf-8")
             self.assertEqual(text.count("proxies: # LEAVE THIS LINE!"),
-                             3 if path.parent.name == "mihomo" else 2)
+                             2)
             self.assertNotIn("vless://", text)
             self.assertNotIn("uuid:", text.lower())
 

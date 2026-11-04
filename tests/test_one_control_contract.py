@@ -62,7 +62,7 @@ class GarasuOneControlContract(unittest.TestCase):
         s = (BASE / "shadowrocket.conf").read_text(encoding="utf-8")
         self.assertIn("[General]", s)
         self.assertIn("[Rule]", s)
-        self.assertIn("main/clients/one-control/shadowrocket.conf", s)
+        self.assertIn("garasu-one-control-20261104/clients/one-control/shadowrocket.conf", s)
         self.assertIn("FINAL,PROXY,dns-failed", s)
         self.assertLess(s.index("rkn-domains.list,PROXY"), s.index("DOMAIN-SUFFIX,ru,DIRECT"))
         self.assertNotIn("vless://", s)

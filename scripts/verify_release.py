@@ -144,8 +144,22 @@ def verify_contract(root: Path) -> None:
                 .get("subscriptionTemplate", "Default") == "Default"
                 for rule in active),
             "SSR refers to an unverified named template")
-    require(not any(rule.get("responseType") == "XRAY_JSON" for rule in active),
-            "Unverified Xray JSON opt-in enabled")
+    template_types = ("MIHOMO", "STASH", "SINGBOX", "CLASH", "XRAY_JSON")
+    require(all(sum(r["responseType"] == t for r in active) == 1
+                for t in template_types), "SSR missing/duplicate one of the five native formats")
+    xray = next(r for r in active if r["responseType"] == "XRAY_JSON")
+    xray_condition = xray["conditions"]
+    require(len(xray_condition) == 1
+            and xray_condition[0]["headerName"] == "user-agent"
+            and xray_condition[0]["operator"] == "REGEX"
+            and xray_condition[0]["value"].startswith("^(?:garasu-xray-json")
+            and xray.get("responseModifications", {}).get("ignoreHostXrayJsonTemplate") is True,
+            "Xray JSON must remain explicit opt-in, not a catch-all")
+    require(active[-1]["conditions"] == []
+            and all(r["conditions"] for r in active[:-1]),
+            "SSR fallback must be the only catch-all")
+    require(next(r for r in active if r["name"] == "Clash Core Clients")["responseType"] == "CLASH",
+            "Clash clients must get their own native YAML, not MIHOMO")
     require(not list((root / ".github/workflows").glob("*.yml"))
             and not list((root / ".github/workflows").glob("*.yaml")),
             "Unexpected GitHub Actions workflow")

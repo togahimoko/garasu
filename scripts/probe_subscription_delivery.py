@@ -24,8 +24,9 @@ AGENTS = {
     "incy": "incy/1.0",
     "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36",
     "xray": "v2rayN/7.0",
+    "xray-json": "garasu-xray-json/1.0",
 }
-DEFAULT_AGENTS = ("mihomo", "clash", "stash", "singbox", "happ", "incy", "browser")
+DEFAULT_AGENTS = ("mihomo", "clash", "stash", "singbox", "happ", "incy", "browser", "xray-json")
 MAX_BYTES = 2_000_000  # Bounded diagnostics; large rule sets must not be inline.
 
 
@@ -100,7 +101,7 @@ EXPECTED_GARASU_PROVIDERS = frozenset((
 ))
 
 
-def _yaml_checks(body):
+def _yaml_checks(body, client="mihomo"):
     """Only non-sensitive booleans leave this function; never return node data."""
     providers, groups, rule_lines, blocks = set(), set(), [], []
     provider_types = {}
@@ -165,17 +166,29 @@ def _yaml_checks(body):
     rkn_ip = pos("RULE-SET,rkn-ips,Garasu")
     ru = pos("DOMAIN-SUFFIX,ru,DIRECT")
     final = pos("MATCH,Garasu")
+    if client == "clash":
+        provider_base = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/"
+        remote_valid = all(
+            provider_types.get(name) == "http"
+            and provider_urls.get(name) == provider_base + name + ".yaml"
+            and name not in provider_formats
+            and provider_intervals.get(name) == 21600
+            for name in providers
+        )
+    else:
+        provider_base = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/"
+        remote_valid = all(
+            (provider_types.get(name) == "http" or (client == "stash" and name not in provider_types))
+            and provider_urls.get(name) == provider_base + name + ".mrs"
+            and provider_formats.get(name) == "mrs"
+            and provider_intervals.get(name) == 21600
+            for name in providers
+        )
     return {
         "personal_node_shapes_valid": len(blocks) >= 2 and all(required <= b for b in blocks),
         "garasu_provider_set_valid": providers == EXPECTED_GARASU_PROVIDERS,
         "garasu_providers_remote": (
-            providers == EXPECTED_GARASU_PROVIDERS
-            and all(provider_types.get(name) == "http"
-                    and provider_urls.get(name) ==
-                    "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/"
-                    + name + ".mrs"
-                    and provider_formats.get(name) == "mrs"
-                    and provider_intervals.get(name) == 21600 for name in providers)
+            providers == EXPECTED_GARASU_PROVIDERS and remote_valid
         ),
         "garasu_route_order_valid": (
             groups == {"Garasu"}
@@ -251,7 +264,7 @@ def request_once(url, client, transport, *, opener=None, timeout=8):
             result["format"] = _format(data, result["mime"])
             if result["format"] == "yaml":
                 result["yaml_counts"] = _yaml_counts(data)
-                result["yaml_checks"] = _yaml_checks(data)
+                result["yaml_checks"] = _yaml_checks(data, client)
     except urllib.error.HTTPError as exc:
         result["status"] = exc.code
         result["error"] = "HTTPError"

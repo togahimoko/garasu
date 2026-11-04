@@ -44,11 +44,21 @@ class ReleaseIntegrityTests(unittest.TestCase):
             with self.assertRaisesRegex(ReleaseError, "Missing or unsafe"):
                 verify_manifest(tmp)
 
-    def test_unverified_xray_response_is_disabled(self):
+    def test_xray_json_requires_explicit_agent_and_known_template(self):
         import json
+        import re
         srr = json.loads((ROOT / "release/remnawave/srr.json").read_text())
-        self.assertFalse(any(r["responseType"] == "XRAY_JSON" and r["enabled"]
-                             for r in srr["rules"]))
+        matching = [r for r in srr["rules"]
+                    if r["responseType"] == "XRAY_JSON" and r["enabled"]]
+        self.assertEqual(len(matching), 1)
+        rule = matching[0]
+        self.assertEqual(rule["responseModifications"]["subscriptionTemplate"], "Default")
+        self.assertTrue(rule["responseModifications"]["ignoreHostXrayJsonTemplate"])
+        self.assertEqual(len(rule["conditions"]), 1)
+        expr = rule["conditions"][0]["value"]
+        self.assertIsNotNone(re.search(expr, "garasu-xray-json/1.0", re.I))
+        self.assertIsNone(re.search(expr, "v2rayN/7.0", re.I))
+        self.assertIsNone(re.search(expr, "happ/1.0", re.I))
 
     def test_rejects_invalid_release_branch(self):
         with self.assertRaisesRegex(ReleaseError, "main or dev"):

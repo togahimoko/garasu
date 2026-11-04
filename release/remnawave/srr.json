@@ -72,18 +72,18 @@
     },
     {
       "name": "Clash Core Clients",
-      "description": "Mihomo-compatible Garasu YAML for Clash-named modern cores; legacy Clash does not support VLESS/REALITY",
+      "description": "Classic Clash/Premium native YAML: one automatic Garasu group and 10 remote YAML providers",
       "enabled": true,
       "operator": "AND",
       "conditions": [
         {
           "headerName": "user-agent",
           "operator": "REGEX",
-          "value": "^clash(?:/|$)",
+          "value": "^clash(?:/|$|x(?:/|$)|-premium(?:/|$)|[- ]for[- ]windows(?:/|$))",
           "caseSensitive": false
         }
       ],
-      "responseType": "MIHOMO",
+      "responseType": "CLASH",
       "responseModifications": {
         "subscriptionTemplate": "Default"
       }
@@ -139,21 +139,22 @@
       }
     },
     {
-      "name": "Garasu Xray JSON opt-in",
-      "description": "Disabled until a dedicated Xray JSON template is installed and verified in Remnawave",
-      "enabled": false,
+      "name": "Xray JSON clients (opt-in)",
+      "description": "Explicit native Xray JSON requests use Default Xray template; other Xray apps retain Base64",
+      "enabled": true,
       "operator": "AND",
       "conditions": [
         {
           "headerName": "user-agent",
-          "operator": "STARTS_WITH",
-          "value": "garasu-xray-json",
+          "operator": "REGEX",
+          "value": "^(?:garasu-xray-json|xray(?:-core)?)(?:/|$)",
           "caseSensitive": false
         }
       ],
       "responseType": "XRAY_JSON",
       "responseModifications": {
-        "subscriptionTemplate": "Garasu Xray JSON"
+        "subscriptionTemplate": "Default",
+        "ignoreHostXrayJsonTemplate": true
       }
     },
     {

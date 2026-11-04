@@ -58,3 +58,5 @@ python3 scripts/probe_release_assets.py --branch main
 - [GitHub Issues](https://github.com/togahimoko/garasu/issues/new/choose): структурированные отчёты без личных данных.
 - [Настройки GitHub](docs/github-maintenance.md): защита main, права и проверка метаданных.
 [Архитектура](docs/architecture.md) · [Эксплуатация и выпуск](docs/operations.md) · [Технический аудит](docs/audit.md) · [Источники данных](SOURCES.md)
+
+**[Исследование маршрутизации в РФ](docs/russia-routing-audit.md)** — риски холодного запуска, приоритеты DIRECT/PROXY/REJECT, DNS, полнота наборов и сравнение клиентских форматов.

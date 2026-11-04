@@ -66,13 +66,18 @@ class ReleaseLayoutTest(unittest.TestCase):
     def test_mihomo_only_one_visible_policy(self):
         text = (RELEASE / "mihomo/config.yaml").read_text(encoding="utf-8")
         data = load_yaml("mihomo/config.yaml")
-        self.assertEqual(text.count("proxies: # LEAVE THIS LINE!"), 2)
+        self.assertEqual(text.count("proxies: # LEAVE THIS LINE!"), 3)
         self.assertIsNone(data["proxies"])
         self.assertEqual([g["name"] for g in data["proxy-groups"]
                           if not g.get("hidden")], ["Garasu"])
-        self.assertEqual(len(data["proxy-groups"]), 1)
-        self.assertEqual(data["proxy-groups"][0]["type"], "url-test")
-        self.assertEqual(data["proxy-groups"][0]["empty-fallback"], "REJECT")
+        self.assertEqual(len(data["proxy-groups"]), 2)
+        self.assertEqual(data["proxy-groups"][0]["type"], "select")
+        self.assertEqual(data["proxy-groups"][0]["default-selected"], "Garasu Auto")
+        self.assertEqual(data["proxy-groups"][0]["proxies"], ["Garasu Auto"])
+        self.assertNotIn("remnawave", data["proxy-groups"][0])
+        self.assertEqual(data["proxy-groups"][1]["type"], "url-test")
+        self.assertTrue(data["proxy-groups"][1]["hidden"])
+        self.assertEqual(data["proxy-groups"][1]["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         self.assertNotIn("tun", data)
         self.assertTrue(all(x["proxy"] == "DIRECT"

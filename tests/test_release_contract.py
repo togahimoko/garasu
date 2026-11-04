@@ -22,19 +22,26 @@ class NativeReleaseContract(unittest.TestCase):
         cls.ssr = json.loads((RELEASE / "remnawave/srr.json").read_text())
         cls.preview = json.loads((RELEASE / "remnawave/srr-test.json").read_text())
 
-    def test_single_group_and_no_direct_fallback(self):
+    def test_one_visible_selector_and_fail_closed_auto(self):
         config = self.mihomo
         self.assertEqual(config["mode"], "rule")
         self.assertEqual(config["rules"][-1], "MATCH,Garasu")
-        groups = config["proxy-groups"]
-        self.assertEqual(len(groups), 1)
-        self.assertEqual(groups[0]["name"], "Garasu")
-        self.assertEqual(groups[0]["type"], "url-test")
-        self.assertTrue(groups[0]["include-all"])
-        self.assertFalse(groups[0]["lazy"])
-        self.assertEqual(groups[0]["empty-fallback"], "REJECT")
-        self.assertFalse(config["profile"]["store-selected"])
-        self.assertNotIn("DIRECT", groups[0].get("proxies") or [])
+        select, auto = config["proxy-groups"]
+        self.assertEqual([g["name"] for g in config["proxy-groups"]
+                          if not g.get("hidden")], ["Garasu"])
+        self.assertEqual(select["type"], "select")
+        self.assertEqual(select["proxies"], ["Garasu Auto"])
+        self.assertEqual(select["default-selected"], "Garasu Auto")
+        self.assertNotIn("remnawave", select)
+        self.assertTrue(config["profile"]["store-selected"])
+        self.assertEqual(auto["name"], "Garasu Auto")
+        self.assertEqual(auto["type"], "url-test")
+        self.assertTrue(auto["include-all"])
+        self.assertTrue(auto["hidden"])
+        self.assertFalse(auto["remnawave"]["include-proxies"])
+        self.assertFalse(auto["lazy"])
+        self.assertEqual(auto["empty-fallback"], "REJECT")
+        self.assertNotIn("DIRECT", select["proxies"])
         self.assertNotIn("tun", config)
 
     def test_dynamic_subscriber_node_counts(self):
@@ -46,13 +53,17 @@ class NativeReleaseContract(unittest.TestCase):
                      "server": "127.0.0.1", "port": 29000 + i}
                     for i in range(count)
                 ]
-                group = data["proxy-groups"][0]
-                group["proxies"] = []
-                names = {n["name"] for n in data["proxies"]}
-                self.assertEqual(len(names), count)
-                self.assertTrue(group["include-all"])
-                self.assertEqual(group["empty-fallback"], "REJECT")
-                self.assertNotIn("DIRECT", group["proxies"])
+                select, auto = data["proxy-groups"]
+                select["proxies"] = ["Garasu Auto"] + [
+                    n["name"] for n in data["proxies"]
+                ]
+                auto["proxies"] = []
+                self.assertEqual(len(select["proxies"]), 1 + count)
+                self.assertEqual(select["proxies"][0], "Garasu Auto")
+                self.assertEqual(select["default-selected"], "Garasu Auto")
+                self.assertTrue(auto["include-all"])
+                self.assertEqual(auto["empty-fallback"], "REJECT")
+                self.assertNotIn("DIRECT", select["proxies"])
                 self.assertEqual(data["rules"][-1], "MATCH,Garasu")
 
     def test_routing_priority_and_rule_download_bootstrap(self):
@@ -75,7 +86,8 @@ class NativeReleaseContract(unittest.TestCase):
         for path in (RELEASE / "mihomo/config.yaml",
                      RELEASE / "stash/config.yaml"):
             text = path.read_text(encoding="utf-8")
-            self.assertEqual(text.count("proxies: # LEAVE THIS LINE!"), 2)
+            self.assertEqual(text.count("proxies: # LEAVE THIS LINE!"),
+                             3 if path.name == "config.yaml" else 2)
             self.assertNotIn("vless://", text)
             self.assertNotIn("uuid:", text.lower())
 

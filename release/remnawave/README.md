@@ -10,7 +10,7 @@
 - Sing-box template: ../singbox/config.json.
 - INCY and Happ native routing: ../incy/config.json and ../happ/config.json.
 
-The response rule template names Garasu Mihomo / Garasu Stash / Garasu Singbox
+The response rule template names Garasu / Garasu Stash / Garasu Singbox
 must match actual Remnawave template record names. The SRR JSON does not read
 YAML directly from GitHub; template bodies must be installed separately through
 the Remnawave Templates editor, and then assigned via these response rules.
@@ -22,3 +22,5 @@ automatically import the managed Shadowrocket routing file.
 DO NOT paste the full srr.json into production until each native client has
 been tested with personal subscription access, and a backup of current SRR is
 stored. No live subscriptions or SSR rules have been modified by this commit.
+
+For a non-disruptive test, create a **new** MIHOMO template named `Garasu` and import release/mihomo/config.yaml. Current production `Garasu Mihomo` remains unchanged until you activate and verify the new SSR mapping.

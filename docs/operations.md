@@ -2,6 +2,9 @@
 
 ## Проверки перед выпуском
 
+Единая команда: `python3 scripts/qa.py --branch main`; с установленным ядром Mihomo: `python3 scripts/qa.py --branch main --core /path/to/mihomo`. Подробный [чек-лист выпуска](release-checklist.md).
+
+
 Требуются Python 3.10+ и PyYAML, для проверки Mihomo — актуальное локальное ядро. Работать рекомендуется в отдельной копии репозитория.
 
 ```bash

@@ -1,4 +1,5 @@
 """Static contract for Garasu one-control candidates; no live network tests."""
+import hashlib
 import json
 from pathlib import Path
 import unittest
@@ -31,8 +32,27 @@ class GarasuOneControlContract(unittest.TestCase):
         self.assertEqual(auto["expected-status"], 204)
         self.assertFalse(auto["remnawave"]["include-proxies"])
         self.assertEqual(p["rules"][-1], "MATCH,Garasu")
-        self.assertEqual(len(p["rule-providers"]), 13)
-        self.assertTrue(all(x["proxy"] == "DIRECT" for x in p["rule-providers"].values()))
+        providers = p["rule-providers"]
+        self.assertEqual(len(providers), 13)
+        self.assertTrue(all(x["proxy"] == "DIRECT" for x in providers.values()))
+        manifest = json.loads((BASE.parents[1] / "rules/mrs/manifest.json").read_text())
+        self.assertEqual(len(manifest["files"]), 13)
+        self.assertEqual(set(providers), {x["name"] for x in manifest["files"]})
+        for item in manifest["files"]:
+            name = item["name"]
+            r = providers[name]
+            self.assertEqual(r["format"], "mrs")
+            self.assertEqual(r["behavior"], item["kind"])
+            self.assertEqual(r["type"], "http")
+            self.assertEqual(
+                r["url"],
+                "https://raw.githubusercontent.com/togahimoko/garasu/"
+                "garasu-one-control-20261104/rules/mrs/" + name + ".mrs",
+            )
+            self.assertEqual(r["path"], "./rule-providers/garasu-" + name + ".mrs")
+            blob = (BASE.parents[1] / "rules/mrs" / (name + ".mrs")).read_bytes()
+            self.assertEqual(len(blob), item["mrs_bytes"])
+            self.assertEqual(hashlib.sha256(blob).hexdigest(), item["sha256"])
         self.assertLess(p["rules"].index("RULE-SET,rkn-domains,Garasu"),
                         p["rules"].index("DOMAIN-SUFFIX,ru,DIRECT"))
 

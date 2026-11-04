@@ -87,7 +87,7 @@ class NativeReleaseContract(unittest.TestCase):
                      RELEASE / "stash/config.yaml"):
             text = path.read_text(encoding="utf-8")
             self.assertEqual(text.count("proxies: # LEAVE THIS LINE!"),
-                             3 if path.name == "config.yaml" else 2)
+                             3 if path.parent.name == "mihomo" else 2)
             self.assertNotIn("vless://", text)
             self.assertNotIn("uuid:", text.lower())
 

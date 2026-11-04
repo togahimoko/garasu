@@ -1,6 +1,7 @@
 """No subscription URL/token may be printed by the refresh diagnostic."""
 import io
 import json
+from pathlib import Path
 import unittest
 
 from scripts import probe_subscription_delivery as probe
@@ -117,13 +118,13 @@ class DeliveryProbe(unittest.TestCase):
                b"proxy-groups:\n  - name: Garasu\n    type: select\n"
                b"  - name: Garasu Auto\n    type: url-test\n"
                b"rule-providers:\n" +
-               b"".join(("  %s:\n    type: http\n" % n).encode() for n in providers) +
+               b"".join(("  %s:\n    type: inline\n" % n).encode() for n in providers) +
                b"rules:\n" + b"".join(rules))
         result = probe.request_once(SECRET, "clash", "proxy",
                                     opener=FakeOpener(raw, kind="application/x-yaml"))
         self.assertEqual(result["yaml_counts"], {
             "proxies": 2, "proxy_providers": 0, "proxy_groups": 2,
-            "rule_providers": 13, "rules": 16})
+            "rule_providers": 10, "rules": 16})
         self.assertTrue(probe._clash_ready(result))
         self.assertTrue(all(result["yaml_checks"].values()))
         self.assertNotIn("PrivateOne", json.dumps(result))
@@ -134,10 +135,33 @@ class DeliveryProbe(unittest.TestCase):
         result["yaml_checks"]["garasu_route_order_valid"] = False
         self.assertFalse(probe._clash_ready(result))
 
+    def test_live_sized_offline_template_can_be_checked_without_truncation(self):
+        release = (Path(__file__).resolve().parents[1] /
+                   "release/mihomo/config.yaml").read_bytes()
+        self.assertGreater(len(release), 1_000_000)
+        self.assertLess(len(release), probe.MAX_BYTES)
+        fixtures = (b"proxies:\n"
+                    b"  - name: MOCK_ONE\n    type: socks5\n    server: 127.0.0.1\n    port: 18001\n"
+                    b"  - name: MOCK_TWO\n    type: socks5\n    server: 127.0.0.1\n    port: 18002\n")
+        release = release.replace(b"proxies: # LEAVE THIS LINE!", fixtures, 1)
+        result = probe.request_once(SECRET, "clash", "direct",
+                                    opener=FakeOpener(release))
+        self.assertFalse(result["truncated"])
+        self.assertEqual(result["read_bytes"], len(release))
+        self.assertTrue(probe._clash_ready(result))
+        self.assertTrue(result["yaml_checks"]["garasu_providers_inline"])
+        self.assertNotIn("MOCK_ONE", json.dumps(result))
+
+    def test_rejects_remote_provider_even_with_valid_names(self):
+        providers = sorted(probe.EXPECTED_GARASU_PROVIDERS)
+        raw = ("rule-providers:\n" +
+               "".join("  " + name + ":\n    type: http\n" for name in providers))
+        self.assertFalse(probe._yaml_checks(raw.encode())["garasu_providers_inline"])
+
     def test_response_body_is_bounded(self):
-        opener = FakeOpener(b"A" * 200000)
+        opener = FakeOpener(b"A" * (probe.MAX_BYTES + 4096))
         result = probe.request_once(SECRET, "clash", "direct", opener=opener)
-        self.assertEqual(result["read_bytes"], 65536)
+        self.assertEqual(result["read_bytes"], probe.MAX_BYTES)
         self.assertTrue(result["truncated"])
 
 

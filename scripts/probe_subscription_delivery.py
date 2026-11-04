@@ -32,7 +32,7 @@ AGENTS = {
     "xray_json": "garasu-xray-json",
 }
 DEFAULT_AGENTS = ("mihomo", "clash", "stash", "singbox", "happ", "incy", "browser")
-MAX_BYTES = 65536
+MAX_BYTES = 4_000_000  # Inline RKN/RU templates are approximately 2–3 MB.
 
 
 class RejectRedirect(urllib.request.HTTPRedirectHandler):
@@ -102,14 +102,16 @@ def _yaml_counts(body):
 
 EXPECTED_GARASU_PROVIDERS = frozenset((
     "rkn-domains", "youtube", "discord", "ai", "crypto", "proxy",
-    "ads", "games", "direct", "rkn-ips", "proxy-ips", "direct-ips", "ru-ips"
+    "ads", "rkn-ips", "proxy-ips", "ru-ips",
 ))
 
 
 def _yaml_checks(body):
     """Only non-sensitive booleans leave this function; never return node data."""
     providers, groups, rule_lines, blocks = set(), set(), [], []
+    provider_types = {}
     section, fields = None, None
+    current_provider = None
     for line in body.decode("utf-8", errors="replace").splitlines():
         if not line.strip() or line.lstrip().startswith("#"):
             continue
@@ -140,6 +142,11 @@ def _yaml_checks(body):
                 name = re.match(r"^  ([a-z][a-z0-9-]*):", line)
                 if name:
                     providers.add(name.group(1))
+                    current_provider = name.group(1)
+                elif re.match(r"^    type:\s*(\S+)", line):
+                    kind = re.match(r"^    type:\s*(\S+)", line).group(1)
+                    if current_provider in providers:
+                        provider_types[current_provider] = kind
         elif section == "rules" and re.match(r"^  -\s+", line):
             rule_lines.append(line.split("- ", 1)[1].strip().strip("'\""))
     if fields is not None:
@@ -155,6 +162,10 @@ def _yaml_checks(body):
     return {
         "personal_node_shapes_valid": len(blocks) >= 2 and all(required <= b for b in blocks),
         "garasu_provider_set_valid": providers == EXPECTED_GARASU_PROVIDERS,
+        "garasu_providers_inline": (
+            providers == EXPECTED_GARASU_PROVIDERS
+            and all(provider_types.get(name) == "inline" for name in providers)
+        ),
         "garasu_route_order_valid": (
             {"Garasu", "Garasu Auto"} <= groups
             and 0 <= rkn_domain < ru and 0 <= rkn_ip < ru
@@ -171,10 +182,10 @@ def _clash_ready(report):
             and report["format"] == "yaml" and not report["truncated"]
             and counts.get("proxies", 0) >= 2
             and counts.get("proxy_groups", 0) >= 2
-            and counts.get("rule_providers", 0) == 13
+            and counts.get("rule_providers", 0) == len(EXPECTED_GARASU_PROVIDERS)
             and counts.get("rules", 0) >= 15
             and all(report.get("yaml_checks", {}).values())
-            and len(report.get("yaml_checks", {})) == 3)
+            and len(report.get("yaml_checks", {})) == 4)
 
 
 def _opener(transport):
@@ -247,7 +258,7 @@ def main():
     parser.add_argument("--clients", nargs="+", choices=list(AGENTS),
                         default=list(DEFAULT_AGENTS))
     parser.add_argument("--require-clash-ready", action="store_true",
-                        help="exit 2 unless clash/1.0 returns at least two nodes and all 13 Garasu rule providers")
+                        help="exit 2 unless clash/1.0 returns two nodes and all ten offline Garasu providers")
     args = parser.parse_args()
     url = os.environ.get("GARASU_SUBSCRIPTION_URL", "")
     if not url:

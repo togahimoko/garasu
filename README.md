@@ -1,34 +1,31 @@
 # Garasu
 
-**Garasu** is a collection of maintained routing profiles and interoperable rule sets.
+Нативные профили маршрутизации, списки правил и средства проверки для Remnawave и VPN-клиентов.
 
-## Clients
+## Структура
 
-- Shadowrocket
-- Happ
-- INCY
-- Mihomo / Clash-compatible clients
-- Stash
-- Sing-box compatible clients
-- Xray-core (advanced opt-in)
-- Surge / Loon rule sets
-- Quantumult X filter resources
-
-## Repository
-
-| Directory | Contents |
+| Каталог | Содержимое |
 | --- | --- |
-| [clients](clients/) | Client-specific profiles and templates |
-| [rules](rules/) | Domain/IP rules in multiple engine formats |
-| [geo](geo/) | Xray GeoIP / GeoSite assets |
-| [install](install/) | Installation links and integrity metadata |
+| [release](release/) | Актуальные шаблоны Mihomo, Stash, sing-box, INCY, Happ, Shadowrocket, Xray и SSR |
+| [release/mihomo/.mrs](release/mihomo/.mrs/) | 13 компилированных наборов MRS с контрольными суммами |
+| [rules](rules/) | Исходные списки и форматы для остальных приложений |
+| [geo](geo/) | GeoIP/GeoSite |
+| [scripts](scripts/) | Сборка источников, проверки безопасности и диагностика |
+| [tests](tests/) | Автоматизированные проверки |
+| [clients](clients/) | Совместимость с ранее опубликованными ссылками |
+| [install](install/) | Действующие установочные ссылки и манифесты |
+| [reports](reports/) | Результаты аудита правил |
 
-## Reliability
+## Документация
 
-Garasu routing is independent of server count or location. See [multi-node reliability](docs/multi-node-reliability.md) for automatic choice, failure behavior, and client-specific support. Production profiles are distinct from experimental failover templates.
+- [Архитектура](docs/architecture.md): разделение форматов и порядок маршрутизации.
+- [Эксплуатация](docs/operations.md): подготовка релиза, тесты, обновление и восстановление.
+- [Аудит](docs/audit.md): результаты структурных и технических проверок.
 
-## Updates and compatibility
+## Выпуск
 
-Rule sets are validated before scheduled publication. See [compatibility](docs/compatibility.md) for supported formats and limitations, and [sources](SOURCES.md) for third-party attribution.
+Шаблоны из `release/` применяются в Remnawave **явно**. Публикация файла в GitHub не меняет действующие платные подписки, не добавляет серверы и не обновляет шаблоны в панели. Персональные VLESS/REALITY-параметры выдаются Remnawave, а не хранятся в этом репозитории.
 
-Garasu does not distribute access credentials or personal VPN subscriptions.
+Файлы `clients/` и `install/` пока сохранены для совместимости: их URL могут быть встроены в действующие подписки. Удаление этих путей без миграции пользователей недопустимо.
+
+Источники данных и сведения об использовании сторонних наборов приведены в [SOURCES.md](SOURCES.md).

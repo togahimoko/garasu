@@ -1,0 +1,189 @@
+{
+  "version": "1",
+  "rules": [
+    {
+      "name": "Browser Subscription",
+      "description": "System critical: do not delete or disable this rule.",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "accept",
+          "operator": "CONTAINS",
+          "value": "text/html",
+          "caseSensitive": true
+        }
+      ],
+      "responseType": "BROWSER"
+    },
+    {
+      "name": "Mihomo Clients",
+      "description": "Garasu native Mihomo YAML with personal VLESS/REALITY nodes and MRS rule assets",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "REGEX",
+          "value": "^(?:flclash|rabbit|flowvy|murge|mihomo|prizrak-box|koala-clash|clash(?:[- /]verge(?:[- ]rev)?|[- /]nyanpasu|x meta|[-.]?meta))",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "MIHOMO",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Mihomo"
+      }
+    },
+    {
+      "name": "Stash (iOS, macOS)",
+      "description": "Response with generated YAML config (Stash Template)",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "REGEX",
+          "value": "^stash",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "STASH",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Stash"
+      }
+    },
+    {
+      "name": "Sing-box clients",
+      "description": "Response with generated JSON config (Singbox template)",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "REGEX",
+          "value": "^(?:sfa|sfi|sfm|sft|karing|singbox)",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "SINGBOX",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Singbox"
+      }
+    },
+    {
+      "name": "Clash Core Clients",
+      "description": "Mihomo-compatible Garasu YAML for Clash-named modern cores; legacy Clash does not support VLESS/REALITY",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "REGEX",
+          "value": "^clash(?:/|$)",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "MIHOMO",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Mihomo"
+      }
+    },
+    {
+      "name": "INCY Garasu",
+      "description": "Base64 personal nodes and auto-updating native Garasu routing",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "STARTS_WITH",
+          "value": "incy/",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "XRAY_BASE64",
+      "responseModifications": {
+        "headers": [
+          {
+            "key": "autorouting",
+            "value": "incy://autorouting/onadd/https://raw.githubusercontent.com/togahimoko/garasu/staging/release/incy/config.json"
+          }
+        ],
+        "applyHeadersToEnd": true,
+        "ignoreServeJsonAtBaseSubscription": true
+      }
+    },
+    {
+      "name": "Happ Garasu",
+      "description": "Base64 personal nodes and embedded native Garasu routing",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "STARTS_WITH",
+          "value": "happ",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "XRAY_BASE64",
+      "responseModifications": {
+        "headers": [
+          {
+            "key": "routing",
+            "value": "happ://routing/onadd/eyJOYW1lIjoiR2FyYXN1IiwiR2xvYmFsUHJveHkiOiJ0cnVlIiwiVXNlQ2h1bmtGaWxlcyI6ImZhbHNlIiwiUmVtb3RlRG5zIjoiOC44LjguOCIsIkRvbWVzdGljRG5zIjoiNzcuODguOC44IiwiUmVtb3RlRE5TVHlwZSI6IkRvSCIsIlJlbW90ZUROU0RvbWFpbiI6Imh0dHBzOi8vZG5zLmdvb2dsZS9kbnMtcXVlcnkiLCJSZW1vdGVETlNJUCI6IjguOC44LjgiLCJEb21lc3RpY0ROU1R5cGUiOiJEb0giLCJEb21lc3RpY0ROU0RvbWFpbiI6Imh0dHBzOi8vY29tbW9uLmRvdC5kbnMueWFuZGV4Lm5ldC9kbnMtcXVlcnkiLCJEb21lc3RpY0ROU0lQIjoiNzcuODguOC44IiwiTGFzdFVwZGF0ZWQiOiIxNzkzNzYxNDk5IiwiRG5zSG9zdHMiOnsiZG5zLmdvb2dsZSI6IjguOC44LjgiLCJjb21tb24uZG90LmRucy55YW5kZXgubmV0IjoiNzcuODguOC44In0sIlJvdXRlT3JkZXIiOiJibG9jay1wcm94eS1kaXJlY3QiLCJEaXJlY3RTaXRlcyI6WyJnZW9zaXRlOnByaXZhdGUiLCJnZW9zaXRlOmNhdGVnb3J5LXJ1IiwiZ2Vvc2l0ZTpnYXJhc3UtcnUiXSwiRGlyZWN0SXAiOlsiZ2VvaXA6cHJpdmF0ZSIsImdlb2lwOnJ1Il0sIlByb3h5U2l0ZXMiOlsiZ2Vvc2l0ZTp0ZWxlZ3JhbSIsImdlb3NpdGU6Z2l0aHViIiwiZ2Vvc2l0ZTpkaXNjb3JkIiwiZ2Vvc2l0ZTp3aGF0c2FwcCIsImdlb3NpdGU6YmFubmVkLXJ1IiwiZ2Vvc2l0ZTpob3N0aW5nIiwiZ2Vvc2l0ZTp5b3V0dWJlIiwiZ2Vvc2l0ZTphaSIsImdlb3NpdGU6Y3J5cHRvIiwiZ2Vvc2l0ZTpjYXRlZ29yeS1nZW9ibG9jay1ydSIsImdlb3NpdGU6dHdpdGNoLWFkcyJdLCJQcm94eUlwIjpbImdlb2lwOnRlbGVncmFtIiwiZ2VvaXA6YmxvY2tlZC1ydSJdLCJCbG9ja1NpdGVzIjpbImdlb3NpdGU6Z2FyYXN1LWFkcyJdLCJCbG9ja0lwIjpbXSwiRG9tYWluU3RyYXRlZ3kiOiJJUElmTm9uTWF0Y2giLCJGYWtlRE5TIjoiZmFsc2UiLCJHZW9pcHVybCI6Imh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS90b2dhaGltb2tvL2dhcmFzdS9tYWluL2dlby9nZW9pcC5kYXQiLCJHZW9zaXRldXJsIjoiaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3RvZ2FoaW1va28vZ2FyYXN1L21haW4vZ2VvL2dlb3NpdGUuZGF0In0="
+          }
+        ],
+        "applyHeadersToEnd": true,
+        "ignoreServeJsonAtBaseSubscription": true
+      }
+    },
+    {
+      "name": "Garasu Xray JSON opt-in",
+      "description": "Explicit Xray JSON opt-in; ordinary clients keep XRAY_BASE64 fallback",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "STARTS_WITH",
+          "value": "garasu-xray-json",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "XRAY_JSON",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Xray JSON"
+      }
+    },
+    {
+      "name": "Shadowrocket Garasu",
+      "description": "Personal XRAY_BASE64 nodes; managed Garasu rule profile is imported separately",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "user-agent",
+          "operator": "STARTS_WITH",
+          "value": "shadowrocket",
+          "caseSensitive": false
+        }
+      ],
+      "responseType": "XRAY_BASE64",
+      "responseModifications": {
+        "ignoreServeJsonAtBaseSubscription": true
+      }
+    },
+    {
+      "name": "Fallback Base64",
+      "description": "System critical: do not delete or disable this rule.",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [],
+      "responseType": "XRAY_BASE64"
+    }
+  ],
+  "settings": {
+    "disableSubscriptionAccessByPath": false
+  }
+}

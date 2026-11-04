@@ -27,7 +27,7 @@ A single YAML file cannot control different cores. A single Remnawave subscripti
 
 ## Specific changes compared with existing production
 
-- Mihomo: Garasu Auto hidden. Rule-providers fetch over DIRECT rather than requiring the same potentially broken VPN; this breaks the bootstrap cycle. Failed DIRECT GitHub requests still need cached rule sets; no universal mirror fallback is claimed. Only Garasu is visible.
+- Mihomo: Garasu Auto hidden. **All 13 domain/IP providers use genuine compiled binary MRS (format: mrs).** The source remains our own text and CIDR lists, compiled with the installed native Mihomo compiler. MRS is not a cross-client replacement for GeoSite/GeoIP/Shadowrocket lists. Rule-providers fetch over DIRECT rather than requiring the same potentially broken VPN; this breaks the bootstrap cycle. Failed DIRECT GitHub requests still need cached rule sets; no universal mirror fallback is claimed. Only Garasu is visible.
 - Stash: single native Garasu URL-test group preserved, with REJECT when zero subscribers' nodes are injected.
 - INCY/Happ: identical routing policies named Garasu; personal node delivery remains Remnawave's job.
 - Shadowrocket: native PROXY routing, not a complete VLESS subscription. Managed update URL points to the staging branch only. Switch to an immutable promoted release before production rollout.
@@ -36,14 +36,15 @@ A single YAML file cannot control different cores. A single Remnawave subscripti
 
 ## Canary release checklist (must precede any live switch)
 
-1. Run: python3 -m unittest tests.test_one_control_contract
-2. Generate Mihomo subscriptions with synthetic 0, 1, 2 and 5 nodes and validate with real Mihomo core. Bare template with Remnawave anchors is not a standalone subscription.
-3. Generate sing-box 1.14 profiles with actual Remnawave injection. Confirm URL-test and native sing-box check; zero-node output must be rejected, not converted into DIRECT.
-4. Create NEW Remnawave template names, test with a dedicated canary subscriber and manually identifiable client UA. Do not change existing response rules yet.
-5. Test cold cache, rule downloads when VPN is down, DNS, node failover, IPv4/IPv6, Wi-Fi/mobile switching and effective routing in each actual app.
-6. Verify no cross-subscriber node leakage and keep full production template + SRR backups for rollback.
-7. Only after tests succeed, promote with staged SRR. GitHub files do not automatically update Remnawave's stored templates.
-8. No GitHub Actions, automatic deployments, changes to Steal, port 443, existing nodes or paid customers.
+1. Run: python3 -m unittest tests.test_one_control_contract; verify rules/mrs/manifest.json SHA256 against all 13 real binary blobs.
+2. Recompile MRS explicitly when any source rules change: python3 scripts/build_mrs.py --core /path/to/mihomo --output /tmp/garasu-mrs-next --source-commit <committed-source-sha>. Review hashes and release the binary set together with its source snapshot. No GitHub Actions required.
+3. Generate Mihomo subscriptions with synthetic 0, 1, 2 and 5 nodes and validate with real Mihomo core. Bare template with Remnawave anchors is not a standalone subscription.
+4. Generate sing-box 1.14 profiles with actual Remnawave injection. Confirm URL-test and native sing-box check; zero-node output must be rejected, not converted into DIRECT.
+5. Create NEW Remnawave template names, test with a dedicated canary subscriber and manually identifiable client UA. Do not change existing response rules yet.
+6. Test cold cache, rule downloads when VPN is down, DNS, node failover, IPv4/IPv6, Wi-Fi/mobile switching and effective routing in each actual app.
+7. Verify no cross-subscriber node leakage and keep full production template + SRR backups for rollback.
+8. Only after tests succeed, promote with staged SRR. GitHub files do not automatically update Remnawave's stored templates.
+9. No GitHub Actions, automatic deployments, changes to Steal, port 443, existing nodes or paid customers.
 
 ## Diagnostic separation
 

@@ -119,8 +119,8 @@ class GarasuTests(unittest.TestCase):
                          "garasu-test-mihomo")
         self.assertEqual(preview["rules"][1]["responseType"], "MIHOMO")
         self.assertEqual(preview["rules"][1]["responseModifications"]["subscriptionTemplate"],
-                         "Garasu")
-        self.assertTrue(all(rule["responseModifications"]["subscriptionTemplate"] == "Garasu"
+                         "Default")
+        self.assertTrue(all(rule["responseModifications"]["subscriptionTemplate"] == "Default"
                             for rule in full["rules"]
                             if rule["responseType"] == "MIHOMO"))
         self.assertIn("INCY Garasu", [r["name"] for r in full["rules"]])

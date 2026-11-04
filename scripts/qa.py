@@ -13,6 +13,11 @@ import sys
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
+# Running "python scripts/qa.py --core ..." puts scripts/ on sys.path,
+# not the repository root, so the native verifier package import would fail.
+# Keep both script and module execution independent of the caller's PYTHONPATH.
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 PYTHON = sys.executable
 
 

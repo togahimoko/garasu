@@ -4,58 +4,58 @@
   "scope": "static domain-only first-match, excluding resolved IP, process, DNS state, QUIC, TUN and runtime availability",
   "included": {
     "Mihomo": [
-      "ads",
-      "ai",
-      "crypto",
-      "discord",
-      "proxy",
-      "rkn-domains",
-      "youtube"
+      "ads"
     ],
     "Stash": [
-      "ads",
-      "ai",
-      "crypto",
-      "discord",
-      "proxy",
-      "rkn-domains",
-      "youtube"
+      "ads"
     ],
     "Shadowrocket": [
-      "ads",
-      "ai",
-      "crypto",
-      "discord",
-      "proxy",
-      "rkn-domains",
-      "youtube"
+      "ads"
     ],
     "sing-box": [
-      "ads",
-      "ai",
-      "crypto",
-      "discord",
-      "proxy",
-      "rkn-domains",
-      "youtube"
+      "ads"
     ]
   },
   "unused": {
     "Mihomo": [
+      "ai",
+      "crypto",
       "direct",
-      "games"
+      "discord",
+      "games",
+      "proxy",
+      "rkn-domains",
+      "youtube"
     ],
     "Stash": [
+      "ai",
+      "crypto",
       "direct",
-      "games"
+      "discord",
+      "games",
+      "proxy",
+      "rkn-domains",
+      "youtube"
     ],
     "Shadowrocket": [
+      "ai",
+      "crypto",
       "direct",
-      "games"
+      "discord",
+      "games",
+      "proxy",
+      "rkn-domains",
+      "youtube"
     ],
     "sing-box": [
+      "ai",
+      "crypto",
       "direct",
-      "games"
+      "discord",
+      "games",
+      "proxy",
+      "rkn-domains",
+      "youtube"
     ]
   },
   "domains": {
@@ -65,35 +65,131 @@
       "clients": {
         "Mihomo": {
           "actions": {
-            "PROXY": 75306
+            "PROXY": 75302,
+            "REJECT": 4
           },
-          "deviations": 0,
-          "reasons": {},
-          "samples": []
+          "deviations": 4,
+          "reasons": {
+            "SET:ads": 4
+          },
+          "samples": [
+            {
+              "domain": "doubleclick.net",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googleadservices.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googletagmanager.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "sentry.io",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            }
+          ]
         },
         "Stash": {
           "actions": {
-            "PROXY": 75306
+            "PROXY": 75302,
+            "REJECT": 4
           },
-          "deviations": 0,
-          "reasons": {},
-          "samples": []
+          "deviations": 4,
+          "reasons": {
+            "SET:ads": 4
+          },
+          "samples": [
+            {
+              "domain": "doubleclick.net",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googleadservices.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googletagmanager.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "sentry.io",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            }
+          ]
         },
         "Shadowrocket": {
           "actions": {
-            "PROXY": 75306
+            "PROXY": 75302,
+            "REJECT": 4
           },
-          "deviations": 0,
-          "reasons": {},
-          "samples": []
+          "deviations": 4,
+          "reasons": {
+            "SET:ads": 4
+          },
+          "samples": [
+            {
+              "domain": "doubleclick.net",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googleadservices.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googletagmanager.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "sentry.io",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            }
+          ]
         },
         "sing-box": {
           "actions": {
-            "PROXY": 75306
+            "PROXY": 75302,
+            "REJECT": 4
           },
-          "deviations": 0,
-          "reasons": {},
-          "samples": []
+          "deviations": 4,
+          "reasons": {
+            "SET:ads": 4
+          },
+          "samples": [
+            {
+              "domain": "doubleclick.net",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googleadservices.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googletagmanager.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "sentry.io",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            }
+          ]
         }
       }
     },
@@ -293,251 +389,35 @@
       "clients": {
         "Mihomo": {
           "actions": {
-            "REJECT": 1104,
-            "PROXY": 117
+            "REJECT": 1221
           },
-          "deviations": 117,
-          "reasons": {
-            "SET:rkn-domains": 117
-          },
-          "samples": [
-            {
-              "domain": "a.ads2.msn.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ac3.msn.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.browser.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.qun.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.weixin.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adeventtracker.spotify.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adfilter.imtt.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adnet.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adping.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            }
-          ]
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
         },
         "Stash": {
           "actions": {
-            "REJECT": 1104,
-            "PROXY": 117
+            "REJECT": 1221
           },
-          "deviations": 117,
-          "reasons": {
-            "SET:rkn-domains": 117
-          },
-          "samples": [
-            {
-              "domain": "a.ads2.msn.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ac3.msn.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.browser.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.qun.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.weixin.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adeventtracker.spotify.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adfilter.imtt.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adnet.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adping.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            }
-          ]
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
         },
         "Shadowrocket": {
           "actions": {
-            "REJECT": 1104,
-            "PROXY": 117
+            "REJECT": 1221
           },
-          "deviations": 117,
-          "reasons": {
-            "SET:rkn-domains": 117
-          },
-          "samples": [
-            {
-              "domain": "a.ads2.msn.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ac3.msn.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.browser.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.qun.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.weixin.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adeventtracker.spotify.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adfilter.imtt.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adnet.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adping.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            }
-          ]
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
         },
         "sing-box": {
           "actions": {
-            "REJECT": 1104,
-            "PROXY": 117
+            "REJECT": 1221
           },
-          "deviations": 117,
-          "reasons": {
-            "SET:rkn-domains": 117
-          },
-          "samples": [
-            {
-              "domain": "a.ads2.msn.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ac3.msn.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.browser.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.qun.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "ad.weixin.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adeventtracker.spotify.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adfilter.imtt.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adnet.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            },
-            {
-              "domain": "adping.qq.com",
-              "actual": "PROXY",
-              "matched": "SET:rkn-domains"
-            }
-          ]
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
         }
       }
     },
@@ -547,13 +427,11 @@
       "clients": {
         "Mihomo": {
           "actions": {
-            "PROXY": 116,
-            "DIRECT": 1
+            "PROXY": 117
           },
-          "deviations": 116,
+          "deviations": 117,
           "reasons": {
-            "MATCH": 113,
-            "SET:rkn-domains": 3
+            "MATCH": 117
           },
           "samples": [
             {
@@ -610,13 +488,11 @@
         },
         "Stash": {
           "actions": {
-            "PROXY": 116,
-            "DIRECT": 1
+            "PROXY": 117
           },
-          "deviations": 116,
+          "deviations": 117,
           "reasons": {
-            "MATCH": 113,
-            "SET:rkn-domains": 3
+            "MATCH": 117
           },
           "samples": [
             {
@@ -673,13 +549,11 @@
         },
         "Shadowrocket": {
           "actions": {
-            "PROXY": 116,
-            "DIRECT": 1
+            "PROXY": 117
           },
-          "deviations": 116,
+          "deviations": 117,
           "reasons": {
-            "MATCH": 113,
-            "SET:rkn-domains": 3
+            "MATCH": 117
           },
           "samples": [
             {
@@ -736,13 +610,11 @@
         },
         "sing-box": {
           "actions": {
-            "PROXY": 116,
-            "DIRECT": 1
+            "PROXY": 117
           },
-          "deviations": 116,
+          "deviations": 117,
           "reasons": {
-            "FINAL": 113,
-            "SET:rkn-domains": 3
+            "FINAL": 117
           },
           "samples": [
             {
@@ -805,62 +677,61 @@
       "clients": {
         "Mihomo": {
           "actions": {
-            "PROXY": 3206,
-            "DIRECT": 78
+            "DIRECT": 111,
+            "PROXY": 3173
           },
-          "deviations": 3206,
+          "deviations": 3173,
           "reasons": {
-            "MATCH": 3190,
-            "SET:rkn-domains": 16
+            "MATCH": 3173
           },
           "samples": [
-            {
-              "domain": "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa",
-              "actual": "PROXY",
-              "matched": "MATCH"
-            },
-            {
-              "domain": "10.in-addr.arpa",
-              "actual": "PROXY",
-              "matched": "MATCH"
-            },
-            {
-              "domain": "100.100.in-addr.arpa",
-              "actual": "PROXY",
-              "matched": "MATCH"
-            },
-            {
-              "domain": "100.51.198.in-addr.arpa",
-              "actual": "PROXY",
-              "matched": "MATCH"
-            },
             {
               "domain": "100beatscheap.com",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "101.100.in-addr.arpa",
+              "domain": "12diasdepresentesdeitunes.com",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "102.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.cl",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "103.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.co",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "104.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.co.cr",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "105.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.co.ni",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.co.ve",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com.co",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com.hn",
               "actual": "PROXY",
               "matched": "MATCH"
             }
@@ -868,62 +739,61 @@
         },
         "Stash": {
           "actions": {
-            "PROXY": 3206,
-            "DIRECT": 78
+            "DIRECT": 111,
+            "PROXY": 3173
           },
-          "deviations": 3206,
+          "deviations": 3173,
           "reasons": {
-            "MATCH": 3190,
-            "SET:rkn-domains": 16
+            "MATCH": 3173
           },
           "samples": [
-            {
-              "domain": "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa",
-              "actual": "PROXY",
-              "matched": "MATCH"
-            },
-            {
-              "domain": "10.in-addr.arpa",
-              "actual": "PROXY",
-              "matched": "MATCH"
-            },
-            {
-              "domain": "100.100.in-addr.arpa",
-              "actual": "PROXY",
-              "matched": "MATCH"
-            },
-            {
-              "domain": "100.51.198.in-addr.arpa",
-              "actual": "PROXY",
-              "matched": "MATCH"
-            },
             {
               "domain": "100beatscheap.com",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "101.100.in-addr.arpa",
+              "domain": "12diasdepresentesdeitunes.com",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "102.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.cl",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "103.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.co",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "104.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.co.cr",
               "actual": "PROXY",
               "matched": "MATCH"
             },
             {
-              "domain": "105.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.co.ni",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.co.ve",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com.co",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com.hn",
               "actual": "PROXY",
               "matched": "MATCH"
             }
@@ -931,13 +801,12 @@
         },
         "Shadowrocket": {
           "actions": {
-            "DIRECT": 173,
-            "PROXY": 3111
+            "DIRECT": 111,
+            "PROXY": 3173
           },
-          "deviations": 3111,
+          "deviations": 3173,
           "reasons": {
-            "MATCH": 3095,
-            "SET:rkn-domains": 16
+            "MATCH": 3173
           },
           "samples": [
             {
@@ -994,62 +863,61 @@
         },
         "sing-box": {
           "actions": {
-            "PROXY": 3206,
-            "DIRECT": 78
+            "DIRECT": 111,
+            "PROXY": 3173
           },
-          "deviations": 3206,
+          "deviations": 3173,
           "reasons": {
-            "FINAL": 3190,
-            "SET:rkn-domains": 16
+            "FINAL": 3173
           },
           "samples": [
-            {
-              "domain": "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa",
-              "actual": "PROXY",
-              "matched": "FINAL"
-            },
-            {
-              "domain": "10.in-addr.arpa",
-              "actual": "PROXY",
-              "matched": "FINAL"
-            },
-            {
-              "domain": "100.100.in-addr.arpa",
-              "actual": "PROXY",
-              "matched": "FINAL"
-            },
-            {
-              "domain": "100.51.198.in-addr.arpa",
-              "actual": "PROXY",
-              "matched": "FINAL"
-            },
             {
               "domain": "100beatscheap.com",
               "actual": "PROXY",
               "matched": "FINAL"
             },
             {
-              "domain": "101.100.in-addr.arpa",
+              "domain": "12diasdepresentesdeitunes.com",
               "actual": "PROXY",
               "matched": "FINAL"
             },
             {
-              "domain": "102.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.cl",
               "actual": "PROXY",
               "matched": "FINAL"
             },
             {
-              "domain": "103.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.co",
               "actual": "PROXY",
               "matched": "FINAL"
             },
             {
-              "domain": "104.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.co.cr",
               "actual": "PROXY",
               "matched": "FINAL"
             },
             {
-              "domain": "105.100.in-addr.arpa",
+              "domain": "12diasderegalosdeitunes.co.ni",
+              "actual": "PROXY",
+              "matched": "FINAL"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.co.ve",
+              "actual": "PROXY",
+              "matched": "FINAL"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com",
+              "actual": "PROXY",
+              "matched": "FINAL"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com.co",
+              "actual": "PROXY",
+              "matched": "FINAL"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com.hn",
               "actual": "PROXY",
               "matched": "FINAL"
             }
@@ -1058,152 +926,7 @@
       }
     }
   },
-  "non_ru_disagreements": 95,
-  "non_ru_examples": [
-    {
-      "domain": "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "10.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "100.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "100.51.198.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "101.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "102.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "103.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "104.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "105.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "106.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "107.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "108.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "109.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "110.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "111.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    },
-    {
-      "domain": "112.100.in-addr.arpa",
-      "actions": {
-        "Mihomo": "PROXY",
-        "Stash": "PROXY",
-        "Shadowrocket": "DIRECT",
-        "sing-box": "PROXY"
-      }
-    }
-  ],
-  "ru_direct_without_provider_guard": true
+  "non_ru_disagreements": 0,
+  "non_ru_examples": [],
+  "ru_direct_without_provider_guard": false
 }

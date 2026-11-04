@@ -63,19 +63,11 @@ def check_native(core: Path) -> None:
                 proxy["name"] for proxy in cfg["proxies"]
             ]
             auto["proxies"] = []
-            # Mihomo enforces SAFE_PATHS: all rule files must be inside
-            # its temporary working directory, not read from the checkout.
-            assets = tmp / "local-mrs"
-            assets.mkdir(exist_ok=True)
-            for name, asset in cfg["rule-providers"].items():
-                src = ROOT / "release/mihomo/.mrs" / (name + ".mrs")
-                local = assets / (name + ".mrs")
-                if not local.exists():
-                    shutil.copyfile(src, local)
-                asset["type"] = "file"
-                asset["path"] = str(local)
-                for field in ("url", "interval", "proxy"):
-                    asset.pop(field, None)
+            # The production universal profile must remain self-contained.
+            if set(cfg["rule-providers"]) != {"ads"}:
+                raise RuntimeError("Unexpected remote provider in universal mode")
+            if cfg["rule-providers"]["ads"]["type"] != "inline":
+                raise RuntimeError("Ads list must be inlined for offline startup")
             cfg["mixed-port"] = 18000 + count
             path = tmp / (f"synthetic-{count}.yaml")
             path.write_text(yaml.safe_dump(cfg, allow_unicode=True),
@@ -104,6 +96,8 @@ def main() -> None:
          [PYTHON, "scripts/audit_public_exposure.py"]),
         ("Source rule consistency",
          [PYTHON, "scripts/audit_rules.py", "--check"]),
+        ("Single universal Garasu routing policy",
+         [PYTHON, "scripts/sync_universal_routing.py", "--check"]),
         ("Cross-client routing coverage",
          [PYTHON, "scripts/audit_route_coverage.py", "--check"]),
         ("Binary GeoSite/GeoIP semantic integrity",
@@ -119,6 +113,9 @@ def main() -> None:
         if not core.is_file():
             parser.error("Mihomo binary not found: " + str(core))
         check_native(core)
+        run("Native offline DIRECT / PROXY / REJECT routing",
+            [PYTHON, "scripts/smoke_universal_mihomo.py", "--core", str(core)],
+            env=env)
     print("\nPASS Garasu release quality gate", flush=True)
 
 

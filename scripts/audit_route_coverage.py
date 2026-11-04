@@ -70,9 +70,21 @@ def shadow_rules(root: Path) -> list[str]:
     text = (root / "release/shadowrocket/config.conf").read_text()
     lines = text.split("[Rule]", 1)[1].splitlines()
     rules = []
+    inline_ads = set()
+    compressed_ads = False
     for line in lines:
         line = line.strip()
         if not line or line.startswith("#"):
+            continue
+        # The fully embedded ads section can contain >1000 native rules.
+        # Compress to one equivalent provider rule in the analyzer only;
+        # first assert that its domain contents exactly match source data.
+        if line.startswith("DOMAIN-SUFFIX,") and line.endswith(",REJECT"):
+            category = line.split(",")[1]
+            inline_ads.add(category)
+            if not compressed_ads:
+                rules.append("RULE-SET,ads,REJECT")
+                compressed_ads = True
             continue
         source = SHADOW_URL.search(line)
         if line.startswith("DOMAIN-SET,") and source:
@@ -81,6 +93,8 @@ def shadow_rules(root: Path) -> list[str]:
             rules.append("MATCH," + line.split(",")[1])
         else:
             rules.append(line)
+    if inline_ads and inline_ads != get_sets(root)["ads"]:
+        raise ValueError("Shadowrocket embedded ad domains differ from canonical ads source")
     return rules
 
 

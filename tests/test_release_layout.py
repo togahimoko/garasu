@@ -48,20 +48,15 @@ class ReleaseLayoutTest(unittest.TestCase):
             blob = (MRS / (name + ".mrs")).read_bytes()
             self.assertEqual(len(blob), item["mrs_bytes"])
             self.assertEqual(hashlib.sha256(blob).hexdigest(), item["sha256"])
+        # MRS remain published/verified as reproducible source artifacts.
+        # The customer-facing universal profile uses an offline inline ad set.
         for client in ("mihomo", "stash"):
             data = load_yaml(client + "/config.yaml")
             providers = data["rule-providers"]
-            self.assertEqual(set(providers), set(CATEGORIES))
-            for name, p in providers.items():
-                self.assertEqual(p["type"], "http")
-                self.assertEqual(p["format"], "mrs")
-                self.assertEqual(p["behavior"],
-                                 "ipcidr" if name.endswith("-ips") else "domain")
-                self.assertEqual(
-                    p["url"],
-                    "https://raw.githubusercontent.com/togahimoko/garasu/"
-                    "main/release/mihomo/.mrs/" + name + ".mrs",
-                )
+            self.assertEqual(set(providers), {"ads"})
+            self.assertEqual(providers["ads"]["type"], "inline")
+            self.assertEqual(providers["ads"]["behavior"], "domain")
+            self.assertGreater(len(providers["ads"]["payload"]), 1000)
 
     def test_mihomo_only_one_visible_policy(self):
         text = (RELEASE / "mihomo/config.yaml").read_text(encoding="utf-8")
@@ -80,8 +75,9 @@ class ReleaseLayoutTest(unittest.TestCase):
         self.assertEqual(data["proxy-groups"][1]["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         self.assertNotIn("tun", data)
-        self.assertTrue(all(x["proxy"] == "DIRECT"
-                            for x in data["rule-providers"].values()))
+        self.assertEqual(set(data["rule-providers"]), {"ads"})
+        self.assertNotIn("DOMAIN-SUFFIX,ru,DIRECT", data["rules"])
+        self.assertIn("DOMAIN-SUFFIX,sberbank.ru,DIRECT", data["rules"])
 
     def test_stash_and_native_client_exports(self):
         stash = load_yaml("stash/config.yaml")

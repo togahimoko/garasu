@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "name": "Garasu",
+  "profiles": 1,
+  "fallback": "PROXY",
+  "routing_policy": "private DIRECT, ads REJECT, blocked PROXY, selected RU domestic DIRECT, unknown PROXY",
+  "private_domains": ["localhost", "local", "lan", "home.arpa", "arpa"],
+  "private_ipv4": ["127.0.0.0/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "100.64.0.0/10", "169.254.0.0/16"],
+  "private_ipv6": ["::1/128", "fc00::/7", "fe80::/10"],
+  "ads_domain_set": "ads",
+  "blocked_domain_sets": ["rkn-domains", "youtube", "discord", "ai", "crypto", "proxy"],
+  "blocked_ip_sets": ["rkn-ips", "proxy-ips"],
+  "critical_ru_direct_domains": [
+    "2gis.ru",
+    "alfabank.ru",
+    "avito.ru",
+    "cbr.ru",
+    "gosuslugi.ru",
+    "nalog.gov.ru",
+    "ozon.ru",
+    "pochta.ru",
+    "sber.ru",
+    "sberbank.ru",
+    "tbank.ru",
+    "tinkoff.ru",
+    "vk.com",
+    "vtb.ru",
+    "wildberries.ru",
+    "ya.ru",
+    "yandex.ru"
+  ]
+}

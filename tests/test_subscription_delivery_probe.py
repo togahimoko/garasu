@@ -119,7 +119,7 @@ class DeliveryProbe(unittest.TestCase):
                b"proxy-groups:\n  - name: Garasu\n    type: select\n"
                b"  - name: Garasu Auto\n    type: url-test\n"
                b"rule-providers:\n" +
-               b"".join(("  %s:\n    type: inline\n" % n).encode() for n in providers) +
+               b"".join(("  %s:\n    type: http\n    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/%s.txt\n" % (n,n)).encode() for n in providers) +
                b"rules:\n" + b"".join(rules))
         result = probe.request_once(SECRET, "clash", "proxy",
                                     opener=FakeOpener(raw, kind="application/x-yaml"))
@@ -139,8 +139,8 @@ class DeliveryProbe(unittest.TestCase):
     def test_live_sized_offline_template_can_be_checked_without_truncation(self):
         release = (Path(__file__).resolve().parents[1] /
                    "release/mihomo/config.yaml").read_bytes()
-        self.assertGreater(len(release), 1_000_000)
-        self.assertLess(len(release), probe.MAX_BYTES)
+        self.assertGreater(len(release), 3000)
+        self.assertLess(len(release), 12000)
         fixtures = (b"proxies:\n"
                     b"  - name: MOCK_ONE\n    type: socks5\n    server: 127.0.0.1\n    port: 18001\n"
                     b"  - name: MOCK_TWO\n    type: socks5\n    server: 127.0.0.1\n    port: 18002\n")
@@ -150,14 +150,14 @@ class DeliveryProbe(unittest.TestCase):
         self.assertFalse(result["truncated"])
         self.assertEqual(result["read_bytes"], len(release))
         self.assertTrue(probe._clash_ready(result))
-        self.assertTrue(result["yaml_checks"]["garasu_providers_inline"])
+        self.assertTrue(result["yaml_checks"]["garasu_providers_remote"])
         self.assertNotIn("MOCK_ONE", json.dumps(result))
 
-    def test_rejects_remote_provider_even_with_valid_names(self):
+    def test_rejects_remote_provider_with_missing_or_untrusted_urls(self):
         providers = sorted(probe.EXPECTED_GARASU_PROVIDERS)
         raw = ("rule-providers:\n" +
                "".join("  " + name + ":\n    type: http\n" for name in providers))
-        self.assertFalse(probe._yaml_checks(raw.encode())["garasu_providers_inline"])
+        self.assertFalse(probe._yaml_checks(raw.encode())["garasu_providers_remote"])
 
     def test_response_body_is_bounded(self):
         opener = FakeOpener(b"A" * (probe.MAX_BYTES + 4096))

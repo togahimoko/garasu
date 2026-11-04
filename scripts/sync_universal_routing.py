@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build a single RU split-tunnel policy from Garasu-owned, pinned source data.
 
-All desktop profiles embed the necessary RKN exceptions before broad RU DIRECT:
-loss of GitHub connectivity at cold start cannot remove those exceptions.
+Remnawave receives small native templates; all large domain/CIDR lists are
+published as separate Garasu-owned remote rule providers on GitHub.
+Client caches and successful remote downloads are required for the full policy.
 Mobile Xray-compatible formats use Garasu's paired GeoSite/GeoIP snapshot.
 """
 from __future__ import annotations
@@ -24,6 +25,8 @@ HAPP = "release/happ/config.json"
 XRAY = "release/xray/config.json"
 TARGETS = (MIHOMO, STASH, SHADOW, SINGBOX, INCY, HAPP, XRAY)
 GEO_BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/geo/"
+PROVIDERS_BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/"
+SINGBOX_BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/"
 
 
 def _domains(root: Path, filename: str) -> list[str]:
@@ -94,9 +97,9 @@ def _private_rules(p: dict) -> list[str]:
 
 
 def native_rules(p: dict, group: str) -> list[str]:
-    # Top-to-bottom priority: private, ads, explicit VPN, blocked snapshot,
-    # Russian domestic, foreign fallback to VPN. Nothing downloads at boot.
-    result = ["# GARASU SPLIT: offline RKN before RU, foreign -> VPN."]
+    # Top-to-bottom priority: private, ads, explicit VPN, blocked sources,
+    # Russian domestic, foreign fallback to VPN. Remote sets must load first.
+    result = ["# GARASU SPLIT: remote RKN before RU, foreign -> VPN."]
     result += _private_rules(p)
     result += ["RULE-SET,ads,REJECT"]
     result += ["RULE-SET," + category + "," + group for category in
@@ -109,13 +112,7 @@ def native_rules(p: dict, group: str) -> list[str]:
     return result
 
 
-def render_yaml(src: str, p: dict) -> str:
-    marker = "\nrule-providers:\n"
-    if marker not in src or "\nrules:\n" not in src:
-        raise ValueError("Invalid Remnawave YAML template")
-    prefix = src.split(marker, 1)[0].rstrip("\n")
-    if prefix.count("proxies: # LEAVE THIS LINE!") < 2:
-        raise ValueError("Missing Remnawave node injection markers")
+def provider_sets(p: dict) -> dict[str, tuple[str, list[str]]]:
     groups = {"ads": ("domain", p["_ads_domains"]),
               "rkn-domains": ("domain", p["_rkn_domains"]),
               "rkn-ips": ("ipcidr", p["_rkn_ips"]),
@@ -123,14 +120,55 @@ def render_yaml(src: str, p: dict) -> str:
               "ru-ips": ("ipcidr", p["_ru_ips"])}
     for name, domains in p["_proxy_domains"].items():
         groups[name] = ("domain", domains)
-    parts = [prefix, "", "rule-providers:"]
-    for key, (behavior, values) in groups.items():
-        parts.extend(["  " + key + ":", "    type: inline",
-                      "    behavior: " + behavior, "    payload:"])
+    return groups
+
+
+def provider_artifacts(p: dict) -> dict[str, str]:
+    """Exact policy data: same ten sets for Mihomo, Stash and sing-box."""
+    out = {}
+    for key, (behavior, values) in provider_sets(p).items():
         if behavior == "domain":
-            parts.extend("      - '+." + value + "'" for value in values)
+            text = "\n".join("+." + v for v in values) + "\n"
         else:
-            parts.extend("      - '" + value + "'" for value in values)
+            text = "\n".join(values) + "\n"
+        out[f"release/providers/{key}.txt"] = text
+        source = {
+            "version": 3,
+            "rules": [{"domain_suffix" if behavior == "domain" else "ip_cidr": values}]
+        }
+        out[f"release/singbox/rules/{key}.json"] = (
+            json.dumps(source, ensure_ascii=False, separators=(",", ":")) + "\n")
+    return out
+
+
+def render_yaml(src: str, p: dict, *, stash: bool = False) -> str:
+    marker = "\nrule-providers:\n"
+    if marker not in src or "\nrules:\n" not in src:
+        raise ValueError("Invalid Remnawave YAML template")
+    prefix = src.split(marker, 1)[0].rstrip("\n")
+    if prefix.count("proxies: # LEAVE THIS LINE!") < 2:
+        raise ValueError("Missing Remnawave node injection markers")
+    prefix = prefix.replace(
+        "Native inline domain/ipcidr rule sets; no GitHub bootstrap at cold start.",
+        "Remote Garasu rule sets; cache and first-download required.")
+    prefix = prefix.replace(
+        "No Moscow proxy chain. RKN/RU lists are embedded in the subscription; regenerate to update.",
+        "No Moscow chain. Rules downloaded from canonical Garasu GitHub providers.")
+    parts = [prefix, "", "rule-providers:"]
+    for key, (behavior, _) in provider_sets(p).items():
+        parts.extend([
+            f"  {key}:",
+            "    behavior: " + behavior,
+            "    format: text",
+            "    url: " + PROVIDERS_BASE + key + ".txt",
+            "    interval: 21600",
+            "    path: ./rule-providers/garasu-" + key + ".txt",
+        ])
+        if not stash:
+            parts.extend([
+                "    type: http",
+                "    proxy: Garasu Auto",
+            ])
     parts.extend(["", "rules:"])
     for rule in native_rules(p, "Garasu"):
         parts.append("  " + rule if rule.startswith("#") else "  - " + rule)
@@ -142,32 +180,48 @@ def render_shadow(src: str, p: dict) -> str:
     if marker not in src:
         raise ValueError("Missing Shadowrocket native section")
     prefix = src.split(marker, 1)[0]
-    out = ["# GARASU SPLIT: all blocked RU exceptions embedded."]
+    prefix = prefix.replace("Shadowrocket managed routing profile.",
+                            "Shadowrocket remote Garasu routing profile.")
+    out = ["# GARASU SPLIT: remote provider lists; cache required."]
     out += _private_rules(p)
-    out += ["DOMAIN-SUFFIX," + x + ",REJECT" for x in p["_ads_domains"]]
-    for category in ("rkn-domains", "youtube", "discord", "ai", "crypto", "proxy"):
-        domains = p["_rkn_domains"] if category == "rkn-domains" else p["_proxy_domains"][category]
-        out += ["DOMAIN-SUFFIX," + x + ",PROXY" for x in domains]
-    out += ["IP-CIDR," + x + ",PROXY,no-resolve" for x in
-            p["_rkn_ips"] + p["_proxy_ips"]]
+    for key in provider_sets(p):
+        if key == "ads":
+            out.append("DOMAIN-SET," + PROVIDERS_BASE + key + ".txt,REJECT")
+        elif key in ("rkn-ips", "proxy-ips", "ru-ips"):
+            action = "DIRECT" if key == "ru-ips" else "PROXY"
+            out.append("RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/" +
+                       key + ".list," + action)
+        elif key != "ru-ips":
+            out.append("DOMAIN-SET," + PROVIDERS_BASE + key + ".txt,PROXY")
     out += ["DOMAIN-SUFFIX," + x + ",DIRECT" for x in
             p["critical_ru_direct_domains"] + p["russian_tlds"]]
-    out += ["IP-CIDR," + x + ",DIRECT,no-resolve" for x in p["_ru_ips"]]
-    out += ["FINAL,PROXY,dns-failed"]
+    # Place RU IP DIRECT after all blocked IP providers and domain exceptions.
+    ru = "RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.list,DIRECT"
+    out.remove(ru)
+    out.append(ru)
+    out.append("FINAL,PROXY,dns-failed")
     return prefix + marker + "\n".join(out) + "\n"
 
 
 def route_singbox(cfg: dict, p: dict) -> dict:
-    def inline(tag: str, key: str, values: list[str]) -> dict:
-        return {"type": "inline", "tag": "garasu-" + tag,
-                "rules": [{key: values}]}
-    sets = [inline("ads", "domain_suffix", p["_ads_domains"]),
-            inline("rkn-domains", "domain_suffix", p["_rkn_domains"]),
-            inline("rkn-ips", "ip_cidr", p["_rkn_ips"]),
-            inline("proxy-ips", "ip_cidr", p["_proxy_ips"]),
-            inline("ru-ips", "ip_cidr", p["_ru_ips"])]
-    for name, domains in p["_proxy_domains"].items():
-        sets.append(inline(name, "domain_suffix", domains))
+    cfg["route"]["rule_set"] = [
+        {
+            "type": "remote",
+            "tag": "garasu-" + key,
+            "format": "source",
+            "url": SINGBOX_BASE + key + ".json",
+            "update_interval": "6h",
+            "http_client": "garasu-rules",
+        }
+        for key in provider_sets(p)
+    ]
+    # The existing http_clients tag is required for sing-box >= 1.14.
+    clients = [item for item in cfg.get("http_clients", [])
+               if item.get("tag") == "garasu-rules"]
+    if len(clients) != 1:
+        raise ValueError("Missing dedicated sing-box HTTP downloader")
+    clients[0]["detour"] = "→ Remnawave"
+    cfg["route"]["default_http_client"] = "garasu-rules"
     routes = [{"action": "sniff"}, {"protocol": "dns", "action": "hijack-dns"},
               {"domain_suffix": p["private_domains"], "outbound": "direct"},
               {"ip_cidr": p["private_ipv4"] + p["private_ipv6"], "outbound": "direct"},
@@ -179,9 +233,9 @@ def route_singbox(cfg: dict, p: dict) -> dict:
                    {"domain_suffix": p["russian_tlds"], "outbound": "direct"},
                    {"rule_set": ["garasu-ru-ips"], "outbound": "direct"}])
     cfg["route"]["rules"] = routes
-    cfg["route"]["rule_set"] = sets
     cfg["route"]["final"] = "→ Remnawave"
     dns = cfg.get("dns", {})
+    dns.pop("independent_cache", None)  # Deprecated as of sing-box 1.14.
     dns["rules"] = [
         {"domain_suffix": p["private_domains"], "action": "route", "server": "local"},
         {"domain_suffix": p["critical_ru_direct_domains"] + p["russian_tlds"],
@@ -219,7 +273,7 @@ def route_xray(cfg: dict, p: dict) -> dict:
          "outboundTag": "direct"},
         {"type": "field", "ip": p["private_ipv4"] + p["private_ipv6"],
          "outboundTag": "direct"},
-        {"type": "field", "domain": ["domain:" + x for x in p["_ads_domains"]],
+        {"type": "field", "domain": ["geosite:garasu-ads"],
          "outboundTag": "block"},
         {"type": "field", "domain": ["geosite:banned-ru", "geosite:youtube",
                                       "geosite:discord", "geosite:ai", "geosite:crypto"],
@@ -235,13 +289,31 @@ def route_xray(cfg: dict, p: dict) -> dict:
     return cfg
 
 
+def offline_mihomo_fixture(config: dict, root: Path) -> dict:
+    """Offline tests use VERIFIED local source sets; production stays HTTP-based."""
+    import copy
+    cfg = copy.deepcopy(config)
+    for key, item in cfg["rule-providers"].items():
+        expected = PROVIDERS_BASE + key + ".txt"
+        if item.get("type") != "http" or item.get("url") != expected or item.get("format") != "text":
+            raise ValueError("Unrecognized remote Garasu provider: " + key)
+        text = (root / "release/providers" / (key + ".txt")).read_text()
+        payload = [line for line in text.splitlines() if line and not line.startswith("#")]
+        if not payload:
+            raise ValueError("Empty remote rule provider: " + key)
+        cfg["rule-providers"][key] = {
+            "type": "inline", "behavior": item["behavior"], "payload": payload
+        }
+    return cfg
+
+
 def expected(root: Path) -> dict[str, str]:
     p = load_policy(root)
-    out = {}
+    out = provider_artifacts(p)
     for name in TARGETS:
         old = (root / name).read_text(encoding="utf-8")
         if name in (MIHOMO, STASH):
-            out[name] = render_yaml(old, p)
+            out[name] = render_yaml(old, p, stash=(name == STASH))
         elif name == SHADOW:
             out[name] = render_shadow(old, p)
         else:
@@ -286,6 +358,7 @@ def main() -> None:
     for name, data in rendered.items():
         target = root / name
         if args.write:
+            target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(data, encoding="utf-8")
             print("GENERATED", name, len(data))
         elif target.read_text(encoding="utf-8") != data:

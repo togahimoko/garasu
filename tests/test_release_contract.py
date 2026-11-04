@@ -147,7 +147,7 @@ class NativeReleaseContract(unittest.TestCase):
         self.assertTrue(self._match(test[1], "garasu-test-mihomo/1.0"))
         self.assertFalse(self._match(test[1], "mihomo/1.0"))
         self.assertEqual(test[1]["responseModifications"]["subscriptionTemplate"],
-                         "Garasu")
+                         "Default")
         self.assertEqual(test[-1]["responseType"], "XRAY_BASE64")
 
 

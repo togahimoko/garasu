@@ -28,13 +28,14 @@ def run(title: str, argv: list[str], *, env=None) -> None:
 
 
 def check_native(core: Path) -> None:
-    """Test actual binary MRS compilation and 0/1/2/5 synthetic node configs."""
+    """Test binary MRS and 0/1/2/5 nodes with locally loaded provider fixtures."""
     try:
         import yaml
     except ImportError as exc:
         raise RuntimeError("Native QA requires PyYAML") from exc
 
     from scripts.verify_release import digest, json_file
+    from scripts.sync_universal_routing import offline_mihomo_fixture
     release = json_file(ROOT, "release/mihomo/.mrs/manifest.json")
     with tempfile.TemporaryDirectory(prefix="garasu-native-qa-") as directory:
         tmp = Path(directory)
@@ -68,18 +69,13 @@ def check_native(core: Path) -> None:
                 proxy["name"] for proxy in cfg["proxies"]
             ]
             auto["proxies"] = []
-            # RKN and RU must be in the same self-contained subscription:
-            # missing GitHub Raw cannot leave broad RU DIRECT unguarded.
-            providers = cfg["rule-providers"]
-            required = {"ads", "rkn-domains", "rkn-ips", "ru-ips",
-                        "proxy-ips", "youtube", "discord", "ai", "crypto", "proxy"}
-            if set(providers) != required or any(
-                    item.get("type") != "inline" for item in providers.values()):
-                raise RuntimeError("A split-routing provider is missing or remote")
-            if (len(providers["rkn-domains"]["payload"]) < 10000 or
-                    len(providers["rkn-ips"]["payload"]) < 20000 or
-                    len(providers["ru-ips"]["payload"]) < 20000):
-                raise RuntimeError("Incomplete self-contained RKN/RU snapshot")
+            # Offline native syntax testing: substitute local exact rule data
+            # for HTTP providers. Production YAML remains remote and small.
+            cfg = offline_mihomo_fixture(cfg, ROOT)
+            if (len(cfg["rule-providers"]["rkn-domains"]["payload"]) < 10000 or
+                    len(cfg["rule-providers"]["rkn-ips"]["payload"]) < 20000 or
+                    len(cfg["rule-providers"]["ru-ips"]["payload"]) < 20000):
+                raise RuntimeError("Incomplete local source snapshot")
             cfg["mixed-port"] = 18000 + count
             path = tmp / (f"synthetic-{count}.yaml")
             path.write_text(yaml.safe_dump(cfg, allow_unicode=True),
@@ -89,12 +85,49 @@ def check_native(core: Path) -> None:
         print("PASS native Mihomo validation", flush=True)
 
 
+def check_singbox_native(core: Path) -> None:
+    """Validate sing-box 1.14 native schema with exact locally published sources."""
+    import json
+    from scripts.sync_universal_routing import SINGBOX_BASE
+
+    cfg = json.loads((ROOT / "release/singbox/config.json").read_text())
+    if len(cfg["route"]["rule_set"]) != 10:
+        raise RuntimeError("Unexpected sing-box provider count")
+    for item in cfg["route"]["rule_set"]:
+        name = item["tag"].removeprefix("garasu-")
+        path = ROOT / "release/singbox/rules" / (name + ".json")
+        if (item.get("type"), item.get("format"), item.get("url")) != (
+                "remote", "source", SINGBOX_BASE + name + ".json"):
+            raise RuntimeError("Unrecognized sing-box remote rule-set: " + name)
+        item.clear()
+        item.update({"type": "local", "tag": "garasu-" + name,
+                     "format": "source", "path": str(path)})
+
+    # No real node credentials or network services are ever used by this check.
+    cfg["outbounds"].append({
+        "type": "socks", "tag": "OFFLINE_TEST_NODE",
+        "server": "127.0.0.1", "server_port": 19080, "version": "5"
+    })
+    group = next(x for x in cfg["outbounds"] if x["tag"] == "→ Remnawave")
+    group["outbounds"] = ["OFFLINE_TEST_NODE"]
+    for item in cfg["http_clients"]:
+        if item["tag"] == "garasu-rules":
+            item["detour"] = "OFFLINE_TEST_NODE"
+    with tempfile.TemporaryDirectory(prefix="garasu-singbox-native-") as directory:
+        dest = Path(directory) / "singbox.json"
+        dest.write_text(json.dumps(cfg, ensure_ascii=False), encoding="utf-8")
+        run("sing-box native 1.14 schema + ten source rule-sets",
+            [str(core), "check", "-c", str(dest)])
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--branch", choices=("main", "dev"), default="main",
                         help="Branch expected inside release URLs")
     parser.add_argument("--core", type=Path,
                         help="Optional local Mihomo binary for native offline tests")
+    parser.add_argument("--singbox-core", type=Path,
+                        help="Optional sing-box 1.14 binary for native source-format checks")
     args = parser.parse_args()
     env = os.environ.copy()
     env["PYTHONPATH"] = str(ROOT) + os.pathsep + env.get("PYTHONPATH", "")
@@ -130,6 +163,11 @@ def main() -> None:
         run("Native offline DIRECT / PROXY / REJECT routing",
             [PYTHON, "scripts/smoke_universal_mihomo.py", "--core", str(core)],
             env=env)
+    if args.singbox_core:
+        binary = args.singbox_core.expanduser().resolve()
+        if not binary.is_file():
+            parser.error("sing-box binary not found: " + str(binary))
+        check_singbox_native(binary)
     print("\nPASS Garasu release quality gate", flush=True)
 
 

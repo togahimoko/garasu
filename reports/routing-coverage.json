@@ -940,5 +940,5 @@
   },
   "non_ru_disagreements": 0,
   "non_ru_examples": [],
-  "ru_direct_without_provider_guard": false
+  "ru_direct_without_provider_guard": true
 }

@@ -104,6 +104,7 @@ def _yaml_checks(body):
     """Only non-sensitive booleans leave this function; never return node data."""
     providers, groups, rule_lines, blocks = set(), set(), [], []
     provider_types = {}
+    provider_urls = {}
     section, fields = None, None
     current_provider = None
     for line in body.decode("utf-8", errors="replace").splitlines():
@@ -137,10 +138,13 @@ def _yaml_checks(body):
                 if name:
                     providers.add(name.group(1))
                     current_provider = name.group(1)
-                elif re.match(r"^    type:\s*(\S+)", line):
-                    kind = re.match(r"^    type:\s*(\S+)", line).group(1)
-                    if current_provider in providers:
-                        provider_types[current_provider] = kind
+                else:
+                    kind = re.match(r"^    type:\s*(\S+)", line)
+                    url = re.match(r"^    url:\s*(\S+)", line)
+                    if kind and current_provider in providers:
+                        provider_types[current_provider] = kind.group(1)
+                    if url and current_provider in providers:
+                        provider_urls[current_provider] = url.group(1)
         elif section == "rules" and re.match(r"^  -\s+", line):
             rule_lines.append(line.split("- ", 1)[1].strip().strip("'\""))
     if fields is not None:
@@ -156,9 +160,12 @@ def _yaml_checks(body):
     return {
         "personal_node_shapes_valid": len(blocks) >= 2 and all(required <= b for b in blocks),
         "garasu_provider_set_valid": providers == EXPECTED_GARASU_PROVIDERS,
-        "garasu_providers_inline": (
+        "garasu_providers_remote": (
             providers == EXPECTED_GARASU_PROVIDERS
-            and all(provider_types.get(name) == "inline" for name in providers)
+            and all(provider_types.get(name) == "http"
+                    and provider_urls.get(name) ==
+                    "https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/"
+                    + name + ".txt" for name in providers)
         ),
         "garasu_route_order_valid": (
             {"Garasu", "Garasu Auto"} <= groups

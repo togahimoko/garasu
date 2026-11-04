@@ -75,51 +75,46 @@ def yaml_route(domain: str, rules: list[str],
 
 
 def shadow_rules(root: Path) -> list[str]:
-    # Shadowrocket contains actual inline RKN and advertisement exceptions.
-    # The report compresses those validated blocks to equivalent set matches.
-    from scripts.sync_universal_routing import load_policy
+    """Normalize remote Shadowrocket links for static domain policy parity."""
+    from scripts.sync_universal_routing import PROVIDERS_BASE, provider_sets, load_policy
     p = load_policy(root)
-    text = (root / "release/shadowrocket/config.conf").read_text()
-    lines = text.split("[Rule]", 1)[1].splitlines()
-    rules = []
-    inline_ads = []
-    proxy_domains = []
-    proxy_ips = []
-    reject_seen = False
-    proxy_seen = False
-    for line in lines:
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if line.startswith("DOMAIN-SUFFIX,") and line.endswith(",REJECT"):
-            inline_ads.append(line.split(",")[1])
-            if not reject_seen:
-                rules.append("RULE-SET,ads,REJECT")
-                reject_seen = True
-            continue
-        if line.startswith("DOMAIN-SUFFIX,") and line.endswith(",PROXY"):
-            proxy_domains.append(line.split(",")[1])
-            if not proxy_seen:
-                rules.extend("RULE-SET," + name + ",Garasu" for name in
-                             ("rkn-domains", "youtube", "discord", "ai", "crypto", "proxy"))
-                proxy_seen = True
-            continue
-        if line.startswith("IP-CIDR,") and line.split(",")[2] == "PROXY":
-            proxy_ips.append(line.split(",")[1])
-            continue
-        if line.startswith("IP-CIDR,") and line.split(",")[2] == "DIRECT":
-            continue
-        if line.startswith("FINAL,"):
-            rules.append("MATCH," + line.split(",")[1])
+    expected = set(provider_sets(p))
+    content = (root / "release/shadowrocket/config.conf").read_text()
+    entries = [line.strip() for line in content.split("[Rule]", 1)[1].splitlines()
+               if line.strip() and not line.lstrip().startswith("#")]
+    rules, found = [], []
+    for line in entries:
+        parts = line.split(",")
+        if parts[0] == "DOMAIN-SET":
+            host, target = parts[1], parts[2]
+            if not host.startswith(PROVIDERS_BASE) or not host.endswith(".txt"):
+                raise ValueError("Unexpected remote Shadowrocket domain source: " + host)
+            name = host.removeprefix(PROVIDERS_BASE).removesuffix(".txt")
+            if name not in expected or name in ("rkn-ips", "proxy-ips", "ru-ips"):
+                raise ValueError("Unknown Shadowrocket domain source: " + name)
+            rules.append("RULE-SET," + name + "," +
+                         ("REJECT" if target == "REJECT" else "Garasu"))
+            found.append(name)
+        elif parts[0] == "RULE-SET":
+            if len(parts) != 3:
+                raise ValueError("Malformed remote Shadowrocket IP rule")
+            import re
+            hit = re.search(r"/main/rules/(rkn-ips|proxy-ips|ru-ips)\.list$",parts[1])
+            if not hit:
+                raise ValueError("Unexpected remote Shadowrocket IP source: "+parts[1])
+            name=hit.group(1)
+            rules.append("RULE-SET,"+name+","+
+                         ("DIRECT" if parts[2]=="DIRECT" else "Garasu"))
+            found.append(name)
+        elif line.startswith("FINAL,"):
+            rules.append("MATCH,Garasu")
         else:
             rules.append(line)
-    expected_domains = p["_rkn_domains"] + [
-        item for name in ("youtube", "discord", "ai", "crypto", "proxy")
-        for item in p["_proxy_domains"][name]]
-    if (inline_ads != p["_ads_domains"]
-            or proxy_domains != expected_domains
-            or proxy_ips != p["_rkn_ips"] + p["_proxy_ips"]):
-        raise ValueError("Shadowrocket inline rules differ from exact source snapshot")
+    if set(found)!=expected or len(found)!=len(expected):
+        raise ValueError("Remote Shadowrocket provider set is incomplete or duplicated")
+    if (rules.index("RULE-SET,rkn-domains,Garasu") >=
+        rules.index("DOMAIN-SUFFIX,ru,DIRECT")):
+        raise ValueError("Shadowrocket RU DIRECT bypasses blocked set")
     return rules
 
 
@@ -248,8 +243,9 @@ def markdown(result: dict) -> str:
         "## Отказоустойчивость",
         "",
         "В Garasu российские домены и IP идут напрямую только ПОСЛЕ",
-        "встроенного полного списка RKN-исключений, относящихся к DIRECT.",
-        "Mihomo/Stash не зависят от скачивания rule-provider при холодном старте.",
+        "удалённых списков RKN-исключений, относящихся к DIRECT.",
+        "Холодный старт требует успешной загрузки либо кэша всех провайдеров.",
+        "При недоступном GitHub без кэша маршрутизация не считается проверенной.",
         "На мобильных INCY/Happ используется согласованная пара GeoSite/GeoIP;",
         "её доступность и работу на конкретном устройстве необходимо проверять.",
         "",

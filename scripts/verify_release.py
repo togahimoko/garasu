@@ -114,8 +114,7 @@ def verify_links(root: Path, target_branch: str) -> int:
     for rel in ("release/mihomo/config.yaml", "release/stash/config.yaml",
                 "release/shadowrocket/config.conf", "release/remnawave/srr.json"):
         text = (root / rel).read_text(encoding="utf-8")
-        # The universal profile can be fully self-contained: no remote
-        # release URL is required inside Mihomo/Stash YAML.
+        # The production profile must use canonical remote providers.
         if "raw.githubusercontent.com/togahimoko/garasu/" in text:
             require("/" + target_branch + "/release/" in text,
                     "Canonical release points to wrong branch: " + rel)

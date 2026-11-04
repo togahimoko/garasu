@@ -66,7 +66,7 @@ class NativeReleaseContract(unittest.TestCase):
                 self.assertNotIn("DIRECT", select["proxies"])
                 self.assertEqual(data["rules"][-1], "MATCH,Garasu")
 
-    def test_single_universal_policy_has_no_remote_bootstrap(self):
+    def test_single_universal_policy_uses_remote_provider_links(self):
         rules = self.mihomo["rules"]
         self.assertLess(rules.index("RULE-SET,ads,REJECT"),
                         rules.index("DOMAIN-SUFFIX,sberbank.ru,DIRECT"))
@@ -78,10 +78,12 @@ class NativeReleaseContract(unittest.TestCase):
                         rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
         self.assertEqual(rules[-1], "MATCH,Garasu")
         providers = self.mihomo["rule-providers"]
-        self.assertTrue(all(p["type"] == "inline" for p in providers.values()))
-        self.assertGreater(len(providers["rkn-domains"]["payload"]), 10000)
-        self.assertGreater(len(providers["rkn-ips"]["payload"]), 20000)
-        self.assertGreater(len(providers["ru-ips"]["payload"]), 20000)
+        self.assertEqual(len(providers), 10)
+        self.assertTrue(all(p["type"] == "http" and p["format"] == "text"
+                            and "payload" not in p for p in providers.values()))
+        self.assertTrue(all(p["url"].startswith(
+            "https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/")
+                            for p in providers.values()))
         self.assertEqual(self.mihomo["dns"]["proxy-server-nameserver"],
                          ["system"])
 

@@ -31,7 +31,7 @@
       ],
       "responseType": "MIHOMO",
       "responseModifications": {
-        "subscriptionTemplate": "Garasu"
+        "subscriptionTemplate": "Default"
       }
     },
     {
@@ -85,7 +85,7 @@
       ],
       "responseType": "MIHOMO",
       "responseModifications": {
-        "subscriptionTemplate": "Garasu"
+        "subscriptionTemplate": "Default"
       }
     },
     {

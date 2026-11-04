@@ -53,6 +53,22 @@ def expected_files(root=ROOT):
 
     manifest = json.loads((root / "install/manifest.json").read_text(encoding="utf-8"))
     output = {}
+    # Legacy public URLs must not leak old manual selectors or text providers.
+    # Keep the exact native template at each compatibility path.
+    aliases = {
+        "clients/mihomo-remnawave.yaml": "release/mihomo/config.yaml",
+        "clients/stash-remnawave.yaml": "release/stash/config.yaml",
+        "clients/singbox-remnawave.json": "release/singbox/config.json",
+        "clients/singbox-remnawave-1.14.json": "release/singbox/config.json",
+        "clients/shadowrocket.conf": "release/shadowrocket/config.conf",
+    }
+    for legacy, current in aliases.items():
+        blob = (root / current).read_bytes()
+        output[legacy] = blob
+        if legacy in manifest["files"]:
+            manifest["files"][legacy]["sha256"] = sha(blob)
+            manifest["files"][legacy]["bytes"] = len(blob)
+
     for app, profile in mobile.items():
         key = "clients/" + app + ".json"
         blob = encoded(profile)

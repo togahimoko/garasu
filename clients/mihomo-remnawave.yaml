@@ -1,6 +1,9 @@
-# Garasu MAX | Remnawave Mihomo template (not a standalone subscription).
+# Garasu | Remnawave Mihomo subscription template.
+# One automatic Garasu route; no manual selectors.
+# Subscriber nodes are injected by Remnawave, not committed to GitHub.
+# TUN lifecycle belongs to the client GUI: never force-toggle an existing session.
 # Import as MIHOMO TEMPLATE in Remnawave; Remnawave injects each user's nodes.
-# No Moscow proxy chain. Geo/RKN lists auto-update from Garasu GitHub.
+# No Moscow chain. Rules downloaded from canonical Garasu GitHub providers.
 mode: rule
 # Clash Verge Rev default local HTTP/SOCKS listener. The GUI system proxy
 # must point to this same port; change it there if already occupied.
@@ -11,7 +14,7 @@ ipv6: false
 unified-delay: true
 tcp-concurrent: true
 profile:
-  store-selected: false
+  store-selected: true
   store-fake-ip: true
 dns:
   enable: true
@@ -24,7 +27,7 @@ dns:
     - https://dns.google/dns-query
     - https://cloudflare-dns.com/dns-query
   # Resolve Remnawave-provided node endpoints without depending on proxy DoH bootstrap.
-  # This is a canary fallback to the local system resolver; test on real ISPs.
+  # Bootstrap uses the system resolver; verify on actual client networks.
   proxy-server-nameserver:
     - system
   # DIRECT destinations should resolve using the local network resolver.
@@ -48,16 +51,9 @@ dns:
 proxies: # LEAVE THIS LINE!
 
 proxy-groups:
+  # One automatic route for any number of available nodes. No manual selectors.
   - name: Garasu
-    type: select
-    proxies:
-      - Garasu Auto
-    remnawave:
-      include-proxies: false
-  - name: Garasu Auto
     type: url-test
-    # All subscriber nodes, irrespective of their country or name.
-    # Switch to another healthy node when the current node fails.
     url: https://cp.cloudflare.com/generate_204
     interval: 180
     tolerance: 150
@@ -65,125 +61,100 @@ proxy-groups:
     timeout: 8000
     max-failed-times: 2
     expected-status: 204
-    # Do not resolve an empty subscriber pool as implicit DIRECT.
     empty-fallback: REJECT
     include-all: true
-    remnawave:
-      include-proxies: false
     proxies: # LEAVE THIS LINE!
-      # Personal nodes are selected automatically by include-all.
+      # All available nodes are selected automatically.
+
 rule-providers:
-  rkn-domains:
-    type: http
-    behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-domains.list
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-rkn-domains.list
-    interval: 21600
-  youtube:
-    type: http
-    behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/youtube.list
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-youtube.list
-    interval: 21600
-  discord:
-    type: http
-    behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/discord.list
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-discord.list
-    interval: 21600
-  ai:
-    type: http
-    behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ai.list
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-ai.list
-    interval: 21600
-  crypto:
-    type: http
-    behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/crypto.list
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-crypto.list
-    interval: 21600
-  proxy:
-    type: http
-    behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy.list
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-proxy.list
-    interval: 21600
   ads:
-    type: http
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ads.list
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-ads.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ads.mrs
     interval: 21600
-  games:
+    path: ./rule-providers/garasu-ads.mrs
     type: http
+    proxy: Garasu
+  rkn-domains:
     behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/games.list
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-games.list
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/rkn-domains.mrs
     interval: 21600
-  direct:
+    path: ./rule-providers/garasu-rkn-domains.mrs
     type: http
-    behavior: domain
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct.list
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-direct.list
-    interval: 21600
+    proxy: Garasu
   rkn-ips:
-    type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-ips.cidr
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-rkn-ips.cidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/rkn-ips.mrs
     interval: 21600
+    path: ./rule-providers/garasu-rkn-ips.mrs
+    type: http
+    proxy: Garasu
   proxy-ips:
-    type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/proxy-ips.cidr
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-proxy-ips.cidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/proxy-ips.mrs
     interval: 21600
-  direct-ips:
+    path: ./rule-providers/garasu-proxy-ips.mrs
     type: http
-    behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/direct-ips.cidr
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-direct-ips.cidr
-    interval: 21600
+    proxy: Garasu
   ru-ips:
-    type: http
     behavior: ipcidr
-    format: text
-    url: https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.cidr
-    proxy: Garasu Auto
-    path: ./rule-providers/garasu-ru-ips.cidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ru-ips.mrs
     interval: 21600
+    path: ./rule-providers/garasu-ru-ips.mrs
+    type: http
+    proxy: Garasu
+  youtube:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/youtube.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-youtube.mrs
+    type: http
+    proxy: Garasu
+  discord:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/discord.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-discord.mrs
+    type: http
+    proxy: Garasu
+  ai:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ai.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-ai.mrs
+    type: http
+    proxy: Garasu
+  crypto:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/crypto.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-crypto.mrs
+    type: http
+    proxy: Garasu
+  proxy:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/proxy.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-proxy.mrs
+    type: http
+    proxy: Garasu
+
 rules:
-  # Private destinations must not fall through to the Czech proxy, even
-  # before DNS or remote rule providers become available.
+  # GARASU SPLIT: remote RKN before RU, foreign -> VPN.
   - DOMAIN-SUFFIX,localhost,DIRECT
   - DOMAIN-SUFFIX,local,DIRECT
   - DOMAIN-SUFFIX,lan,DIRECT
   - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - DOMAIN-SUFFIX,arpa,DIRECT
   - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
   - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
   - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
@@ -193,21 +164,37 @@ rules:
   - IP-CIDR6,::1/128,DIRECT,no-resolve
   - IP-CIDR6,fc00::/7,DIRECT,no-resolve
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
+  - RULE-SET,ads,REJECT
   - RULE-SET,rkn-domains,Garasu
-  - RULE-SET,rkn-ips,Garasu
   - RULE-SET,youtube,Garasu
   - RULE-SET,discord,Garasu
   - RULE-SET,ai,Garasu
   - RULE-SET,crypto,Garasu
   - RULE-SET,proxy,Garasu
-  - RULE-SET,proxy-ips,Garasu
-  - RULE-SET,ads,REJECT
-  - GEOIP,LAN,DIRECT,no-resolve
+  - RULE-SET,rkn-ips,Garasu,no-resolve
+  - RULE-SET,proxy-ips,Garasu,no-resolve
+  - DOMAIN-SUFFIX,2gis.ru,DIRECT
+  - DOMAIN-SUFFIX,alfabank.ru,DIRECT
+  - DOMAIN-SUFFIX,avito.ru,DIRECT
+  - DOMAIN-SUFFIX,cbr.ru,DIRECT
+  - DOMAIN-SUFFIX,gosuslugi.ru,DIRECT
+  - DOMAIN-SUFFIX,nalog.gov.ru,DIRECT
+  - DOMAIN-SUFFIX,ozon.ru,DIRECT
+  - DOMAIN-SUFFIX,pochta.ru,DIRECT
+  - DOMAIN-SUFFIX,sber.ru,DIRECT
+  - DOMAIN-SUFFIX,sberbank.ru,DIRECT
+  - DOMAIN-SUFFIX,tbank.ru,DIRECT
+  - DOMAIN-SUFFIX,tinkoff.ru,DIRECT
+  - DOMAIN-SUFFIX,vk.com,DIRECT
+  - DOMAIN-SUFFIX,vtb.ru,DIRECT
+  - DOMAIN-SUFFIX,wildberries.ru,DIRECT
+  - DOMAIN-SUFFIX,ya.ru,DIRECT
+  - DOMAIN-SUFFIX,yandex.ru,DIRECT
   - DOMAIN-SUFFIX,ru,DIRECT
   - DOMAIN-SUFFIX,su,DIRECT
-  - DOMAIN-SUFFIX,moscow,DIRECT
   - DOMAIN-SUFFIX,xn--p1ai,DIRECT
   - DOMAIN-SUFFIX,xn--p1acf,DIRECT
+  - DOMAIN-SUFFIX,moscow,DIRECT
   - DOMAIN-SUFFIX,xn--80asehdb,DIRECT
   - DOMAIN-SUFFIX,xn--c1avg,DIRECT
   - DOMAIN-SUFFIX,xn--80aswg,DIRECT

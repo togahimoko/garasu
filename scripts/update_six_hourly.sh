@@ -26,6 +26,8 @@ cd "$WORK_DIR/garasu"
 "$PYTHON" scripts/sync_universal_routing.py --write
 "$PYTHON" scripts/build_binary_assets.py --mihomo-core "$MIHOMO" --singbox-core "$SINGBOX" --write
 "$PYTHON" scripts/sync_public_links.py --write
+# Alias synchronization can update manifest file digests; refresh QA reports.
+"$PYTHON" scripts/audit_rules.py --write
 "$PYTHON" scripts/audit_route_coverage.py --write
 "$PYTHON" scripts/audit_geodata.py --write
 

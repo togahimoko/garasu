@@ -13,6 +13,10 @@ class SixHourlyPublisher(unittest.TestCase):
                       "scripts/build_binary_assets.py", "scripts/qa.py", "git push"):
             self.assertIn(stage, source)
         self.assertLess(source.index("scripts/qa.py"), source.index("git push"))
+        self.assertLess(source.index("scripts/sync_public_links.py"),
+                        source.index("scripts/audit_rules.py --write"))
+        self.assertLess(source.index("scripts/audit_rules.py --write"),
+                        source.index("scripts/qa.py"))
         self.assertIn("GIT_TERMINAL_PROMPT=0", source)
 
     def test_macos_timer_fires_every_six_hours(self):

@@ -26,7 +26,7 @@ Garasu публикует нативные профили маршрутизац
 - INCY/Happ: `release/incy/config.json` и `release/happ/config.json`, нативная политика Xray/geo.
 - Shadowrocket: `release/shadowrocket/config.conf`, отдельная политика при сохранении личной подписки.
 - Xray JSON: `release/xray/config.json`, опциональный шаблон виртуального хоста.
-- Remnawave: `release/remnawave/srr.json` и `srr-test.json`.
+- Remnawave: один рабочий SSR `release/remnawave/srr.json`; второго тестового профиля нет.
 
 Одного универсального файла для всех ядер нет. Remnawave должен выдавать подходящий формат по клиенту, сохраняя персональные узлы и доступы.
 

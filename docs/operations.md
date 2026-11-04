@@ -2,7 +2,7 @@
 
 ## Проверки перед выпуском
 
-Единая команда: `python3 scripts/qa.py --branch main`; с установленным ядром Mihomo: `python3 scripts/qa.py --branch main --core /path/to/mihomo`. Подробный [чек-лист выпуска](release-checklist.md).
+Единая команда: `python3 scripts/qa.py --branch main`; при изменении правил выполнить `python3 scripts/sync_universal_routing.py --write`, затем `python3 scripts/sync_public_links.py --write` для синхронизации production-ссылок, мобильных aliases и манифеста; с установленным ядром Mihomo: `python3 scripts/qa.py --branch main --core /path/to/mihomo`. Подробный [чек-лист выпуска](release-checklist.md).
 
 
 Требуются Python 3.10+ и PyYAML, для проверки Mihomo — актуальное локальное ядро. Работать рекомендуется в отдельной копии репозитория.
@@ -41,11 +41,11 @@ GitHub Actions для обновления и публикации не испо
 Шаблоны в панели должны быть установлены отдельно; коммит в GitHub не меняет шаблоны, хранящиеся в Remnawave.
 
 1. Экспортировать действующие SSR, шаблоны и настройки подписки.
-2. Проверить существующий шаблон MIHOMO `Default` на тестовой подписке; для изолированных испытаний можно создать отдельный `Garasu` и применять только специально подготовленный тестовый SSR. Не указывать в SSR несуществующее имя шаблона.
-3. Проверить выдачу на выделенной тестовой подписке через `release/remnawave/srr-test.json` и User-Agent `garasu-test-mihomo`.
-4. Проверить персональную VLESS/REALITY-нодовую часть, UDP/XUDP, DNS, MRS, маршрутизацию и обновления на фактических устройствах.
-5. Проверить Stash, sing-box, INCY, Happ, Shadowrocket и fallback XRAY_BASE64.
-6. Только после проверки рассматривать `release/remnawave/srr.json`; при проблемах восстановить исходный SSR и шаблоны.
+2. Убедиться, что в панели существуют именованные шаблоны `Default` для MIHOMO, STASH и SINGBOX; SSR сам шаблоны не создаёт.
+3. Использовать только `release/remnawave/srr.json` с реальными User-Agent. Перед внедрением сохранить действующий SSR и проверить ответы существующей авторизованной подписки без изменения её прав.
+4. Проверить персональные VLESS/REALITY-узлы, DNS, TCP, UDP/XUDP, маршрутизацию и обновления на фактических клиентах.
+5. Проверить Stash, sing-box, INCY, Happ, Shadowrocket и fallback XRAY_BASE64. Для Shadowrocket правила устанавливаются отдельно managed-config.
+6. После успешной проверки внедрить production SSR; при проблеме восстановить исходный экспорт. Публикация GitHub сама по себе Remnawave не обновляет.
 
 ## Подключение дополнительной ноды без потери ручного выбора
 

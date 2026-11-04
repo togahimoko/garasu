@@ -18,15 +18,17 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 MIHOMO = "release/mihomo/config.yaml"
 STASH = "release/stash/config.yaml"
+CLASH = "release/clash/config.yaml"
 SHADOW = "release/shadowrocket/config.conf"
 SINGBOX = "release/singbox/config.json"
 INCY = "release/incy/config.json"
 HAPP = "release/happ/config.json"
 XRAY = "release/xray/config.json"
-TARGETS = (MIHOMO, STASH, SHADOW, SINGBOX, INCY, HAPP, XRAY)
+TARGETS = (MIHOMO, STASH, CLASH, SHADOW, SINGBOX, INCY, HAPP, XRAY)
 GEO_BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/geo/"
 PROVIDERS_BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/"
 SINGBOX_BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/"
+CLASH_BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/"
 
 
 def _domains(root: Path, filename: str) -> list[str]:
@@ -134,6 +136,13 @@ def provider_artifacts(p: dict) -> dict[str, str]:
         else:
             text = "\n".join(values) + "\n"
         out[f"release/providers/{key}.txt"] = text
+        # Classic Clash/Premium understands remote YAML payloads, not MRS.
+        # JSON double-quoted strings are valid YAML scalars and never auto-cast.
+        clash_entries = ["payload:"]
+        clash_entries.extend("  - " + json.dumps(
+            ("." + v) if behavior == "domain" else v
+        ) for v in values)
+        out[f"release/clash/providers/{key}.yaml"] = "\n".join(clash_entries) + "\n"
         source = {
             "version": 3,
             "rules": [{"domain_suffix" if behavior == "domain" else "ip_cidr": values}]
@@ -175,6 +184,31 @@ def render_yaml(src: str, p: dict, *, stash: bool = False) -> str:
     for rule in native_rules(p, "Garasu"):
         parts.append("  " + rule if rule.startswith("#") else "  - " + rule)
     return "\n".join(parts) + "\n"
+
+
+
+def render_clash(src: str, p: dict) -> str:
+    marker = "\nrule-providers:\n"
+    if marker not in src or "\nrules:\n" not in src:
+        raise ValueError("Classic Clash template sections missing")
+    prefix = src.split(marker, 1)[0].rstrip("\n")
+    if prefix.count("proxies: # LEAVE THIS LINE!") != 2:
+        raise ValueError("Classic Clash node insertion anchors missing")
+    # No Mihomo-only fields: format=mrs, include-all, remnawave, hidden, etc.
+    output = [prefix, "", "rule-providers:"]
+    for key, (behavior, _) in provider_sets(p).items():
+        output.extend((
+            "  " + key + ":",
+            "    type: http",
+            "    behavior: " + behavior,
+            "    url: " + CLASH_BASE + key + ".yaml",
+            "    path: ./rule-providers/garasu-" + key + ".yaml",
+            "    interval: 21600",
+        ))
+    output.extend(("", "rules:"))
+    for rule in native_rules(p, "Garasu"):
+        output.append("  " + rule if rule.startswith("#") else "  - " + rule)
+    return "\n".join(output) + "\n"
 
 
 def render_shadow(src: str, p: dict) -> str:
@@ -316,6 +350,8 @@ def expected(root: Path) -> dict[str, str]:
         old = (root / name).read_text(encoding="utf-8")
         if name in (MIHOMO, STASH):
             out[name] = render_yaml(old, p, stash=(name == STASH))
+        elif name == CLASH:
+            out[name] = render_clash(old, p)
         elif name == SHADOW:
             out[name] = render_shadow(old, p)
         else:

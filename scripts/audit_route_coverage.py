@@ -147,10 +147,11 @@ def audit(root: Path) -> dict:
     data = get_sets(root)
     mihomo = yaml.safe_load((root / "release/mihomo/config.yaml").read_text())
     stash = yaml.safe_load((root / "release/stash/config.yaml").read_text())
+    clash = yaml.safe_load((root / "release/clash/config.yaml").read_text())
     sing = json.loads((root / "release/singbox/config.json").read_text())
     source = json.loads((root / "install/manifest.json").read_text())
     configs = {"Mihomo": mihomo["rules"], "Stash": stash["rules"],
-               "Shadowrocket": shadow_rules(root)}
+               "Clash": clash["rules"], "Shadowrocket": shadow_rules(root)}
     used = {}
     for name, rules in configs.items():
         used[name] = sorted({line.split(",")[1] for line in rules
@@ -160,7 +161,7 @@ def audit(root: Path) -> dict:
                                for item in sing["route"]["rules"]
                                for name in item.get("rule_set", [])
                                if name.removeprefix("garasu-") in data})
-    clients = ("Mihomo", "Stash", "Shadowrocket", "sing-box")
+    clients = ("Mihomo", "Stash", "Clash", "Shadowrocket", "sing-box")
     def route(client: str, name: str) -> tuple[str, str]:
         if client == "sing-box":
             return singbox_route(name, sing["route"]["rules"], data)
@@ -220,14 +221,14 @@ def markdown(result: dict) -> str:
         "",
         "**Ограничение:** статическая проверка доменов, не моделирует DNS-разрешение, IP, TUN, UDP и реальное соединение.",
         "",
-        "| Набор | Записей | Назначение | Mihomo: не так | Stash | Shadowrocket | sing-box |",
-        "| --- | ---: | --- | ---: | ---: | ---: | ---: |",
+        "| Набор | Записей | Назначение | Mihomo: не так | Stash | Clash | Shadowrocket | sing-box |",
+        "| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: |",
     ]
     for name, item in result["domains"].items():
         header.append("| " + name + " | " + str(item["count"]) + " | " +
                       item["declared_action"] + " | " + " | ".join(
                           str(item["clients"][client]["deviations"]) for client in
-                          ("Mihomo", "Stash", "Shadowrocket", "sing-box")) + " |")
+                          ("Mihomo", "Stash", "Clash", "Shadowrocket", "sing-box")) + " |")
     header.extend(["", "## Наборы, загружаемые, но не используемые для маршрутизации", ""])
     for client, names in result["unused"].items():
         header.append("- " + client + ": " + (", ".join(names) or "—"))

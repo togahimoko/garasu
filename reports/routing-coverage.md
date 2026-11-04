@@ -4,22 +4,23 @@ Upstream: `82d104cde92b271f545e1f61a61b1acd079e0aa7`.
 
 **Ограничение:** статическая проверка доменов, не моделирует DNS-разрешение, IP, TUN, UDP и реальное соединение.
 
-| Набор | Записей | Назначение | Mihomo: не так | Stash | Shadowrocket | sing-box |
-| --- | ---: | --- | ---: | ---: | ---: | ---: |
-| rkn-domains | 75306 | PROXY | 4 | 4 | 4 | 4 |
-| youtube | 176 | PROXY | 0 | 0 | 0 | 0 |
-| discord | 28 | PROXY | 0 | 0 | 0 | 0 |
-| ai | 215 | PROXY | 0 | 0 | 0 | 0 |
-| crypto | 96 | PROXY | 0 | 0 | 0 | 0 |
-| proxy | 154 | PROXY | 0 | 0 | 0 | 0 |
-| ads | 1217 | REJECT | 0 | 0 | 0 | 0 |
-| games | 117 | DIRECT | 116 | 116 | 116 | 116 |
-| direct | 3284 | DIRECT | 3110 | 3110 | 3110 | 3110 |
+| Набор | Записей | Назначение | Mihomo: не так | Stash | Clash | Shadowrocket | sing-box |
+| --- | ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| rkn-domains | 75306 | PROXY | 4 | 4 | 4 | 4 | 4 |
+| youtube | 176 | PROXY | 0 | 0 | 0 | 0 | 0 |
+| discord | 28 | PROXY | 0 | 0 | 0 | 0 | 0 |
+| ai | 215 | PROXY | 0 | 0 | 0 | 0 | 0 |
+| crypto | 96 | PROXY | 0 | 0 | 0 | 0 | 0 |
+| proxy | 154 | PROXY | 0 | 0 | 0 | 0 | 0 |
+| ads | 1217 | REJECT | 0 | 0 | 0 | 0 | 0 |
+| games | 117 | DIRECT | 116 | 116 | 116 | 116 | 116 |
+| direct | 3284 | DIRECT | 3110 | 3110 | 3110 | 3110 | 3110 |
 
 ## Наборы, загружаемые, но не используемые для маршрутизации
 
 - Mihomo: direct, games
 - Stash: direct, games
+- Clash: direct, games
 - Shadowrocket: direct, games
 - sing-box: direct, games
 

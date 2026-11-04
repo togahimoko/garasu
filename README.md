@@ -16,6 +16,7 @@ Remnawave выдаёт пользователю **его собственные 
 | --- | --- |
 | [release/](release/) | Нативные шаблоны клиентов и правила выдачи Remnawave |
 | [release/mihomo/.mrs/](release/mihomo/.mrs/) | 13 бинарных MRS и манифест SHA-256 |
+| [release/clash/](release/clash/) | Отдельный Clash/Premium YAML и 10 удалённых YAML-наборов (21600 с) |
 | [release/providers/](release/providers/) | 10 исходных текстовых списков для компиляции MRS |
 | [release/singbox/rules/](release/singbox/rules/) | 10 бинарных SRS и исходные JSON для sing-box |
 | [rules/](rules/) | Исходные домены, CIDR и экспортные форматы |
@@ -24,6 +25,18 @@ Remnawave выдаёт пользователю **его собственные 
 | [tests/](tests/) | Контрактные проверки конфигураций, маршрутов и выдачи |
 | [clients/](clients/) · [install/](install/) | Совместимость со старыми опубликованными ссылками |
 | [reports/](reports/) | Отчёты проверки наборов правил |
+
+## Пять шаблонов подписки
+
+| Тип в интерфейсе | Канонический файл |
+| --- | --- |
+| Xray JSON | [release/xray/config.json](release/xray/config.json) |
+| Mihomo | [release/mihomo/config.yaml](release/mihomo/config.yaml) |
+| Stash | [release/stash/config.yaml](release/stash/config.yaml) |
+| Singbox | [release/singbox/config.json](release/singbox/config.json) |
+| Clash | [release/clash/config.yaml](release/clash/config.yaml) |
+
+У каждого типа отдельный файл. Одна автоматическая группа Garasu для доступных нод в Clash/Mihomo/Stash/Singbox; крупные правила хранятся только в удалённых наборах. **Classic Clash Premium** использует YAML-провайдеры; формат MRS и VLESS/REALITY — для Mihomo. Xray JSON использует локальную пару GeoSite/GeoIP: автоматическое скачивание этих файлов самим JSON-конфигом не обеспечивается.
 
 ## Проверка качества
 

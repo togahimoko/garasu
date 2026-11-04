@@ -1,0 +1,145 @@
+# Garasu | CLASH (classic) template.
+# One automatic group, compatible YAML rule providers.
+# Never send Mihomo MRS providers to the classic Clash core.
+mode: rule
+mixed-port: 7890
+allow-lan: false
+log-level: warning
+ipv6: false
+dns:
+  enable: true
+  ipv6: false
+  enhanced-mode: fake-ip
+  default-nameserver:
+    - 77.88.8.8
+    - 1.1.1.1
+  nameserver:
+    - 77.88.8.8
+    - 1.1.1.1
+
+proxies: # LEAVE THIS LINE!
+
+proxy-groups:
+  - name: Garasu
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 180
+    tolerance: 150
+    proxies: # LEAVE THIS LINE!
+
+rule-providers:
+  ads:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/ads.yaml
+    path: ./rule-providers/garasu-ads.yaml
+    interval: 21600
+  rkn-domains:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/rkn-domains.yaml
+    path: ./rule-providers/garasu-rkn-domains.yaml
+    interval: 21600
+  rkn-ips:
+    type: http
+    behavior: ipcidr
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/rkn-ips.yaml
+    path: ./rule-providers/garasu-rkn-ips.yaml
+    interval: 21600
+  proxy-ips:
+    type: http
+    behavior: ipcidr
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/proxy-ips.yaml
+    path: ./rule-providers/garasu-proxy-ips.yaml
+    interval: 21600
+  ru-ips:
+    type: http
+    behavior: ipcidr
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/ru-ips.yaml
+    path: ./rule-providers/garasu-ru-ips.yaml
+    interval: 21600
+  youtube:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/youtube.yaml
+    path: ./rule-providers/garasu-youtube.yaml
+    interval: 21600
+  discord:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/discord.yaml
+    path: ./rule-providers/garasu-discord.yaml
+    interval: 21600
+  ai:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/ai.yaml
+    path: ./rule-providers/garasu-ai.yaml
+    interval: 21600
+  crypto:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/crypto.yaml
+    path: ./rule-providers/garasu-crypto.yaml
+    interval: 21600
+  proxy:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/proxy.yaml
+    path: ./rule-providers/garasu-proxy.yaml
+    interval: 21600
+
+rules:
+  # GARASU SPLIT: remote RKN before RU, foreign -> VPN.
+  - DOMAIN-SUFFIX,localhost,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,lan,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - DOMAIN-SUFFIX,arpa,DIRECT
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR6,::1/128,DIRECT,no-resolve
+  - IP-CIDR6,fc00::/7,DIRECT,no-resolve
+  - IP-CIDR6,fe80::/10,DIRECT,no-resolve
+  - RULE-SET,ads,REJECT
+  - RULE-SET,rkn-domains,Garasu
+  - RULE-SET,youtube,Garasu
+  - RULE-SET,discord,Garasu
+  - RULE-SET,ai,Garasu
+  - RULE-SET,crypto,Garasu
+  - RULE-SET,proxy,Garasu
+  - RULE-SET,rkn-ips,Garasu,no-resolve
+  - RULE-SET,proxy-ips,Garasu,no-resolve
+  - DOMAIN-SUFFIX,2gis.ru,DIRECT
+  - DOMAIN-SUFFIX,alfabank.ru,DIRECT
+  - DOMAIN-SUFFIX,avito.ru,DIRECT
+  - DOMAIN-SUFFIX,cbr.ru,DIRECT
+  - DOMAIN-SUFFIX,gosuslugi.ru,DIRECT
+  - DOMAIN-SUFFIX,nalog.gov.ru,DIRECT
+  - DOMAIN-SUFFIX,ozon.ru,DIRECT
+  - DOMAIN-SUFFIX,pochta.ru,DIRECT
+  - DOMAIN-SUFFIX,sber.ru,DIRECT
+  - DOMAIN-SUFFIX,sberbank.ru,DIRECT
+  - DOMAIN-SUFFIX,tbank.ru,DIRECT
+  - DOMAIN-SUFFIX,tinkoff.ru,DIRECT
+  - DOMAIN-SUFFIX,vk.com,DIRECT
+  - DOMAIN-SUFFIX,vtb.ru,DIRECT
+  - DOMAIN-SUFFIX,wildberries.ru,DIRECT
+  - DOMAIN-SUFFIX,ya.ru,DIRECT
+  - DOMAIN-SUFFIX,yandex.ru,DIRECT
+  - DOMAIN-SUFFIX,ru,DIRECT
+  - DOMAIN-SUFFIX,su,DIRECT
+  - DOMAIN-SUFFIX,xn--p1ai,DIRECT
+  - DOMAIN-SUFFIX,xn--p1acf,DIRECT
+  - DOMAIN-SUFFIX,moscow,DIRECT
+  - DOMAIN-SUFFIX,xn--80asehdb,DIRECT
+  - DOMAIN-SUFFIX,xn--c1avg,DIRECT
+  - DOMAIN-SUFFIX,xn--80aswg,DIRECT
+  - DOMAIN-SUFFIX,xn--80adxhks,DIRECT
+  - DOMAIN-SUFFIX,xn--d1acj3b,DIRECT
+  - RULE-SET,ru-ips,DIRECT,no-resolve
+  - MATCH,Garasu

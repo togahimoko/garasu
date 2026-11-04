@@ -5,6 +5,7 @@
 | Клиент | Шаблон |
 | --- | --- |
 | Mihomo / Clash Verge | [mihomo/config.yaml](mihomo/config.yaml) |
+| Clash (классический) | [clash/config.yaml](clash/config.yaml) |
 | Stash | [stash/config.yaml](stash/config.yaml) |
 | sing-box | [singbox/config.json](singbox/config.json) |
 | INCY | [incy/config.json](incy/config.json) |
@@ -18,3 +19,4 @@ Mihomo и Stash получают 10 бинарных [MRS](mihomo/.mrs/) с об
 **Не применять SSR вслепую:** сначала сверить наличие шаблонов, тип клиента и права на узлы в Remnawave. Коммит на GitHub не меняет живую конфигурацию сервера.
 
 Документы: [архитектура](../docs/architecture.md) · [эксплуатация](../docs/operations.md) · [аудит](../docs/audit.md).
+\nКлассический **Clash** использует 10 отдельных YAML-провайдеров из [clash/providers/](clash/providers/) каждые 21600 секунд: MRS не поддерживается старым ядром. Установка одного маршрута Garasu не делает оригинальный Clash совместимым с VLESS/REALITY; для них используйте Mihomo.\n

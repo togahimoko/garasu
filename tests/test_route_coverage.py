@@ -22,6 +22,16 @@ class RouteCoverageTests(unittest.TestCase):
             (ROOT / "reports/routing-coverage.json").read_text(encoding="utf-8"))
         self.assertEqual(self.record, published)
 
+    def test_classic_clash_parity_in_static_domain_routing(self):
+        for category in ("rkn-domains", "ads", "youtube", "discord", "ai", "crypto", "proxy"):
+            for client in ("Clash", "Mihomo"):
+                with self.subTest(category=category, client=client):
+                    record = self.record["domains"][category]["clients"][client]
+                    self.assertEqual(sum(record["actions"].values()),
+                                     self.record["domains"][category]["count"])
+                    self.assertEqual(record["deviations"],
+                                     self.record["domains"][category]["clients"]["Mihomo"]["deviations"])
+
     def test_domain_proxies_and_ru_fallback(self):
         for domain in ("www.youtube.com", "chatgpt.com",
                        "api.github.com"):

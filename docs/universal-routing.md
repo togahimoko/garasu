@@ -13,6 +13,7 @@
 ## Ссылочные наборы правил
 
 - Mihomo и Stash: 10 удалённых бинарных MRS-провайдеров из [release/mihomo/.mrs/](../release/mihomo/.mrs/), обновление каждые 21600 секунд. У Mihomo одна автоматическая группа Garasu, без селекторов.
+- Clash/Premium: 10 удалённых **YAML** rule-providers из [release/clash/providers/](../release/clash/providers/), тоже каждые 21600 секунд. Старому Clash нельзя передавать Mihomo MRS, а оригинальное бесплатное ядро не поддерживает Premium rule-providers.
 - sing-box 1.14: 10 удалённых бинарных SRS-наборов из [release/singbox/rules/](../release/singbox/rules/), кэш и обновление каждые 6 часов.
 - Shadowrocket: ссылки DOMAIN-SET / RULE-SET на GitHub; личные узлы по-прежнему выдаёт отдельная подписка Remnawave.
 - INCY/Happ: компактные заголовки единственного SSR и ссылки на Garasu geo/geosite.dat и geo/geoip.dat.

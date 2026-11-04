@@ -21,6 +21,15 @@
       "rkn-domains",
       "youtube"
     ],
+    "Clash": [
+      "ads",
+      "ai",
+      "crypto",
+      "discord",
+      "proxy",
+      "rkn-domains",
+      "youtube"
+    ],
     "Shadowrocket": [
       "ads",
       "ai",
@@ -46,6 +55,10 @@
       "games"
     ],
     "Stash": [
+      "direct",
+      "games"
+    ],
+    "Clash": [
       "direct",
       "games"
     ],
@@ -96,6 +109,38 @@
           ]
         },
         "Stash": {
+          "actions": {
+            "PROXY": 75302,
+            "REJECT": 4
+          },
+          "deviations": 4,
+          "reasons": {
+            "SET:ads": 4
+          },
+          "samples": [
+            {
+              "domain": "doubleclick.net",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googleadservices.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "googletagmanager.com",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            },
+            {
+              "domain": "sentry.io",
+              "actual": "REJECT",
+              "matched": "SET:ads"
+            }
+          ]
+        },
+        "Clash": {
           "actions": {
             "PROXY": 75302,
             "REJECT": 4
@@ -213,6 +258,14 @@
           "reasons": {},
           "samples": []
         },
+        "Clash": {
+          "actions": {
+            "PROXY": 176
+          },
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
+        },
         "Shadowrocket": {
           "actions": {
             "PROXY": 176
@@ -244,6 +297,14 @@
           "samples": []
         },
         "Stash": {
+          "actions": {
+            "PROXY": 28
+          },
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
+        },
+        "Clash": {
           "actions": {
             "PROXY": 28
           },
@@ -289,6 +350,14 @@
           "reasons": {},
           "samples": []
         },
+        "Clash": {
+          "actions": {
+            "PROXY": 215
+          },
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
+        },
         "Shadowrocket": {
           "actions": {
             "PROXY": 215
@@ -320,6 +389,14 @@
           "samples": []
         },
         "Stash": {
+          "actions": {
+            "PROXY": 96
+          },
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
+        },
+        "Clash": {
           "actions": {
             "PROXY": 96
           },
@@ -365,6 +442,14 @@
           "reasons": {},
           "samples": []
         },
+        "Clash": {
+          "actions": {
+            "PROXY": 154
+          },
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
+        },
         "Shadowrocket": {
           "actions": {
             "PROXY": 154
@@ -396,6 +481,14 @@
           "samples": []
         },
         "Stash": {
+          "actions": {
+            "REJECT": 1217
+          },
+          "deviations": 0,
+          "reasons": {},
+          "samples": []
+        },
+        "Clash": {
           "actions": {
             "REJECT": 1217
           },
@@ -489,6 +582,69 @@
           ]
         },
         "Stash": {
+          "actions": {
+            "PROXY": 116,
+            "DIRECT": 1
+          },
+          "deviations": 116,
+          "reasons": {
+            "MATCH": 113,
+            "SET:rkn-domains": 3
+          },
+          "samples": [
+            {
+              "domain": "3lateral.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "a4e8s8k3.map2.ssl.hwcdn.net",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "artstation.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "artstationmedia.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "battlebreakers.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "capturingreality.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "client-update.queniuqe.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "cloudsync-prod.s3.amazonaws.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "csgo.com.cn",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "csgo.wmsj.cn",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            }
+          ]
+        },
+        "Clash": {
           "actions": {
             "PROXY": 116,
             "DIRECT": 1
@@ -747,6 +903,69 @@
           ]
         },
         "Stash": {
+          "actions": {
+            "DIRECT": 174,
+            "PROXY": 3110
+          },
+          "deviations": 3110,
+          "reasons": {
+            "MATCH": 3094,
+            "SET:rkn-domains": 16
+          },
+          "samples": [
+            {
+              "domain": "100beatscheap.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasdepresentesdeitunes.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.cl",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.co",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.co.cr",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.co.ni",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.co.ve",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com.co",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            },
+            {
+              "domain": "12diasderegalosdeitunes.com.hn",
+              "actual": "PROXY",
+              "matched": "MATCH"
+            }
+          ]
+        },
+        "Clash": {
           "actions": {
             "DIRECT": 174,
             "PROXY": 3110

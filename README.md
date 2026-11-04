@@ -1,34 +1,42 @@
 # Garasu
 
-**Garasu** is a collection of maintained routing profiles and interoperable rule sets.
+**Маршрутизация для VPN-клиентов на базе Remnawave.** Нативные шаблоны, единые наборы правил и воспроизводимые проверки — без хранения личных VPN-ключей в репозитории.
 
-## Clients
+## Как это работает
 
-- Shadowrocket
-- Happ
-- INCY
-- Mihomo / Clash-compatible clients
-- Stash
-- Sing-box compatible clients
-- Xray-core (advanced opt-in)
-- Surge / Loon rule sets
-- Quantumult X filter resources
+Remnawave выдаёт пользователю **его собственные серверы** и подходящий формат подписки. Garasu задаёт правила для Mihomo, Stash, sing-box, INCY, Happ, Shadowrocket и Xray.
 
-## Repository
+Для Mihomo предусмотрена одна видимая группа **Garasu**: в ней можно выбрать конкретный доступный узел либо **Garasu Auto** для автоматической проверки серверов. Локальная сеть и выбранные российские сервисы идут напрямую; категории заблокированных ресурсов обрабатываются отдельными правилами.
 
-| Directory | Contents |
+## Что находится в репозитории
+
+| Каталог | Назначение |
 | --- | --- |
-| [clients](clients/) | Client-specific profiles and templates |
-| [rules](rules/) | Domain/IP rules in multiple engine formats |
-| [geo](geo/) | Xray GeoIP / GeoSite assets |
-| [install](install/) | Installation links and integrity metadata |
+| [release/](release/) | Нативные шаблоны клиентов и правила выдачи Remnawave |
+| [release/mihomo/.mrs/](release/mihomo/.mrs/) | 13 бинарных наборов MRS и манифест SHA-256 |
+| [rules/](rules/) | Исходные домены, CIDR и экспортные форматы |
+| [geo/](geo/) | GeoIP и GeoSite для Xray-совместимых клиентов |
+| [scripts/](scripts/) | Обновление источников, сборка, диагностика и аудит |
+| [tests/](tests/) | Контрактные проверки конфигураций, маршрутов и выдачи |
+| [clients/](clients/) · [install/](install/) | Совместимость со старыми опубликованными ссылками |
+| [reports/](reports/) | Отчёты проверки наборов правил |
 
-## Reliability
+## Проверка релиза
 
-Garasu routing is independent of server count or location. See [multi-node reliability](docs/multi-node-reliability.md) for automatic choice, failure behavior, and client-specific support. Production profiles are distinct from experimental failover templates.
+```bash
+python3 -m unittest discover -s tests -v
+python3 scripts/audit_public_exposure.py
+python3 scripts/audit_rules.py --check
+```
 
-## Updates and compatibility
+Требуются Python 3.10+ и PyYAML. Бинарные MRS проверяются по SHA-256; запуск нативного ядра Mihomo описан в [эксплуатации](docs/operations.md).
 
-Rule sets are validated before scheduled publication. See [compatibility](docs/compatibility.md) for supported formats and limitations, and [sources](SOURCES.md) for third-party attribution.
+## Выпуск и безопасность
 
-Garasu does not distribute access credentials or personal VPN subscriptions.
+**`main` — опубликованные проверенные файлы. `dev` — разработка и тестирование.** GitHub Actions не используются. Шаблоны в панели Remnawave обновляются только отдельно, после проверки; публикация коммита не переключает платных подписчиков.
+
+Пароли, UUID пользователей, закрытые ключи REALITY и реальные подписки не должны попадать в GitHub. Уже опубликованные пути в `clients/` и `install/` сохраняются для совместимости.
+
+## Документация
+
+[Архитектура](docs/architecture.md) · [Эксплуатация и выпуск](docs/operations.md) · [Технический аудит](docs/audit.md) · [Источники данных](SOURCES.md)

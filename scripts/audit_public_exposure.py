@@ -47,7 +47,7 @@ def find_exposures(path, content):
         for key, value in parse_qsl(query):
             if key.lower() in SENSITIVE_QUERY and value and len(value) >= 8:
                 findings.add("credential in URL query")
-    if path.startswith("clients/"):
+    if path.startswith(("clients/", "release/")):
         if path.endswith((".yaml", ".yml")):
             if re.search(r"(?m)^\s*server\s*:\s*\S+", content):
                 findings.add("static proxy server in YAML template")
@@ -114,9 +114,12 @@ def scan_release(root=ROOT):
     root = Path(root)
     items = list((root / "clients").rglob("*")) if (root / "clients").exists() else []
     items += list((root / "install").rglob("*")) if (root / "install").exists() else []
+    items += list((root / "release").rglob("*")) if (root / "release").exists() else []
     findings = []
     for file in sorted(items):
         if not file.is_file():
+            continue
+        if file.suffix.lower() in (".mrs", ".dat"):
             continue
         if file.stat().st_size > 1_000_000:
             findings.append(file.relative_to(root).as_posix() + ": oversized public asset")

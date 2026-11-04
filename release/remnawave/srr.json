@@ -49,7 +49,7 @@
       ],
       "responseType": "STASH",
       "responseModifications": {
-        "subscriptionTemplate": "Garasu Stash"
+        "subscriptionTemplate": "Default"
       }
     },
     {
@@ -67,7 +67,7 @@
       ],
       "responseType": "SINGBOX",
       "responseModifications": {
-        "subscriptionTemplate": "Garasu Singbox"
+        "subscriptionTemplate": "Default"
       }
     },
     {
@@ -106,7 +106,7 @@
         "headers": [
           {
             "key": "autorouting",
-            "value": "incy://autorouting/onadd/https://raw.githubusercontent.com/togahimoko/garasu/dev/release/incy/config.json"
+            "value": "incy://autorouting/onadd/https://raw.githubusercontent.com/togahimoko/garasu/main/release/incy/config.json"
           }
         ],
         "applyHeadersToEnd": true,
@@ -140,8 +140,8 @@
     },
     {
       "name": "Garasu Xray JSON opt-in",
-      "description": "Explicit Xray JSON opt-in; ordinary clients keep XRAY_BASE64 fallback",
-      "enabled": true,
+      "description": "Disabled until a dedicated Xray JSON template is installed and verified in Remnawave",
+      "enabled": false,
       "operator": "AND",
       "conditions": [
         {

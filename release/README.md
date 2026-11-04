@@ -1,20 +1,20 @@
-# Release
+# Релизные профили Garasu
 
-Native configuration files for Remnawave subscriptions.
+Ветка `main` содержит стабильные исходники релизных конфигураций. Подписки и персональные VLESS-узлы выдаются **Remnawave**, а не хранятся в GitHub.
 
-| Client | Configuration |
+| Клиент | Шаблон |
 | --- | --- |
-| Mihomo | [mihomo/config.yaml](mihomo/config.yaml) |
+| Mihomo / Clash Verge | [mihomo/config.yaml](mihomo/config.yaml) |
 | Stash | [stash/config.yaml](stash/config.yaml) |
 | sing-box | [singbox/config.json](singbox/config.json) |
 | INCY | [incy/config.json](incy/config.json) |
 | Happ | [happ/config.json](happ/config.json) |
 | Shadowrocket | [shadowrocket/config.conf](shadowrocket/config.conf) |
-| Xray (opt-in) | [xray/config.json](xray/config.json) |
-| Remnawave | [remnawave/srr.json](remnawave/srr.json) and [remnawave/srr-test.json](remnawave/srr-test.json) |
+| Xray JSON | [xray/config.json](xray/config.json) — необязательный |
+| Remnawave SSR | [remnawave/](remnawave/) |
 
-Binary rule assets: [mihomo/.mrs/](mihomo/.mrs/). The same domain/IP MRS data is used by Mihomo and compatible Stash releases. Other clients use their native rule formats in `rules/` or `geo/`.
+Mihomo использует [13 бинарных MRS-наборов](mihomo/.mrs/) с контрольными суммами. Для других клиентов применяются собственные форматы из [rules](../rules/) и [geo](../geo/).
 
-Remnawave must inject each subscriber's own nodes. Public templates contain no personal subscription credentials. A GitHub commit does not install templates into the Remnawave panel.
+**Не применять SSR вслепую:** сначала сверить наличие шаблонов, тип клиента и права на узлы в Remnawave. Коммит на GitHub не меняет живую конфигурацию сервера.
 
-See [architecture](../docs/architecture.md) and [operations](../docs/operations.md) before deploying.
+Документы: [архитектура](../docs/architecture.md) · [эксплуатация](../docs/operations.md) · [аудит](../docs/audit.md).

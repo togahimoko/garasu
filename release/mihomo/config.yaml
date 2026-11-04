@@ -84,7 +84,7 @@ rule-providers:
     type: http
     behavior: domain
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/rkn-domains.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/rkn-domains.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-rkn-domains.mrs
     interval: 21600
@@ -92,7 +92,7 @@ rule-providers:
     type: http
     behavior: domain
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/youtube.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/youtube.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-youtube.mrs
     interval: 21600
@@ -100,7 +100,7 @@ rule-providers:
     type: http
     behavior: domain
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/discord.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/discord.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-discord.mrs
     interval: 21600
@@ -108,7 +108,7 @@ rule-providers:
     type: http
     behavior: domain
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/ai.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ai.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-ai.mrs
     interval: 21600
@@ -116,7 +116,7 @@ rule-providers:
     type: http
     behavior: domain
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/crypto.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/crypto.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-crypto.mrs
     interval: 21600
@@ -124,7 +124,7 @@ rule-providers:
     type: http
     behavior: domain
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/proxy.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/proxy.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-proxy.mrs
     interval: 21600
@@ -132,7 +132,7 @@ rule-providers:
     type: http
     behavior: domain
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/ads.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ads.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-ads.mrs
     interval: 21600
@@ -140,7 +140,7 @@ rule-providers:
     type: http
     behavior: domain
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/games.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/games.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-games.mrs
     interval: 21600
@@ -148,7 +148,7 @@ rule-providers:
     type: http
     behavior: domain
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/direct.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/direct.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-direct.mrs
     interval: 21600
@@ -156,7 +156,7 @@ rule-providers:
     type: http
     behavior: ipcidr
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/rkn-ips.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/rkn-ips.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-rkn-ips.mrs
     interval: 21600
@@ -164,7 +164,7 @@ rule-providers:
     type: http
     behavior: ipcidr
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/proxy-ips.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/proxy-ips.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-proxy-ips.mrs
     interval: 21600
@@ -172,7 +172,7 @@ rule-providers:
     type: http
     behavior: ipcidr
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/direct-ips.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/direct-ips.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-direct-ips.mrs
     interval: 21600
@@ -180,7 +180,7 @@ rule-providers:
     type: http
     behavior: ipcidr
     format: mrs
-    url: https://raw.githubusercontent.com/togahimoko/garasu/dev/release/mihomo/.mrs/ru-ips.mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ru-ips.mrs
     proxy: DIRECT
     path: ./rule-providers/garasu-ru-ips.mrs
     interval: 21600

@@ -1,24 +1,26 @@
-# Subscription Response Rules
+# Remnawave — правила выдачи подписок
 
-`srr.json` is the complete client-format selection policy. `srr-test.json` adds a dedicated test User-Agent for the new Mihomo template without deliberately changing normal client mappings.
+В этом каталоге хранятся **файлы для ручного импорта в панель**, а не действующие настройки Remnawave.
 
-## Template names
+| Файл | Назначение |
+| --- | --- |
+| [srr.json](srr.json) | Правила определения формата подписки по User-Agent |
+| [srr-test.json](srr-test.json) | Изолированный вариант для тестового User-Agent и отдельного шаблона |
 
-- MIHOMO: `Default` — the existing installed Remnawave template. To ship the new Garasu YAML, explicitly update this template after a test, or create a separate named `Garasu` template and then change SSR accordingly.
-- STASH: `Garasu Stash` — `../stash/config.yaml`
-- SINGBOX: `Garasu Singbox` — `../singbox/config.json`
-- XRAY_JSON opt-in: `Garasu Xray JSON` — where explicitly supported.
+## Шаблоны
 
-These records must be created separately in Remnawave. The SSR only **selects** existing named templates and does not fetch their contents from GitHub.
+В проверенной панели именованные шаблоны используются под именем `Default`. Поэтому активные правила для **Mihomo, Stash и sing-box** ссылаются на `Default`, а не на несуществующие `Garasu Stash` или `Garasu Singbox`. Это имя должно существовать **для нужного типа ответа**; файл SSR сам шаблон не создаёт.
 
-## Other clients
+Дополнительный `XRAY_JSON`-маршрут в `srr.json` выключен до создания и проверки соответствующего шаблона. Обычные Xray-совместимые клиенты получают персональные узлы в `XRAY_BASE64`.
 
-INCY receives personal XRAY_BASE64 nodes and an `autorouting` header pointing to `../incy/config.json`. Happ receives personal nodes plus embedded native routing. Shadowrocket receives personal XRAY_BASE64 nodes; its managed routing file must be imported separately.
+Файлы шаблонов лежат в соседних папках [mihomo](../mihomo/config.yaml), [stash](../stash/config.yaml) и [singbox](../singbox/config.json). Публикация на GitHub не обновляет содержимое шаблонов в панели автоматически.
 
-## Activation
+## Безопасное внедрение
 
-Export the actual active SSR and all template bodies first. Test `srr-test.json` with a dedicated subscription and User-Agent `garasu-test-mihomo/1.0`. Compare its normal-client rules with the real current configuration: the test file originated from a repository export and may differ from panel state. Verify every client type and a fallback before applying the full SSR. Restore the backed-up SSR and templates on failure.
+1. Сохранить текущие SSR и тела установленных шаблонов Remnawave.
+2. Проверить на тестовой подписке существующие имена шаблонов и выдачу личных узлов.
+3. Импортировать новый шаблон только после нативной проверки, сначала для тестового клиента.
+4. Сверить формат Mihomo, Stash, sing-box, INCY, Happ и Shadowrocket; убедиться, что неизвестный User-Agent получает `XRAY_BASE64`.
+5. Только после проверки заменять активные SSR. При ошибке вернуть сохранённые значения.
 
-Do not overwrite templates used by paying customers for a test. No server ports, nodes or Xray settings need changing.
-
-**Verified on the active panel:** only `Default` templates exist. A `subscriptionTemplate` name that does not exist falls back to the default template. The repository MIHOMO response rules therefore point to `Default` until a separately named Garasu record is actually created. The same concern remains to be addressed for Stash, sing-box and Xray JSON templates before production cutover.
+**Важно:** `srr-test.json` предполагает отдельный тестовый шаблон `Garasu`; без его создания тестовое правило нельзя считать рабочим. Ноды, тарифы, сертификаты и доступы пользователей эти файлы не изменяют.

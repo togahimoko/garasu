@@ -140,6 +140,19 @@ class NativeReleaseContract(unittest.TestCase):
             "BROWSER"
         )
 
+    def test_production_srr_has_no_missing_named_templates(self):
+        # Production SSR refers only to the known installed Default records.
+        # Optional Xray JSON is disabled until its template is deployed.
+        for rule in self.ssr["rules"]:
+            if not rule.get("enabled", False):
+                continue
+            template = rule.get("responseModifications", {}).get("subscriptionTemplate")
+            if template:
+                self.assertEqual(template, "Default", rule["name"])
+        xray = [r for r in self.ssr["rules"] if r["responseType"] == "XRAY_JSON"]
+        self.assertEqual(len(xray), 1)
+        self.assertFalse(xray[0]["enabled"])
+
     def test_dedicated_test_agent_does_not_replace_normal_clients(self):
         test = self.preview["rules"]
         self.assertEqual(test[0]["responseType"], "BROWSER")

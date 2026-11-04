@@ -233,9 +233,7 @@
           "domain:advert-api-sandbox.wb.ru",
           "domain:advert-api-sandbox.wildberries.ru",
           "domain:advert-api.wb.ru",
-          "domain:advert-api.wildberries.ru",
           "domain:advert-media-api.wb.ru",
-          "domain:advert-media-api.wildberries.ru",
           "domain:advertisercommunity.com",
           "domain:advertiserscommunity.com",
           "domain:advertising.adobe.com",
@@ -281,7 +279,6 @@
           "domain:analytics.vk.com",
           "domain:analytics.vk.ru",
           "domain:analytics.vpc.duolingo.com",
-          "domain:analytics.wildberries.ru",
           "domain:api-adservices.apple.com",
           "domain:api-eu.carrotquest.app",
           "domain:api-eu.carrotquest.io",
@@ -1231,7 +1228,6 @@
           "domain:xapi.ozon.com.by",
           "domain:xapi.ozon.com.kz",
           "domain:xapi.ozon.kz",
-          "domain:xapi.ozon.ru",
           "domain:xapi.ozonru.me",
           "domain:xblgdvrassets3010.blob.core.windows.net",
           "domain:xray.mail.ru",
@@ -1263,6 +1259,26 @@
       {
         "type": "field",
         "domain": [
+          "geosite:banned-ru",
+          "geosite:youtube",
+          "geosite:discord",
+          "geosite:ai",
+          "geosite:crypto"
+        ],
+        "outboundTag": "proxy"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:blocked-ru"
+        ],
+        "outboundTag": "proxy"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ru",
+          "geosite:garasu-ru",
           "domain:2gis.ru",
           "domain:alfabank.ru",
           "domain:avito.ru",
@@ -1280,6 +1296,13 @@
           "domain:wildberries.ru",
           "domain:ya.ru",
           "domain:yandex.ru"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:ru"
         ],
         "outboundTag": "direct"
       },

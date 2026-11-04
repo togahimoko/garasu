@@ -29,7 +29,7 @@ class RouteCoverageTests(unittest.TestCase):
                 self.assertEqual(
                     yaml_route(domain, self.mihomo["rules"], self.source)[0], "PROXY")
         self.assertEqual(yaml_route("unlisted-audit.invalid.ru",
-                                    self.mihomo["rules"], self.source)[0], "PROXY")
+                                    self.mihomo["rules"], self.source)[0], "DIRECT")
         self.assertEqual(yaml_route("login.sberbank.ru",
                                     self.mihomo["rules"], self.source)[0], "DIRECT")
         self.assertEqual(yaml_route("esia.gosuslugi.ru",

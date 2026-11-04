@@ -3,6 +3,7 @@
 These checks verify serialized policy, routing precedence and test-user-agent
 selection. Native device import and real ISP connectivity are separate tests.
 """
+import base64
 import copy
 import json
 from pathlib import Path
@@ -70,15 +71,18 @@ class NativeReleaseContract(unittest.TestCase):
         rules = self.mihomo["rules"]
         self.assertLess(rules.index("RULE-SET,ads,REJECT"),
                         rules.index("DOMAIN-SUFFIX,sberbank.ru,DIRECT"))
-        self.assertNotIn("DOMAIN-SUFFIX,ru,DIRECT", rules)
-        self.assertNotIn("RULE-SET,ru-ips,DIRECT,no-resolve", rules)
-        self.assertFalse(any("rkn-domains" in r for r in rules))
+        self.assertIn("DOMAIN-SUFFIX,ru,DIRECT", rules)
+        self.assertIn("RULE-SET,ru-ips,DIRECT,no-resolve", rules)
+        self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
+                        rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
+        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+                        rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
         self.assertEqual(rules[-1], "MATCH,Garasu")
         providers = self.mihomo["rule-providers"]
-        self.assertEqual(set(providers), {"ads"})
-        self.assertEqual(providers["ads"]["type"], "inline")
-        self.assertEqual(providers["ads"]["behavior"], "domain")
-        self.assertGreater(len(providers["ads"]["payload"]), 1000)
+        self.assertTrue(all(p["type"] == "inline" for p in providers.values()))
+        self.assertGreater(len(providers["rkn-domains"]["payload"]), 10000)
+        self.assertGreater(len(providers["rkn-ips"]["payload"]), 20000)
+        self.assertGreater(len(providers["ru-ips"]["payload"]), 20000)
         self.assertEqual(self.mihomo["dns"]["proxy-server-nameserver"],
                          ["system"])
 
@@ -139,6 +143,17 @@ class NativeReleaseContract(unittest.TestCase):
             next(x for x in rules if self._match(x, "mihomo/1.0", "text/html"))["responseType"],
             "BROWSER"
         )
+
+    def test_happ_subscriber_header_equals_generated_profile(self):
+        target = json.loads((RELEASE / "happ/config.json").read_text(encoding="utf-8"))
+        rule = next(r for r in self.ssr["rules"] if r["name"] == "Happ Garasu")
+        value = next(h["value"] for h in
+                     rule["responseModifications"]["headers"]
+                     if h["key"].lower() == "routing")
+        self.assertTrue(value.startswith("happ://routing/onadd/"))
+        profile = json.loads(base64.b64decode(value.split("/onadd/", 1)[1]))
+        self.assertEqual(profile, target)
+        self.assertGreater(int(target["LastUpdated"]), 1793761499)
 
     def test_production_srr_has_no_missing_named_templates(self):
         # Production SSR refers only to the known installed Default records.

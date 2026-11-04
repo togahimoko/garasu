@@ -20,7 +20,7 @@ Garasu публикует нативные профили маршрутизац
 
 ## Форматы
 
-- Mihomo: `release/mihomo/config.yaml`, одна видимая группа `Garasu` типа select с ручным выбором узла и скрытая автоматическая группа `Garasu Auto` типа URL-test, MRS для доменов и IP.
+- Mihomo: `release/mihomo/config.yaml`, одна видимая группа `Garasu` типа select с ручным выбором узла и скрытая автоматическая группа `Garasu Auto` типа URL-test, встроенные inline RKN/RU для доменов и IP.
 - Stash: `release/stash/config.yaml`, собственная группа URL-test и MRS.
 - sing-box: `release/singbox/config.json`, собственный механизм выбора узлов, тег для вставки Remnawave.
 - INCY/Happ: `release/incy/config.json` и `release/happ/config.json`, нативная политика Xray/geo.

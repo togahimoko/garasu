@@ -7,9 +7,12 @@ from collections import Counter
 import json
 from pathlib import Path
 import re
+import sys
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 DOMAIN_SETS = ("rkn-domains", "youtube", "discord", "ai", "crypto",
                "proxy", "ads", "games", "direct")
 EXPECTED = {name: ("REJECT" if name == "ads" else
@@ -29,6 +32,11 @@ def get_sets(root: Path) -> dict[str, set[str]]:
             if not line.startswith("+.") or line.count(".") < 2:
                 raise ValueError("Invalid domain in set " + name)
             values.add(line[2:])
+        if name == "ads":
+            exclusions = json.loads((root / "policy/universal.json").read_text())["ad_exempt_domains"]
+            if not set(exclusions) <= values:
+                raise ValueError("Stale advertising exceptions")
+            values -= set(exclusions)
         result[name] = values
     return result
 
@@ -67,34 +75,51 @@ def yaml_route(domain: str, rules: list[str],
 
 
 def shadow_rules(root: Path) -> list[str]:
+    # Shadowrocket contains actual inline RKN and advertisement exceptions.
+    # The report compresses those validated blocks to equivalent set matches.
+    from scripts.sync_universal_routing import load_policy
+    p = load_policy(root)
     text = (root / "release/shadowrocket/config.conf").read_text()
     lines = text.split("[Rule]", 1)[1].splitlines()
     rules = []
-    inline_ads = set()
-    compressed_ads = False
+    inline_ads = []
+    proxy_domains = []
+    proxy_ips = []
+    reject_seen = False
+    proxy_seen = False
     for line in lines:
         line = line.strip()
         if not line or line.startswith("#"):
             continue
-        # The fully embedded ads section can contain >1000 native rules.
-        # Compress to one equivalent provider rule in the analyzer only;
-        # first assert that its domain contents exactly match source data.
         if line.startswith("DOMAIN-SUFFIX,") and line.endswith(",REJECT"):
-            category = line.split(",")[1]
-            inline_ads.add(category)
-            if not compressed_ads:
+            inline_ads.append(line.split(",")[1])
+            if not reject_seen:
                 rules.append("RULE-SET,ads,REJECT")
-                compressed_ads = True
+                reject_seen = True
             continue
-        source = SHADOW_URL.search(line)
-        if line.startswith("DOMAIN-SET,") and source:
-            rules.append("RULE-SET," + source.group(1) + "," + line.rsplit(",", 1)[1])
-        elif line.startswith("FINAL,"):
+        if line.startswith("DOMAIN-SUFFIX,") and line.endswith(",PROXY"):
+            proxy_domains.append(line.split(",")[1])
+            if not proxy_seen:
+                rules.extend("RULE-SET," + name + ",Garasu" for name in
+                             ("rkn-domains", "youtube", "discord", "ai", "crypto", "proxy"))
+                proxy_seen = True
+            continue
+        if line.startswith("IP-CIDR,") and line.split(",")[2] == "PROXY":
+            proxy_ips.append(line.split(",")[1])
+            continue
+        if line.startswith("IP-CIDR,") and line.split(",")[2] == "DIRECT":
+            continue
+        if line.startswith("FINAL,"):
             rules.append("MATCH," + line.split(",")[1])
         else:
             rules.append(line)
-    if inline_ads and inline_ads != get_sets(root)["ads"]:
-        raise ValueError("Shadowrocket embedded ad domains differ from canonical ads source")
+    expected_domains = p["_rkn_domains"] + [
+        item for name in ("youtube", "discord", "ai", "crypto", "proxy")
+        for item in p["_proxy_domains"][name]]
+    if (inline_ads != p["_ads_domains"]
+            or proxy_domains != expected_domains
+            or proxy_ips != p["_rkn_ips"] + p["_proxy_ips"]):
+        raise ValueError("Shadowrocket inline rules differ from exact source snapshot")
     return rules
 
 
@@ -222,11 +247,11 @@ def markdown(result: dict) -> str:
     header.extend([
         "## Отказоустойчивость",
         "",
-        "В активном шаблоне Mihomo широкое правило `.ru → DIRECT` не связано с",
-        "успешностью загрузки полного списка RKN. Изолированный нативный тест",
-        "отдельно подтвердил: с 13 пустыми remote rule-provider'ами ядро стартует,",
-        "а суффиксное DIRECT-правило остаётся активным. Это риск обхода исключений,",
-        "но не доказательство фактической отправки конкретного сайта напрямую.",
+        "В Garasu российские домены и IP идут напрямую только ПОСЛЕ",
+        "встроенного полного списка RKN-исключений, относящихся к DIRECT.",
+        "Mihomo/Stash не зависят от скачивания rule-provider при холодном старте.",
+        "На мобильных INCY/Happ используется согласованная пара GeoSite/GeoIP;",
+        "её доступность и работу на конкретном устройстве необходимо проверять.",
         "",
         "## Ограничения межклиентной эквивалентности",
         "",

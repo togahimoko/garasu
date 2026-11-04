@@ -121,10 +121,17 @@ def scan_release(root=ROOT):
             continue
         if file.suffix.lower() in (".mrs", ".dat"):
             continue
-        if file.stat().st_size > 1_000_000:
-            findings.append(file.relative_to(root).as_posix() + ": oversized public asset")
-            continue
         path = file.relative_to(root).as_posix()
+        # Offline RKN lists intentionally enlarge only four documented,
+        # credential-free native release templates. Still scan their bytes.
+        offline_split = {
+            "release/mihomo/config.yaml", "release/stash/config.yaml",
+            "release/shadowrocket/config.conf", "release/singbox/config.json",
+        }
+        size_limit = 4_000_000 if path in offline_split else 1_000_000
+        if file.stat().st_size > size_limit:
+            findings.append(path + ": oversized public asset")
+            continue
         try:
             content = file.read_text(encoding="utf-8")
         except UnicodeError:

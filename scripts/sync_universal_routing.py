@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-"""Generate one Garasu first-match policy for all native client formats.
+"""Build a single RU split-tunnel policy from Garasu-owned, pinned source data.
 
-Only updates public routing sections; preserves Remnawave insertion markers,
-subscriber-aware proxy groups and user-provided endpoints.
+All desktop profiles embed the necessary RKN exceptions before broad RU DIRECT:
+loss of GitHub connectivity at cold start cannot remove those exceptions.
+Mobile Xray-compatible formats use Garasu's paired GeoSite/GeoIP snapshot.
 """
 from __future__ import annotations
 
 import argparse
+import base64
+import ipaddress
 import json
 from pathlib import Path
-import ipaddress
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,177 +23,283 @@ INCY = "release/incy/config.json"
 HAPP = "release/happ/config.json"
 XRAY = "release/xray/config.json"
 TARGETS = (MIHOMO, STASH, SHADOW, SINGBOX, INCY, HAPP, XRAY)
-BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/"
+GEO_BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main/geo/"
+
+
+def _domains(root: Path, filename: str) -> list[str]:
+    values = [line.strip().lower().removeprefix("+.")
+              for line in (root / "rules" / (filename + ".list")).read_text().splitlines()
+              if line.strip() and not line.startswith("#")]
+    if len(values) != len(set(values)):
+        raise ValueError("Duplicate domain in " + filename)
+    if any(not re.fullmatch(r"[a-z0-9_*.-]+", s) or s.endswith(".") for s in values):
+        raise ValueError("Invalid domain in " + filename)
+    return values
+
+
+def _cidrs(root: Path, filename: str) -> list[str]:
+    values = [line.strip() for line in (root / "rules" / (filename + ".cidr")).read_text().splitlines()
+              if line.strip() and not line.startswith("#")]
+    for item in values:
+        ipaddress.ip_network(item, strict=False)
+    if len(values) != len(set(values)):
+        raise ValueError("Duplicate CIDR in " + filename)
+    return values
+
+
+def _suffix(host: str, domain: str) -> bool:
+    return host == domain or host.endswith("." + domain)
 
 
 def load_policy(root: Path) -> dict:
-    config = json.loads((root / "policy/universal.json").read_text(encoding="utf-8"))
-    domains = config["critical_ru_direct_domains"]
-    if config["schema_version"] != 1 or config["profiles"] != 1 or config["name"] != "Garasu":
-        raise ValueError("Only the single Garasu profile is supported")
-    if config["fallback"] != "PROXY" or len(domains) != len(set(domains)):
-        raise ValueError("Unexpected fallback or duplicate direct domains")
-    if domains != sorted(domains):
-        raise ValueError("Canonical domain list must be sorted")
-    for domain in domains:
-        if domain != domain.lower() or not re.fullmatch(r"[a-z0-9-]+(?:\.[a-z0-9-]+)+", domain):
-            raise ValueError("Invalid direct domain: " + domain)
-    for cidr in config["private_ipv4"] + config["private_ipv6"]:
+    p = json.loads((root / "policy/universal.json").read_text(encoding="utf-8"))
+    if (p.get("schema_version"), p.get("profiles"), p.get("name"), p.get("fallback")) != (
+            1, 1, "Garasu", "PROXY"):
+        raise ValueError("Only one fail-closed Garasu policy is supported")
+    tlds = p["russian_tlds"]
+    direct = p["critical_ru_direct_domains"]
+    if not tlds or len(tlds) != len(set(tlds)) or len(direct) != len(set(direct)):
+        raise ValueError("Duplicate/empty Russian direct category")
+    for name in tlds + direct + p["ad_exempt_domains"]:
+        if not re.fullmatch(r"[a-z0-9-]+(?:\.[a-z0-9-]+)*", name):
+            raise ValueError("Invalid policy domain: " + name)
+    for cidr in p["private_ipv4"] + p["private_ipv6"]:
         ipaddress.ip_network(cidr)
-    for item in config["blocked_domain_sets"] + config["blocked_ip_sets"] + [config["ads_domain_set"]]:
-        if not (root / "rules" / (item + (".cidr" if item.endswith("-ips") else ".list"))).is_file():
-            raise ValueError("Missing source rule set " + item)
-    return config
+    p["_ads_domains"] = [x for x in _domains(root, "ads") if x not in p["ad_exempt_domains"]]
+    p["_rkn_domains_all"] = _domains(root, "rkn-domains")
+    # Domains outside Russian TLDs or the explicitly DIRECT roots already
+    # fall through to VPN. Only exceptions that could bypass matter here.
+    p["_rkn_domains"] = [x for x in p["_rkn_domains_all"] if
+                         any(_suffix(x, t) for t in tlds) or
+                         any(_suffix(x, root_name) for root_name in direct)]
+    if len(p["_rkn_domains"]) < 10000:
+        raise ValueError("Refusing incomplete Russian blocked-domain exceptions")
+    p["_rkn_ips"] = _cidrs(root, "rkn-ips")
+    p["_ru_ips"] = _cidrs(root, "ru-ips")
+    if len(p["_rkn_ips"]) < 20000 or len(p["_ru_ips"]) < 20000:
+        raise ValueError("Refusing incomplete RU/blocked IP source")
+    p["_proxy_ips"] = _cidrs(root, "proxy-ips")
+    p["_proxy_domains"] = {name: _domains(root, name) for name in
+                            ("youtube", "discord", "ai", "crypto", "proxy")}
+    if not set(p["ad_exempt_domains"]) <= set(_domains(root, "ads")):
+        raise ValueError("Ad exceptions must be actual source entries")
+    return p
+
+
+def _private_rules(p: dict) -> list[str]:
+    out = ["DOMAIN-SUFFIX," + d + ",DIRECT" for d in p["private_domains"]]
+    out += ["IP-CIDR," + n + ",DIRECT,no-resolve" for n in p["private_ipv4"]]
+    out += ["IP-CIDR6," + n + ",DIRECT,no-resolve" for n in p["private_ipv6"]]
+    return out
 
 
 def native_rules(p: dict, group: str) -> list[str]:
-    # Ads are embedded from the GitHub repository at build time. Every other
-    # unrecognized site (including blocked/RKN) always takes the VPN route;
-    # no remote provider is necessary at cold start.
-    rules = ["# GARASU UNIVERSAL: no remote bootstrap dependency."]
-    rules += ["DOMAIN-SUFFIX," + d + ",DIRECT" for d in p["private_domains"]]
-    rules += ["IP-CIDR," + cidr + ",DIRECT,no-resolve" for cidr in p["private_ipv4"]]
-    rules += ["IP-CIDR6," + cidr + ",DIRECT,no-resolve" for cidr in p["private_ipv6"]]
-    rules += ["RULE-SET,ads,REJECT"]
-    rules += ["DOMAIN-SUFFIX," + d + ",DIRECT" for d in p["critical_ru_direct_domains"]]
-    rules += ["MATCH," + group]
-    return rules
+    # Top-to-bottom priority: private, ads, explicit VPN, blocked snapshot,
+    # Russian domestic, foreign fallback to VPN. Nothing downloads at boot.
+    result = ["# GARASU SPLIT: offline RKN before RU, foreign -> VPN."]
+    result += _private_rules(p)
+    result += ["RULE-SET,ads,REJECT"]
+    result += ["RULE-SET," + category + "," + group for category in
+               ("rkn-domains", "youtube", "discord", "ai", "crypto", "proxy")]
+    result += ["RULE-SET,rkn-ips," + group + ",no-resolve",
+               "RULE-SET,proxy-ips," + group + ",no-resolve"]
+    result += ["DOMAIN-SUFFIX," + d + ",DIRECT" for d in p["critical_ru_direct_domains"]]
+    result += ["DOMAIN-SUFFIX," + d + ",DIRECT" for d in p["russian_tlds"]]
+    result += ["RULE-SET,ru-ips,DIRECT,no-resolve", "MATCH," + group]
+    return result
+
 
 def render_yaml(src: str, p: dict) -> str:
     marker = "\nrule-providers:\n"
     if marker not in src or "\nrules:\n" not in src:
-        raise ValueError("Missing YAML rule-provider/rules section")
-    prefix = src.split(marker, 1)[0]
+        raise ValueError("Invalid Remnawave YAML template")
+    prefix = src.split(marker, 1)[0].rstrip("\n")
     if prefix.count("proxies: # LEAVE THIS LINE!") < 2:
-        raise ValueError("Remnawave insertion markers are missing")
-    # A single inline domain provider means a new customer can start even
-    # if their ISP blocks GitHub, while the complete source stays in GitHub.
-    header = "\nrule-providers:\n  ads:\n    type: inline\n    behavior: domain\n    payload:\n"
-    header += "\n".join("      - '+." + d + "'" for d in p["_ads_domains"]) + "\n"
-    routes = "\nrules:\n" + "\n".join(
-        ("  # " + line.removeprefix("# ") if line.startswith("# ") else "  - " + line)
-        for line in native_rules(p, "Garasu")
-    ) + "\n"
-    return prefix + header + routes
+        raise ValueError("Missing Remnawave node injection markers")
+    groups = {"ads": ("domain", p["_ads_domains"]),
+              "rkn-domains": ("domain", p["_rkn_domains"]),
+              "rkn-ips": ("ipcidr", p["_rkn_ips"]),
+              "proxy-ips": ("ipcidr", p["_proxy_ips"]),
+              "ru-ips": ("ipcidr", p["_ru_ips"])}
+    for name, domains in p["_proxy_domains"].items():
+        groups[name] = ("domain", domains)
+    parts = [prefix, "", "rule-providers:"]
+    for key, (behavior, values) in groups.items():
+        parts.extend(["  " + key + ":", "    type: inline",
+                      "    behavior: " + behavior, "    payload:"])
+        if behavior == "domain":
+            parts.extend("      - '+." + value + "'" for value in values)
+        else:
+            parts.extend("      - '" + value + "'" for value in values)
+    parts.extend(["", "rules:"])
+    for rule in native_rules(p, "Garasu"):
+        parts.append("  " + rule if rule.startswith("#") else "  - " + rule)
+    return "\n".join(parts) + "\n"
+
 
 def render_shadow(src: str, p: dict) -> str:
-    if "\n[Rule]\n" not in src:
-        raise ValueError("Shadowrocket [Rule] section missing")
-    prefix = src.split("\n[Rule]\n", 1)[0]
-    output = ["# GARASU UNIVERSAL: no remote rule-provider at first run."]
-    output += ["DOMAIN-SUFFIX," + d + ",DIRECT" for d in p["private_domains"]]
-    output += ["IP-CIDR," + cidr + ",DIRECT,no-resolve" for cidr in p["private_ipv4"]]
-    output += ["IP-CIDR6," + cidr + ",DIRECT,no-resolve" for cidr in p["private_ipv6"]]
-    output += ["DOMAIN-SUFFIX," + d + ",REJECT" for d in p["_ads_domains"]]
-    output += ["DOMAIN-SUFFIX," + d + ",DIRECT" for d in p["critical_ru_direct_domains"]]
-    output += ["FINAL,PROXY,dns-failed"]
-    return prefix + "\n[Rule]\n" + "\n".join(output) + "\n"
+    marker = "\n[Rule]\n"
+    if marker not in src:
+        raise ValueError("Missing Shadowrocket native section")
+    prefix = src.split(marker, 1)[0]
+    out = ["# GARASU SPLIT: all blocked RU exceptions embedded."]
+    out += _private_rules(p)
+    out += ["DOMAIN-SUFFIX," + x + ",REJECT" for x in p["_ads_domains"]]
+    for category in ("rkn-domains", "youtube", "discord", "ai", "crypto", "proxy"):
+        domains = p["_rkn_domains"] if category == "rkn-domains" else p["_proxy_domains"][category]
+        out += ["DOMAIN-SUFFIX," + x + ",PROXY" for x in domains]
+    out += ["IP-CIDR," + x + ",PROXY,no-resolve" for x in
+            p["_rkn_ips"] + p["_proxy_ips"]]
+    out += ["DOMAIN-SUFFIX," + x + ",DIRECT" for x in
+            p["critical_ru_direct_domains"] + p["russian_tlds"]]
+    out += ["IP-CIDR," + x + ",DIRECT,no-resolve" for x in p["_ru_ips"]]
+    out += ["FINAL,PROXY,dns-failed"]
+    return prefix + marker + "\n".join(out) + "\n"
+
 
 def route_singbox(cfg: dict, p: dict) -> dict:
-    routes = [{"action": "sniff"}, {"protocol": "dns", "action": "hijack-dns"}]
-    routes += [{"domain_suffix": p["private_domains"], "action": "route", "outbound": "direct"}]
-    routes += [{"ip_cidr": p["private_ipv4"] + p["private_ipv6"],
-                "action": "route", "outbound": "direct"}]
-    routes += [{"rule_set": ["garasu-ads"], "action": "reject", "method": "default"}]
-    routes += [{"domain_suffix": p["critical_ru_direct_domains"],
-                "action": "route", "outbound": "direct"}]
+    def inline(tag: str, key: str, values: list[str]) -> dict:
+        return {"type": "inline", "tag": "garasu-" + tag,
+                "rules": [{key: values}]}
+    sets = [inline("ads", "domain_suffix", p["_ads_domains"]),
+            inline("rkn-domains", "domain_suffix", p["_rkn_domains"]),
+            inline("rkn-ips", "ip_cidr", p["_rkn_ips"]),
+            inline("proxy-ips", "ip_cidr", p["_proxy_ips"]),
+            inline("ru-ips", "ip_cidr", p["_ru_ips"])]
+    for name, domains in p["_proxy_domains"].items():
+        sets.append(inline(name, "domain_suffix", domains))
+    routes = [{"action": "sniff"}, {"protocol": "dns", "action": "hijack-dns"},
+              {"domain_suffix": p["private_domains"], "outbound": "direct"},
+              {"ip_cidr": p["private_ipv4"] + p["private_ipv6"], "outbound": "direct"},
+              {"rule_set": ["garasu-ads"], "action": "reject"}]
+    routes.extend({"rule_set": ["garasu-" + key], "outbound": "→ Remnawave"}
+                  for key in ("rkn-domains", "youtube", "discord", "ai", "crypto", "proxy",
+                              "rkn-ips", "proxy-ips"))
+    routes.extend([{"domain_suffix": p["critical_ru_direct_domains"], "outbound": "direct"},
+                   {"domain_suffix": p["russian_tlds"], "outbound": "direct"},
+                   {"rule_set": ["garasu-ru-ips"], "outbound": "direct"}])
     cfg["route"]["rules"] = routes
+    cfg["route"]["rule_set"] = sets
     cfg["route"]["final"] = "→ Remnawave"
-    cfg["route"]["rule_set"] = [{"type": "inline", "tag": "garasu-ads",
-                                   "rules": [{"domain_suffix": p["_ads_domains"]}]}]
     dns = cfg.get("dns", {})
     dns["rules"] = [
         {"domain_suffix": p["private_domains"], "action": "route", "server": "local"},
-        {"domain_suffix": p["critical_ru_direct_domains"], "action": "route", "server": "local"},
+        {"domain_suffix": p["critical_ru_direct_domains"] + p["russian_tlds"],
+         "action": "route", "server": "local"},
     ] + [r for r in dns.get("rules", []) if "query_type" in r]
-    # Keep the default DNS/client bootstrap unchanged. Routing no longer
-    # depends on a remote binary rule set.
     return cfg
+
 
 def route_incy(cfg: dict, p: dict) -> dict:
     cfg["Name"] = "Garasu"
+    # Happ applies updated routing only when LastUpdated increases.
+    cfg["LastUpdated"] = "1793810700"
     cfg["GlobalProxy"] = "true"
     cfg["RouteOrder"] = "block-proxy-direct"
-    cfg["DirectSites"] = ["domain:" + x for x in
-                          p["private_domains"] + p["critical_ru_direct_domains"]]
-    cfg["DirectIp"] = list(p["private_ipv4"] + p["private_ipv6"])
-    cfg["ProxySites"] = []
-    cfg["ProxyIp"] = []
-    cfg["BlockSites"] = ["domain:" + domain for domain in p["_ads_domains"]]
+    cfg["DomainStrategy"] = "IPIfNonMatch"
+    cfg["DirectSites"] = ["geosite:private", "geosite:category-ru",
+                          "geosite:garasu-ru"] + ["domain:" + x for x in
+                                                p["critical_ru_direct_domains"]]
+    cfg["DirectIp"] = ["geoip:private", "geoip:ru"]
+    cfg["ProxySites"] = ["geosite:banned-ru", "geosite:youtube",
+                         "geosite:discord", "geosite:ai", "geosite:crypto",
+                         "geosite:telegram", "geosite:github"]
+    cfg["ProxyIp"] = ["geoip:blocked-ru"]
+    cfg["BlockSites"] = ["domain:" + x for x in p["_ads_domains"]]
     cfg["BlockIp"] = []
-    # Self-contained rules: no GeoSite/GeoIP download required to import.
-    cfg["Geoipurl"] = ""
-    cfg["Geositeurl"] = ""
-    cfg["DomainStrategy"] = "AsIs"
+    cfg["Geoipurl"] = GEO_BASE + "geoip.dat"
+    cfg["Geositeurl"] = GEO_BASE + "geosite.dat"
     return cfg
 
+
 def route_xray(cfg: dict, p: dict) -> dict:
+    cfg["routing"]["domainStrategy"] = "AsIs"
     cfg["routing"]["rules"] = [
-        {"type": "field",
-         "domain": ["domain:" + d for d in p["private_domains"]],
+        {"type": "field", "domain": ["domain:" + x for x in p["private_domains"]],
          "outboundTag": "direct"},
         {"type": "field", "ip": p["private_ipv4"] + p["private_ipv6"],
          "outboundTag": "direct"},
-        {"type": "field", "domain": ["domain:" + d for d in p["_ads_domains"]],
+        {"type": "field", "domain": ["domain:" + x for x in p["_ads_domains"]],
          "outboundTag": "block"},
+        {"type": "field", "domain": ["geosite:banned-ru", "geosite:youtube",
+                                      "geosite:discord", "geosite:ai", "geosite:crypto"],
+         "outboundTag": "proxy"},
+        {"type": "field", "ip": ["geoip:blocked-ru"], "outboundTag": "proxy"},
         {"type": "field",
-         "domain": ["domain:" + d for d in p["critical_ru_direct_domains"]],
+         "domain": ["geosite:category-ru", "geosite:garasu-ru"] +
+                   ["domain:" + x for x in p["critical_ru_direct_domains"]],
          "outboundTag": "direct"},
+        {"type": "field", "ip": ["geoip:ru"], "outboundTag": "direct"},
         {"type": "field", "network": "tcp,udp", "outboundTag": "proxy"},
     ]
-    cfg["routing"]["domainStrategy"] = "AsIs"
     return cfg
-
-def render_json(text: str, p: dict, kind: str) -> str:
-    obj = json.loads(text)
-    if kind == SINGBOX:
-        obj = route_singbox(obj, p)
-    elif kind in (INCY, HAPP):
-        obj = route_incy(obj, p)
-    else:
-        obj = route_xray(obj, p)
-    return json.dumps(obj, indent=2, ensure_ascii=False) + "\n"
 
 
 def expected(root: Path) -> dict[str, str]:
     p = load_policy(root)
-    values = [line.strip().lower().removeprefix("+.")
-              for line in (root / "rules/ads.list").read_text().splitlines()
-              if line.strip() and not line.startswith("#")]
-    if len(values) != len(set(values)) or len(values) < 500:
-        raise ValueError("Canonical ads source missing or duplicated")
-    p["_ads_domains"] = sorted(set(values))
-    output = {}
-    for path in TARGETS:
-        old = (root / path).read_text(encoding="utf-8")
-        if path in (MIHOMO, STASH):
-            output[path] = render_yaml(old, p)
-        elif path == SHADOW:
-            output[path] = render_shadow(old, p)
+    out = {}
+    for name in TARGETS:
+        old = (root / name).read_text(encoding="utf-8")
+        if name in (MIHOMO, STASH):
+            out[name] = render_yaml(old, p)
+        elif name == SHADOW:
+            out[name] = render_shadow(old, p)
         else:
-            output[path] = render_json(old, p, path)
-    return output
+            obj = json.loads(old)
+            if name == SINGBOX:
+                obj = route_singbox(obj, p)
+            elif name in (INCY, HAPP):
+                obj = route_incy(obj, p)
+            else:
+                obj = route_xray(obj, p)
+            out[name] = json.dumps(obj, ensure_ascii=False, indent=2) + "\n"
+    return out
+
+
+def expected_srr(root: Path, happ_json: str) -> str:
+    """Keep Happ routing header and delivered profile exactly equivalent."""
+    path = root / "release/remnawave/srr.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    matches = [r for r in data["rules"] if r.get("name") == "Happ Garasu"]
+    if len(matches) != 1:
+        raise ValueError("Expected exactly one Happ routing response")
+    headers = matches[0]["responseModifications"]["headers"]
+    if len(headers) != 1 or headers[0]["key"].lower() != "routing":
+        raise ValueError("Invalid Happ subscription header")
+    payload = json.dumps(json.loads(happ_json), separators=(",", ":"),
+                         ensure_ascii=False).encode("utf-8")
+    headers[0]["value"] = "happ://routing/onadd/" + base64.b64encode(payload).decode("ascii")
+    return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
 
 
 def main() -> None:
     cli = argparse.ArgumentParser(description=__doc__)
-    flag = cli.add_mutually_exclusive_group(required=True)
-    flag.add_argument("--write", action="store_true")
-    flag.add_argument("--check", action="store_true")
+    modes = cli.add_mutually_exclusive_group(required=True)
+    modes.add_argument("--write", action="store_true")
+    modes.add_argument("--check", action="store_true")
     cli.add_argument("--root", type=Path, default=ROOT)
     args = cli.parse_args()
     root = args.root.resolve()
-    changes = expected(root)
-    for path, text in changes.items():
-        full = root / path
+    rendered = expected(root)
+    for name, data in rendered.items():
+        target = root / name
         if args.write:
-            full.write_text(text, encoding="utf-8")
-            print("GENERATED", path)
-        elif full.read_text(encoding="utf-8") != text:
-            raise SystemExit("STALE universal Garasu policy: " + path)
+            target.write_text(data, encoding="utf-8")
+            print("GENERATED", name, len(data))
+        elif target.read_text(encoding="utf-8") != data:
+            raise SystemExit("STALE Roscom-style Garasu profile: " + name)
         else:
-            print("PASS", path)
-    print("UNIVERSAL_GARASU_POLICY=PASS")
+            print("PASS", name)
+    header_path = root / "release/remnawave/srr.json"
+    srr = expected_srr(root, rendered[HAPP])
+    if args.write:
+        header_path.write_text(srr, encoding="utf-8")
+        print("GENERATED", "release/remnawave/srr.json")
+    elif header_path.read_text(encoding="utf-8") != srr:
+        raise SystemExit("STALE Happ SRR routing header")
+    else:
+        print("PASS", "release/remnawave/srr.json")
+    print("GARASU_RU_SPLIT_POLICY=PASS")
 
 
 if __name__ == "__main__":

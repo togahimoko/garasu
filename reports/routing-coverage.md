@@ -12,20 +12,20 @@ Upstream: `82d104cde92b271f545e1f61a61b1acd079e0aa7`.
 | ai | 215 | PROXY | 0 | 0 | 0 | 0 |
 | crypto | 96 | PROXY | 0 | 0 | 0 | 0 |
 | proxy | 154 | PROXY | 0 | 0 | 0 | 0 |
-| ads | 1221 | REJECT | 0 | 0 | 0 | 0 |
-| games | 117 | DIRECT | 117 | 117 | 117 | 117 |
-| direct | 3284 | DIRECT | 3173 | 3173 | 3173 | 3173 |
+| ads | 1217 | REJECT | 0 | 0 | 0 | 0 |
+| games | 117 | DIRECT | 116 | 116 | 116 | 116 |
+| direct | 3284 | DIRECT | 3110 | 3110 | 3110 | 3110 |
 
 ## Наборы, загружаемые, но не используемые для маршрутизации
 
-- Mihomo: ai, crypto, direct, discord, games, proxy, rkn-domains, youtube
-- Stash: ai, crypto, direct, discord, games, proxy, rkn-domains, youtube
-- Shadowrocket: ai, crypto, direct, discord, games, proxy, rkn-domains, youtube
-- sing-box: ai, crypto, direct, discord, games, proxy, rkn-domains, youtube
+- Mihomo: direct, games
+- Stash: direct, games
+- Shadowrocket: direct, games
+- sing-box: direct, games
 
 ## Примеры расхождений в Mihomo
 
-### direct — 3173 расхождений
+### direct — 3110 расхождений
 - `100beatscheap.com`: PROXY (MATCH)
 - `12diasdepresentesdeitunes.com`: PROXY (MATCH)
 - `12diasderegalosdeitunes.cl`: PROXY (MATCH)
@@ -35,7 +35,7 @@ Upstream: `82d104cde92b271f545e1f61a61b1acd079e0aa7`.
 - `12diasderegalosdeitunes.co.ve`: PROXY (MATCH)
 - `12diasderegalosdeitunes.com`: PROXY (MATCH)
 
-### games — 117 расхождений
+### games — 116 расхождений
 - `3lateral.com`: PROXY (MATCH)
 - `a4e8s8k3.map2.ssl.hwcdn.net`: PROXY (MATCH)
 - `artstation.com`: PROXY (MATCH)
@@ -49,11 +49,11 @@ Upstream: `82d104cde92b271f545e1f61a61b1acd079e0aa7`.
 
 ## Отказоустойчивость
 
-В активном шаблоне Mihomo широкое правило `.ru → DIRECT` не связано с
-успешностью загрузки полного списка RKN. Изолированный нативный тест
-отдельно подтвердил: с 13 пустыми remote rule-provider'ами ядро стартует,
-а суффиксное DIRECT-правило остаётся активным. Это риск обхода исключений,
-но не доказательство фактической отправки конкретного сайта напрямую.
+В Garasu российские домены и IP идут напрямую только ПОСЛЕ
+встроенного полного списка RKN-исключений, относящихся к DIRECT.
+Mihomo/Stash не зависят от скачивания rule-provider при холодном старте.
+На мобильных INCY/Happ используется согласованная пара GeoSite/GeoIP;
+её доступность и работу на конкретном устройстве необходимо проверять.
 
 ## Ограничения межклиентной эквивалентности
 

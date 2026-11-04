@@ -119,15 +119,18 @@ def main() -> None:
         providers = config.get("rule-providers", {})
         if any(item.get("type") == "http" for item in providers.values()):
             raise AssertionError("Universal profile still has an HTTP rule-provider")
-        if set(providers) != {"ads"} or len(providers["ads"]["payload"]) < 1000:
-            raise AssertionError("Inline ad provider missing or truncated")
+        required = {"ads", "rkn-domains", "rkn-ips", "ru-ips"}
+        if not required.issubset(providers) or len(providers["ads"]["payload"]) < 1000:
+            raise AssertionError("Inline routing provider missing or truncated")
+        if any(item.get("type") != "inline" for item in providers.values()):
+            raise AssertionError("Cannot depend on remote rule-provider at boot")
         ads_domain = providers["ads"]["payload"][0].removeprefix("+.")
 
         config["mixed-port"] = allocate_port()
         config["external-controller"] = "127.0.0.1:" + str(allocate_port())
         config["log-level"] = "info"
         config["dns"]["enhanced-mode"] = "redir-host"
-        domains = ("sberbank.ru", "unlisted-garasu-test.ru", ads_domain)
+        domains = ("sberbank.ru", "unlisted-garasu-test.net", ads_domain, "003.su")
         config["hosts"] = {host: "127.0.0.1" for host in domains}
         config["proxies"] = [{
             "name": "LOCAL_TEST_PROXY",
@@ -172,21 +175,23 @@ def main() -> None:
             events = logfile.read_text(encoding="utf-8", errors="replace")
             bank_ok = "GARASU_DIRECT_OR_PROXY_OK HTTP=200" in outcomes["sberbank.ru"][1]
             foreign_ok = ("GARASU_DIRECT_OR_PROXY_OK HTTP=200"
-                          in outcomes["unlisted-garasu-test.ru"][1])
+                          in outcomes["unlisted-garasu-test.net"][1])
             ad_blocked = "GARASU_DIRECT_OR_PROXY_OK" not in outcomes[ads_domain][1]
             used_proxy = any(port == httpd.server_port for _, port in traces)
             if not (bank_ok and foreign_ok and ad_blocked and used_proxy):
                 raise AssertionError("Offline route behavior failed: " + repr(outcomes))
             if "sberbank.ru" not in events or "using DIRECT" not in events:
                 raise AssertionError("Bank was not routed directly")
-            if "unlisted-garasu-test.ru" not in events or "using Garasu" not in events:
+            if "unlisted-garasu-test.net" not in events or "using Garasu" not in events:
                 raise AssertionError("Unknown .ru was not routed through Garasu")
             if ads_domain not in events or "using REJECT" not in events:
                 raise AssertionError("Ad domain was not rejected")
             routed = [item for item in traces if item[1] == httpd.server_port]
-            if len(routed) != 1:
-                raise AssertionError("Expected one routed data request; got " + repr(traces))
-            print("PASS native offline bank DIRECT / unknown RU PROXY / ads REJECT")
+            if len(routed) != 2:
+                raise AssertionError("Expected two routed requests; got " + repr(traces))
+            if "003.su" not in events:
+                raise AssertionError("Blocked Russian domain not seen in native trace")
+            print("PASS native offline bank DIRECT / foreign PROXY / blocked RU PROXY / ads REJECT")
             print("PASS remote rule-provider independence, one subscriber group")
         finally:
             if process is not None and process.poll() is None:

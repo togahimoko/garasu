@@ -4,58 +4,58 @@
   "scope": "static domain-only first-match, excluding resolved IP, process, DNS state, QUIC, TUN and runtime availability",
   "included": {
     "Mihomo": [
-      "ads"
+      "ads",
+      "ai",
+      "crypto",
+      "discord",
+      "proxy",
+      "rkn-domains",
+      "youtube"
     ],
     "Stash": [
-      "ads"
+      "ads",
+      "ai",
+      "crypto",
+      "discord",
+      "proxy",
+      "rkn-domains",
+      "youtube"
     ],
     "Shadowrocket": [
-      "ads"
+      "ads",
+      "ai",
+      "crypto",
+      "discord",
+      "proxy",
+      "rkn-domains",
+      "youtube"
     ],
     "sing-box": [
-      "ads"
+      "ads",
+      "ai",
+      "crypto",
+      "discord",
+      "proxy",
+      "rkn-domains",
+      "youtube"
     ]
   },
   "unused": {
     "Mihomo": [
-      "ai",
-      "crypto",
       "direct",
-      "discord",
-      "games",
-      "proxy",
-      "rkn-domains",
-      "youtube"
+      "games"
     ],
     "Stash": [
-      "ai",
-      "crypto",
       "direct",
-      "discord",
-      "games",
-      "proxy",
-      "rkn-domains",
-      "youtube"
+      "games"
     ],
     "Shadowrocket": [
-      "ai",
-      "crypto",
       "direct",
-      "discord",
-      "games",
-      "proxy",
-      "rkn-domains",
-      "youtube"
+      "games"
     ],
     "sing-box": [
-      "ai",
-      "crypto",
       "direct",
-      "discord",
-      "games",
-      "proxy",
-      "rkn-domains",
-      "youtube"
+      "games"
     ]
   },
   "domains": {
@@ -384,12 +384,12 @@
       }
     },
     "ads": {
-      "count": 1221,
+      "count": 1217,
       "declared_action": "REJECT",
       "clients": {
         "Mihomo": {
           "actions": {
-            "REJECT": 1221
+            "REJECT": 1217
           },
           "deviations": 0,
           "reasons": {},
@@ -397,7 +397,7 @@
         },
         "Stash": {
           "actions": {
-            "REJECT": 1221
+            "REJECT": 1217
           },
           "deviations": 0,
           "reasons": {},
@@ -405,7 +405,7 @@
         },
         "Shadowrocket": {
           "actions": {
-            "REJECT": 1221
+            "REJECT": 1217
           },
           "deviations": 0,
           "reasons": {},
@@ -413,7 +413,7 @@
         },
         "sing-box": {
           "actions": {
-            "REJECT": 1221
+            "REJECT": 1217
           },
           "deviations": 0,
           "reasons": {},
@@ -427,11 +427,13 @@
       "clients": {
         "Mihomo": {
           "actions": {
-            "PROXY": 117
+            "PROXY": 116,
+            "DIRECT": 1
           },
-          "deviations": 117,
+          "deviations": 116,
           "reasons": {
-            "MATCH": 117
+            "MATCH": 113,
+            "SET:rkn-domains": 3
           },
           "samples": [
             {
@@ -488,11 +490,13 @@
         },
         "Stash": {
           "actions": {
-            "PROXY": 117
+            "PROXY": 116,
+            "DIRECT": 1
           },
-          "deviations": 117,
+          "deviations": 116,
           "reasons": {
-            "MATCH": 117
+            "MATCH": 113,
+            "SET:rkn-domains": 3
           },
           "samples": [
             {
@@ -549,11 +553,13 @@
         },
         "Shadowrocket": {
           "actions": {
-            "PROXY": 117
+            "PROXY": 116,
+            "DIRECT": 1
           },
-          "deviations": 117,
+          "deviations": 116,
           "reasons": {
-            "MATCH": 117
+            "MATCH": 113,
+            "SET:rkn-domains": 3
           },
           "samples": [
             {
@@ -610,11 +616,13 @@
         },
         "sing-box": {
           "actions": {
-            "PROXY": 117
+            "PROXY": 116,
+            "DIRECT": 1
           },
-          "deviations": 117,
+          "deviations": 116,
           "reasons": {
-            "FINAL": 117
+            "FINAL": 113,
+            "SET:rkn-domains": 3
           },
           "samples": [
             {
@@ -677,12 +685,13 @@
       "clients": {
         "Mihomo": {
           "actions": {
-            "DIRECT": 111,
-            "PROXY": 3173
+            "DIRECT": 174,
+            "PROXY": 3110
           },
-          "deviations": 3173,
+          "deviations": 3110,
           "reasons": {
-            "MATCH": 3173
+            "MATCH": 3094,
+            "SET:rkn-domains": 16
           },
           "samples": [
             {
@@ -739,12 +748,13 @@
         },
         "Stash": {
           "actions": {
-            "DIRECT": 111,
-            "PROXY": 3173
+            "DIRECT": 174,
+            "PROXY": 3110
           },
-          "deviations": 3173,
+          "deviations": 3110,
           "reasons": {
-            "MATCH": 3173
+            "MATCH": 3094,
+            "SET:rkn-domains": 16
           },
           "samples": [
             {
@@ -801,12 +811,13 @@
         },
         "Shadowrocket": {
           "actions": {
-            "DIRECT": 111,
-            "PROXY": 3173
+            "DIRECT": 174,
+            "PROXY": 3110
           },
-          "deviations": 3173,
+          "deviations": 3110,
           "reasons": {
-            "MATCH": 3173
+            "MATCH": 3094,
+            "SET:rkn-domains": 16
           },
           "samples": [
             {
@@ -863,12 +874,13 @@
         },
         "sing-box": {
           "actions": {
-            "DIRECT": 111,
-            "PROXY": 3173
+            "DIRECT": 174,
+            "PROXY": 3110
           },
-          "deviations": 3173,
+          "deviations": 3110,
           "reasons": {
-            "FINAL": 3173
+            "FINAL": 3094,
+            "SET:rkn-domains": 16
           },
           "samples": [
             {

@@ -68,11 +68,18 @@ def check_native(core: Path) -> None:
                 proxy["name"] for proxy in cfg["proxies"]
             ]
             auto["proxies"] = []
-            # The production universal profile must remain self-contained.
-            if set(cfg["rule-providers"]) != {"ads"}:
-                raise RuntimeError("Unexpected remote provider in universal mode")
-            if cfg["rule-providers"]["ads"]["type"] != "inline":
-                raise RuntimeError("Ads list must be inlined for offline startup")
+            # RKN and RU must be in the same self-contained subscription:
+            # missing GitHub Raw cannot leave broad RU DIRECT unguarded.
+            providers = cfg["rule-providers"]
+            required = {"ads", "rkn-domains", "rkn-ips", "ru-ips",
+                        "proxy-ips", "youtube", "discord", "ai", "crypto", "proxy"}
+            if set(providers) != required or any(
+                    item.get("type") != "inline" for item in providers.values()):
+                raise RuntimeError("A split-routing provider is missing or remote")
+            if (len(providers["rkn-domains"]["payload"]) < 10000 or
+                    len(providers["rkn-ips"]["payload"]) < 20000 or
+                    len(providers["ru-ips"]["payload"]) < 20000):
+                raise RuntimeError("Incomplete self-contained RKN/RU snapshot")
             cfg["mixed-port"] = 18000 + count
             path = tmp / (f"synthetic-{count}.yaml")
             path.write_text(yaml.safe_dump(cfg, allow_unicode=True),

@@ -53,10 +53,11 @@ class ReleaseLayoutTest(unittest.TestCase):
         for client in ("mihomo", "stash"):
             data = load_yaml(client + "/config.yaml")
             providers = data["rule-providers"]
-            self.assertEqual(set(providers), {"ads"})
-            self.assertEqual(providers["ads"]["type"], "inline")
-            self.assertEqual(providers["ads"]["behavior"], "domain")
             self.assertGreater(len(providers["ads"]["payload"]), 1000)
+            self.assertGreater(len(providers["rkn-domains"]["payload"]), 10000)
+            self.assertGreater(len(providers["rkn-ips"]["payload"]), 20000)
+            self.assertGreater(len(providers["ru-ips"]["payload"]), 20000)
+            self.assertTrue(all(p["type"] == "inline" for p in providers.values()))
 
     def test_mihomo_only_one_visible_policy(self):
         text = (RELEASE / "mihomo/config.yaml").read_text(encoding="utf-8")
@@ -75,8 +76,10 @@ class ReleaseLayoutTest(unittest.TestCase):
         self.assertEqual(data["proxy-groups"][1]["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         self.assertNotIn("tun", data)
-        self.assertEqual(set(data["rule-providers"]), {"ads"})
-        self.assertNotIn("DOMAIN-SUFFIX,ru,DIRECT", data["rules"])
+        self.assertTrue(all(p["type"] == "inline"
+                            for p in data["rule-providers"].values()))
+        self.assertIn("DOMAIN-SUFFIX,ru,DIRECT", data["rules"])
+        self.assertIn("RULE-SET,rkn-domains,Garasu", data["rules"])
         self.assertIn("DOMAIN-SUFFIX,sberbank.ru,DIRECT", data["rules"])
 
     def test_stash_and_native_client_exports(self):

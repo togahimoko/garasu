@@ -10,18 +10,16 @@
   "DomesticDNSType": "DoH",
   "DomesticDNSDomain": "https://common.dot.dns.yandex.net/dns-query",
   "DomesticDNSIP": "77.88.8.8",
-  "LastUpdated": "1793761499",
+  "LastUpdated": "1793810700",
   "DnsHosts": {
     "dns.google": "8.8.8.8",
     "common.dot.dns.yandex.net": "77.88.8.8"
   },
   "RouteOrder": "block-proxy-direct",
   "DirectSites": [
-    "domain:localhost",
-    "domain:local",
-    "domain:lan",
-    "domain:home.arpa",
-    "domain:arpa",
+    "geosite:private",
+    "geosite:category-ru",
+    "geosite:garasu-ru",
     "domain:2gis.ru",
     "domain:alfabank.ru",
     "domain:avito.ru",
@@ -41,18 +39,21 @@
     "domain:yandex.ru"
   ],
   "DirectIp": [
-    "127.0.0.0/8",
-    "10.0.0.0/8",
-    "172.16.0.0/12",
-    "192.168.0.0/16",
-    "100.64.0.0/10",
-    "169.254.0.0/16",
-    "::1/128",
-    "fc00::/7",
-    "fe80::/10"
+    "geoip:private",
+    "geoip:ru"
   ],
-  "ProxySites": [],
-  "ProxyIp": [],
+  "ProxySites": [
+    "geosite:banned-ru",
+    "geosite:youtube",
+    "geosite:discord",
+    "geosite:ai",
+    "geosite:crypto",
+    "geosite:telegram",
+    "geosite:github"
+  ],
+  "ProxyIp": [
+    "geoip:blocked-ru"
+  ],
   "BlockSites": [
     "domain:1l-hit.mail.ru",
     "domain:1l-hit.vkplay.ru",
@@ -251,9 +252,7 @@
     "domain:advert-api-sandbox.wb.ru",
     "domain:advert-api-sandbox.wildberries.ru",
     "domain:advert-api.wb.ru",
-    "domain:advert-api.wildberries.ru",
     "domain:advert-media-api.wb.ru",
-    "domain:advert-media-api.wildberries.ru",
     "domain:advertisercommunity.com",
     "domain:advertiserscommunity.com",
     "domain:advertising.adobe.com",
@@ -299,7 +298,6 @@
     "domain:analytics.vk.com",
     "domain:analytics.vk.ru",
     "domain:analytics.vpc.duolingo.com",
-    "domain:analytics.wildberries.ru",
     "domain:api-adservices.apple.com",
     "domain:api-eu.carrotquest.app",
     "domain:api-eu.carrotquest.io",
@@ -1249,7 +1247,6 @@
     "domain:xapi.ozon.com.by",
     "domain:xapi.ozon.com.kz",
     "domain:xapi.ozon.kz",
-    "domain:xapi.ozon.ru",
     "domain:xapi.ozonru.me",
     "domain:xblgdvrassets3010.blob.core.windows.net",
     "domain:xray.mail.ru",
@@ -1277,8 +1274,8 @@
     "domain:zz.bdstatic.com"
   ],
   "BlockIp": [],
-  "DomainStrategy": "AsIs",
+  "DomainStrategy": "IPIfNonMatch",
   "FakeDNS": "false",
-  "Geoipurl": "",
-  "Geositeurl": ""
+  "Geoipurl": "https://raw.githubusercontent.com/togahimoko/garasu/main/geo/geoip.dat",
+  "Geositeurl": "https://raw.githubusercontent.com/togahimoko/garasu/main/geo/geosite.dat"
 }

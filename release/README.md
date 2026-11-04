@@ -1,23 +1,20 @@
-# Garasu / release
+# Release
 
-One clean release hierarchy, with app-native configuration files. No dated
-directories, duplicated release trees or personal subscriber credentials.
+Native configuration files for Remnawave subscriptions.
 
-* mihomo/config.yaml — Remnawave Mihomo template; its native compiled MRS
-  data is kept in mihomo/.mrs/ (13 files with SHA256 manifest).
-* stash/config.yaml — Stash template using the same MRS assets.
-* incy/config.json and happ/config.json — their own native routing profiles.
-* shadowrocket/config.conf — managed routing profile; server subscription separate.
-* singbox/config.json — sing-box 1.14 template with Remnawave node injection.
-* xray/config.json — opt-in advanced Xray virtual-host template.
+| Client | Configuration |
+| --- | --- |
+| Mihomo | [mihomo/config.yaml](mihomo/config.yaml) |
+| Stash | [stash/config.yaml](stash/config.yaml) |
+| sing-box | [singbox/config.json](singbox/config.json) |
+| INCY | [incy/config.json](incy/config.json) |
+| Happ | [happ/config.json](happ/config.json) |
+| Shadowrocket | [shadowrocket/config.conf](shadowrocket/config.conf) |
+| Xray (opt-in) | [xray/config.json](xray/config.json) |
+| Remnawave | [remnawave/srr.json](remnawave/srr.json) and [remnawave/srr-test.json](remnawave/srr-test.json) |
 
-The shared source lists remain under rules/ in the repository. MRS binaries are
-built using release/mihomo/build.py, which consumes these source lists.
+Binary rule assets: [mihomo/.mrs/](mihomo/.mrs/). The same domain/IP MRS data is used by Mihomo and compatible Stash releases. Other clients use their native rule formats in `rules/` or `geo/`.
 
-This is a staging branch. The URLs in the new templates intentionally reference
-staging/release/... . When the release is validated and promoted to main, pin
-those references to the approved commit or main. Changing files on GitHub does
-not update Remnawave's server-stored templates.
+Remnawave must inject each subscriber's own nodes. Public templates contain no personal subscription credentials. A GitHub commit does not install templates into the Remnawave panel.
 
-Steal, 443, Xray, existing SRR, paying subscriptions and TUN are unchanged.
-Native client import and subscription injection still require canary testing.
+See [architecture](../docs/architecture.md) and [operations](../docs/operations.md) before deploying.

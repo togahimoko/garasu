@@ -1,26 +1,22 @@
-# Remnawave Garasu SRR (staging)
+# Subscription Response Rules
 
-- srr.json: full response rules for Mihomo, Stash, sing-box, INCY, Happ,
-  Shadowrocket, Xray JSON opt-in and general Base64 fallback.
-- srr-canary.json: a minimal dedicated test User-Agent route added before the
-  original production export; all existing customer response conditions stay
-  unchanged.
-- Mihomo template body: ../mihomo/config.yaml.
-- Stash template: ../stash/config.yaml.
-- Sing-box template: ../singbox/config.json.
-- INCY and Happ native routing: ../incy/config.json and ../happ/config.json.
+`srr.json` is the complete client-format selection policy. `srr-test.json` adds a dedicated test User-Agent for the new Mihomo template without deliberately changing normal client mappings.
 
-The response rule template names Garasu / Garasu Stash / Garasu Singbox
-must match actual Remnawave template record names. The SRR JSON does not read
-YAML directly from GitHub; template bodies must be installed separately through
-the Remnawave Templates editor, and then assigned via these response rules.
+## Template names
 
-INCY autorouting points to the staging hosted JSON. Happ routing is embedded
-as Base64. Shadowrocket XRAY_BASE64 returns personal nodes and does not
-automatically import the managed Shadowrocket routing file.
+- MIHOMO: `Garasu` — `../mihomo/config.yaml`
+- STASH: `Garasu Stash` — `../stash/config.yaml`
+- SINGBOX: `Garasu Singbox` — `../singbox/config.json`
+- XRAY_JSON opt-in: `Garasu Xray JSON` — where explicitly supported.
 
-DO NOT paste the full srr.json into production until each native client has
-been tested with personal subscription access, and a backup of current SRR is
-stored. No live subscriptions or SSR rules have been modified by this commit.
+These records must be created separately in Remnawave. The SSR only **selects** existing named templates and does not fetch their contents from GitHub.
 
-For a non-disruptive test, create a **new** MIHOMO template named `Garasu` and import release/mihomo/config.yaml. Current production `Garasu Mihomo` remains unchanged until you activate and verify the new SSR mapping.
+## Other clients
+
+INCY receives personal XRAY_BASE64 nodes and an `autorouting` header pointing to `../incy/config.json`. Happ receives personal nodes plus embedded native routing. Shadowrocket receives personal XRAY_BASE64 nodes; its managed routing file must be imported separately.
+
+## Activation
+
+Export the actual active SSR and all template bodies first. Test `srr-test.json` with a dedicated subscription and User-Agent `garasu-test-mihomo/1.0`. Compare its normal-client rules with the real current configuration: the test file originated from a repository export and may differ from panel state. Verify every client type and a fallback before applying the full SSR. Restore the backed-up SSR and templates on failure.
+
+Do not overwrite templates used by paying customers for a test. No server ports, nodes or Xray settings need changing.

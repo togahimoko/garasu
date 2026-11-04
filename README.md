@@ -55,4 +55,6 @@ python3 scripts/probe_release_assets.py --branch main
 - [Порядок выпуска](docs/release-checklist.md): контроль качества, публикация и откат.
 - [Участие в проекте](CONTRIBUTING.md): требования к изменениям.
 - [Безопасность](SECURITY.md): работа с ключами и сообщение об уязвимости.
+- [GitHub Issues](https://github.com/togahimoko/garasu/issues/new/choose): структурированные отчёты без личных данных.
+- [Настройки GitHub](docs/github-maintenance.md): защита main, права и проверка метаданных.
 [Архитектура](docs/architecture.md) · [Эксплуатация и выпуск](docs/operations.md) · [Технический аудит](docs/audit.md) · [Источники данных](SOURCES.md)

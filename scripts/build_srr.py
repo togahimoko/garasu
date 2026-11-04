@@ -10,6 +10,19 @@ ROOT = Path(__file__).resolve().parents[1]
 TEMPLATES = {"MIHOMO": "Garasu Mihomo", "STASH": "Garasu Stash", "SINGBOX": "Garasu Singbox"}
 LEGACY_SINGBOX_UA = "^sfa|sfi|sfm|sft|karing|singbox"
 SINGBOX_UA = "^(?:sfa|sfi|sfm|sft|karing|singbox)"
+
+
+def _clash_rule(rule):
+    """Identify only the generic Clash rule, never Clash Verge/Mihomo."""
+    if rule.get("responseType") not in ("CLASH", "MIHOMO"):
+        return False
+    conditions = rule.get("conditions", [])
+    if len(conditions) != 1 or conditions[0].get("headerName", "").lower() != "user-agent":
+        return False
+    condition = conditions[0]
+    operator, value = condition.get("operator"), condition.get("value", "").lower()
+    return ((operator == "REGEX" and value in ("^clash", r"^clash(?:/|$)"))
+            or (operator == "STARTS_WITH" and value in ("clash", "clash/")))
 TEST_AGENTS = {"incy": "garasu-test-incy", "happ": "garasu-test-happ",
                "mihomo": "garasu-test-mihomo", "stash": "garasu-test-stash",
                "singbox": "garasu-test-singbox"}
@@ -42,6 +55,8 @@ def _target_rules(rules):
         typ = rule.get("responseType")
         c = rule.get("conditions", [])
         v = c[0].get("value", "").lower() if c and isinstance(c[0], dict) else ""
+        if _clash_rule(rule):
+            continue  # A Clash compatibility rule may also have responseType MIHOMO.
         if typ in TEMPLATES:
             key = typ.lower()
         elif typ == "XRAY_BASE64" and c and c[0].get("headerName", "").lower() == "user-agent":
@@ -60,7 +75,8 @@ def _target_rules(rules):
     return result
 
 
-def _full(current, links, *, include_xray=False, include_mobile=False):
+def _full(current, links, *, include_xray=False, include_mobile=False,
+          clash_mihomo_compat=False):
     if not isinstance(current, dict) or current.get("version") != "1":
         raise ValueError("Not a supported Remnawave SRR export")
     raw = current.get("rules")
@@ -113,6 +129,21 @@ def _full(current, links, *, include_xray=False, include_mobile=False):
             singbox_conditions[0].get("operator") == "REGEX" and
             singbox_conditions[0].get("value") == LEGACY_SINGBOX_UA):
         singbox_conditions[0]["value"] = SINGBOX_UA
+    if clash_mihomo_compat:
+        clash_rules = [rule for rule in result["rules"] if _clash_rule(rule)]
+        if len(clash_rules) != 1:
+            raise ValueError("Expected exactly one generic Clash rule")
+        clash = clash_rules[0]
+        clash["responseType"] = "MIHOMO"
+        clash["conditions"] = [{
+            "headerName": "user-agent", "operator": "REGEX",
+            "value": r"^clash(?:/|$)", "caseSensitive": False,
+        }]
+        clash.setdefault("responseModifications", {})["subscriptionTemplate"] = TEMPLATES["MIHOMO"]
+        clash["description"] = (
+            "Mihomo-compatible Garasu YAML for Clash-named modern cores; "
+            "legacy Clash does not support VLESS/REALITY"
+        )
     if include_xray:
         result["rules"].insert(-1, {
             "name": XRAY_RULE_NAME,
@@ -128,12 +159,15 @@ def _full(current, links, *, include_xray=False, include_mobile=False):
 
 
 def patch(current, links, mode="test", *, include_xray=False,
-          include_mobile=False):
+          include_mobile=False, clash_mihomo_compat=False):
     """test: real client UAs remain unchanged; full: switch five client rules."""
     if mode not in ("test", "full"):
         raise ValueError("Choose test or full")
+    if mode == "test" and clash_mihomo_compat:
+        raise ValueError("Clash live UA remapping requires full mode; preview stays isolated")
     full = _full(current, links, include_xray=include_xray,
-                 include_mobile=include_mobile)
+                 include_mobile=include_mobile,
+                 clash_mihomo_compat=clash_mihomo_compat)
     if mode == "full":
         return full
     orig = copy.deepcopy(current)
@@ -181,6 +215,8 @@ def main():
                    help="add an explicit Xray JSON rule before BASE64 fallback")
     p.add_argument("--with-mobile-routing", action="store_true",
                    help="add dedicated INCY and Happ routing headers before BASE64 fallback")
+    p.add_argument("--clash-mihomo-compat", action="store_true",
+                   help="serve the existing Garasu Mihomo template to generic clash/1.0 clients (full only)")
     a = p.parse_args()
     source, dest = Path(a.source), Path(a.destination)
     if source.resolve() == dest.resolve():
@@ -189,7 +225,8 @@ def main():
     links = json.loads((ROOT / "install/links.json").read_text(encoding="utf-8"))
     result = patch(current, links, mode=a.mode,
                    include_xray=a.with_xray_json,
-                   include_mobile=a.with_mobile_routing)
+                   include_mobile=a.with_mobile_routing,
+                   clash_mihomo_compat=a.clash_mihomo_compat)
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("Garasu mode=" + a.mode, "rules=" + str(len(result["rules"])))

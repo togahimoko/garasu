@@ -103,6 +103,37 @@ class DeliveryProbe(unittest.TestCase):
         with self.assertRaises(ValueError):
             probe.request_once(SECRET, "mihomo", "unrecognized")
 
+    def test_counts_clash_nodes_and_garasu_sources_without_exposing_them(self):
+        providers = sorted(probe.EXPECTED_GARASU_PROVIDERS)
+        rules = ([b"  - RULE-SET,rkn-domains,Garasu\n",
+                  b"  - RULE-SET,rkn-ips,Garasu\n",
+                  b"  - RULE-SET,ads,REJECT\n"] +
+                 [b"  - DOMAIN-SUFFIX,local,DIRECT\n"] * 10 +
+                 [b"  - DOMAIN-SUFFIX,ru,DIRECT\n",
+                  b"  - RULE-SET,ru-ips,DIRECT\n",
+                  b"  - MATCH,Garasu\n"])
+        raw = (b"proxies:\n  - name: PrivateOne\n    type: vless\n    server: hidden\n    port: 443\n"
+               b"  - name: PrivateTwo\n    type: vless\n    server: hidden\n    port: 443\n"
+               b"proxy-groups:\n  - name: Garasu\n    type: select\n"
+               b"  - name: Garasu Auto\n    type: url-test\n"
+               b"rule-providers:\n" +
+               b"".join(("  %s:\n    type: http\n" % n).encode() for n in providers) +
+               b"rules:\n" + b"".join(rules))
+        result = probe.request_once(SECRET, "clash", "proxy",
+                                    opener=FakeOpener(raw, kind="application/x-yaml"))
+        self.assertEqual(result["yaml_counts"], {
+            "proxies": 2, "proxy_providers": 0, "proxy_groups": 2,
+            "rule_providers": 13, "rules": 16})
+        self.assertTrue(probe._clash_ready(result))
+        self.assertTrue(all(result["yaml_checks"].values()))
+        self.assertNotIn("PrivateOne", json.dumps(result))
+        self.assertNotIn("PrivateTwo", json.dumps(result))
+        result["yaml_counts"]["proxies"] = 0
+        self.assertFalse(probe._clash_ready(result))
+        result["yaml_counts"]["proxies"] = 2
+        result["yaml_checks"]["garasu_route_order_valid"] = False
+        self.assertFalse(probe._clash_ready(result))
+
     def test_response_body_is_bounded(self):
         opener = FakeOpener(b"A" * 200000)
         result = probe.request_once(SECRET, "clash", "direct", opener=opener)

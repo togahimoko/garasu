@@ -72,18 +72,21 @@
     },
     {
       "name": "Clash Core Clients",
-      "description": "Response with generated YAML config (Clash Template)",
+      "description": "Mihomo-compatible Garasu YAML for Clash-named modern cores; legacy Clash does not support VLESS/REALITY",
       "enabled": true,
       "operator": "AND",
       "conditions": [
         {
           "headerName": "user-agent",
           "operator": "REGEX",
-          "value": "^clash",
+          "value": "^clash(?:/|$)",
           "caseSensitive": false
         }
       ],
-      "responseType": "CLASH"
+      "responseType": "MIHOMO",
+      "responseModifications": {
+        "subscriptionTemplate": "Garasu Mihomo"
+      }
     },
     {
       "name": "INCY + Garasu MAX",

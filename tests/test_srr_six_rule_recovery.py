@@ -122,6 +122,26 @@ class SixRuleSRRRecovery(unittest.TestCase):
                              template)
         self.assertEqual(build_srr.patch(full, stub_links(), mode="full"), full)
 
+    def test_generic_clash_can_use_existing_mihomo_template_without_touching_other_rules(self):
+        original = minimal_srr()
+        baseline = build_srr.patch(original, stub_links(), mode="full")
+        fixed = build_srr.patch(original, stub_links(), mode="full",
+                                clash_mihomo_compat=True)
+        self.assertEqual(len(fixed["rules"]), len(baseline["rules"]))
+        for index in (0, 1, 2, 3, 5):
+            self.assertEqual(fixed["rules"][index], baseline["rules"][index])
+        clash = fixed["rules"][4]
+        self.assertEqual(clash["responseType"], "MIHOMO")
+        self.assertEqual(clash["responseModifications"]["subscriptionTemplate"],
+                         "Garasu Mihomo")
+        self.assertTrue(re.search(clash["conditions"][0]["value"], "clash/1.0", re.I))
+        self.assertFalse(re.search(clash["conditions"][0]["value"], "clash-verge/2.0", re.I))
+        self.assertEqual(build_srr.patch(fixed, stub_links(), mode="full",
+                                         clash_mihomo_compat=True), fixed)
+        with self.assertRaises(ValueError):
+            build_srr.patch(original, stub_links(), mode="test",
+                            clash_mihomo_compat=True)
+
     def test_rejects_missing_base64_fallback_in_six_rule_export(self):
         broken = minimal_srr()
         broken["rules"][-1]["responseType"] = "BROWSER"

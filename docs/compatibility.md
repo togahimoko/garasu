@@ -7,13 +7,13 @@ Garasu maintains one MAX routing policy and exports engine-specific rule sets fo
 | Shadowrocket | `clients/shadowrocket.conf` | Managed routing candidate; personal node subscription and device VPN separate; app import unverified |
 | INCY | `clients/incy.json` | `autorouting` candidate header or direct import link; app import unverified |
 | Happ | `clients/happ.json` | `routing` candidate import with separate GeoIP/GeoSite; app import unverified |
-| Mihomo, Clash Verge, FlClash | `clients/mihomo-remnawave.yaml` | Template with Remnawave node injection |
+| Mihomo, Clash Verge, FlClash, Clash-named Mihomo-compatible clients | `clients/mihomo-remnawave.yaml` | MIHOMO template with Remnawave node injection; generic `clash/1.0` uses the same template via SRR, subject to actual client core support |
 | Stash | `clients/stash-remnawave.yaml` | Template with Remnawave node injection |
 | Modern sing-box and compatible clients | `clients/singbox-remnawave.json` | Template using 13 remotely updated JSON rule sets |
 | Xray-core advanced | `clients/xray-advanced-remnawave.json` | **Opt-in:** requires Remnawave virtual-host injection and Garasu GeoIP/GeoSite |
 | Surge and Loon | `rules/surge/*.list` | Candidate integration instructions in [native routing candidates](native-routing-candidates.md); app import unverified |
 | Quantumult X | `rules/quantumultx/*.list` | Candidate resource link and final-rule instructions in [native routing candidates](native-routing-candidates.md); app import unverified |
-| Legacy Clash / old sing-box | Not claimed compatible | Use supported modern engine or create a version-specific adapter |
+| Legacy Clash / old sing-box | Not claimed compatible | The old Clash core cannot load VLESS/REALITY nodes, regardless of a YAML wrapper; [Clash compatibility details](remnawave-clash-compat.md) |
 
 Automatic node selection varies by client: Mihomo canary uses URLTest, Stash canary uses URLTest, sing-box stable uses a manual selector. For supported and unverified failover behavior see [multi-node reliability](multi-node-reliability.md).
 

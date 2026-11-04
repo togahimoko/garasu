@@ -305,9 +305,13 @@
   "outbounds": [
     {
       "tag": "→ Remnawave",
-      "type": "selector",
+      "type": "urltest",
       "outbounds": null,
-      "interrupt_exist_connections": true
+      "interrupt_exist_connections": true,
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "3m",
+      "tolerance": 150,
+      "idle_timeout": "30m"
     },
     {
       "tag": "direct",

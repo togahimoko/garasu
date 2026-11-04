@@ -59,7 +59,7 @@ class NativeReleaseContract(unittest.TestCase):
         rules = self.mihomo["rules"]
         self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
                         rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
-        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
+        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
                         rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
         providers = self.mihomo["rule-providers"]
         self.assertEqual(len(providers), 13)

@@ -106,7 +106,7 @@
         "headers": [
           {
             "key": "autorouting",
-            "value": "incy://autorouting/onadd/https://raw.githubusercontent.com/togahimoko/garasu/staging/release/incy/config.json"
+            "value": "incy://autorouting/onadd/https://raw.githubusercontent.com/togahimoko/garasu/dev/release/incy/config.json"
           }
         ],
         "applyHeadersToEnd": true,

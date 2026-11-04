@@ -60,7 +60,7 @@ class ReleaseLayoutTest(unittest.TestCase):
                 self.assertEqual(
                     p["url"],
                     "https://raw.githubusercontent.com/togahimoko/garasu/"
-                    "staging/release/mihomo/.mrs/" + name + ".mrs",
+                    "dev/release/mihomo/.mrs/" + name + ".mrs",
                 )
 
     def test_mihomo_only_one_visible_policy(self):
@@ -87,7 +87,7 @@ class ReleaseLayoutTest(unittest.TestCase):
         self.assertEqual(incy, happ)
         self.assertEqual(incy["Name"], "Garasu")
         sh = (RELEASE / "shadowrocket/config.conf").read_text(encoding="utf-8")
-        self.assertIn("/staging/release/shadowrocket/config.conf", sh)
+        self.assertIn("/dev/release/shadowrocket/config.conf", sh)
         self.assertIn("FINAL,PROXY", sh)
         sb = json.loads((RELEASE / "singbox/config.json").read_text(encoding="utf-8"))
         self.assertEqual(sb["route"]["final"], "→ Remnawave")

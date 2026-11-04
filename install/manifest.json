@@ -390,8 +390,8 @@
     },
     "clients/shadowrocket.conf": {
       "source": "garasu:managed-config:shadowrocket",
-      "sha256": "ac8907fd44a52a3ff381e907d0b1e1a1cba31b37c069cbc6c72d80a681be3b8e",
-      "bytes": 2325
+      "sha256": "e23367d03a2e5fc705546dce6f7c7dba97e48ce9203aca140d2e73d0087ea2d7",
+      "bytes": 3280
     }
   }
 }

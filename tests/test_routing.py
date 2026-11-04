@@ -41,7 +41,7 @@ class GarasuTests(unittest.TestCase):
 
     def test_shadowrocket_rule_order(self):
         conf = (ROOT / "clients/shadowrocket.conf").read_text()
-        self.assertLess(conf.index("rkn-domains.list,PROXY"), conf.index("DOMAIN-SUFFIX,ru,DIRECT"))
+        self.assertLess(conf.index("rkn-domains.txt,PROXY"), conf.index("DOMAIN-SUFFIX,ru,DIRECT"))
         self.assertLess(conf.index("rkn-ips.list,PROXY"), conf.index("ru-ips.list,DIRECT"))
         self.assertIn("FINAL,PROXY", conf)
         self.assertNotIn("DST-PORT,443,REJECT", conf)
@@ -64,16 +64,17 @@ class GarasuTests(unittest.TestCase):
         self.assertIsNone(data["proxies"])
         groups = {group["name"]: group for group in data["proxy-groups"]}
         self.assertIn("Garasu", groups)
-        self.assertIn("Garasu Auto", groups)
-        self.assertIn("Garasu Auto", groups["Garasu"]["proxies"])
-        self.assertTrue(groups["Garasu Auto"]["include-all"])
-        self.assertFalse(groups["Garasu Auto"]["remnawave"]["include-proxies"])
+        self.assertEqual(set(groups), {"Garasu"})
+        self.assertEqual(groups["Garasu"]["type"], "url-test")
+        self.assertTrue(groups["Garasu"]["include-all"])
+        self.assertEqual(groups["Garasu"]["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         for key, provider in data["rule-providers"].items():
             self.assertTrue(provider["url"].startswith(
-                "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/"
+                "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/"
             ), key)
-            self.assertEqual(provider["format"], "text")
+            self.assertEqual(provider["format"], "mrs")
+            self.assertEqual(provider["interval"], 21600)
             self.assertEqual(provider["type"], "http")
         self.assertEqual(data["rule-providers"]["rkn-ips"]["behavior"], "ipcidr")
         self.assertEqual(data["rule-providers"]["rkn-domains"]["behavior"], "domain")
@@ -156,12 +157,12 @@ class GarasuTests(unittest.TestCase):
         self.assertEqual(data["proxy-groups"][0]["name"], "Garasu")
         self.assertEqual(data["proxy-groups"][0]["proxies"], ["REJECT"])
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
-        for name in ("rkn-domains", "rkn-ips", "ads", "direct"):
+        for name in ("rkn-domains", "rkn-ips", "ads", "ru-ips"):
             self.assertIn(name, data["rule-providers"])
         rules = data["rules"]
         self.assertLess(rules.index("RULE-SET,rkn-domains,Garasu"),
                         rules.index("DOMAIN-SUFFIX,ru,DIRECT"))
-        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu"),
+        self.assertLess(rules.index("RULE-SET,rkn-ips,Garasu,no-resolve"),
                         rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
         self.assertNotIn("RULE-SET,direct,DIRECT", rules)
 
@@ -172,11 +173,12 @@ class GarasuTests(unittest.TestCase):
         self.assertEqual(config["route"]["final"], "→ Remnawave")
         self.assertTrue(config["experimental"]["cache_file"]["enabled"])
         all_tags = {r["tag"] for r in config["route"]["rule_set"]}
-        self.assertEqual(len(all_tags), 13)
+        self.assertEqual(len(all_tags), 10)
         self.assertIn("garasu-ru-ips", all_tags)
         for provider in config["route"]["rule_set"]:
-            self.assertEqual(provider["format"], "source")
-            self.assertIn("/garasu/main/rules/singbox/", provider["url"])
+            self.assertEqual(provider["format"], "binary")
+            self.assertEqual(provider["update_interval"], "6h")
+            self.assertIn("/garasu/main/release/singbox/rules/", provider["url"])
         rules = config["route"]["rules"]
         proxi = next(i for i, r in enumerate(rules) if
                      "garasu-rkn-domains" in r.get("rule_set", []))

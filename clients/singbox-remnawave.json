@@ -6,7 +6,41 @@
           "localhost",
           "local",
           "lan",
-          "home.arpa"
+          "home.arpa",
+          "arpa"
+        ],
+        "action": "route",
+        "server": "local"
+      },
+      {
+        "domain_suffix": [
+          "2gis.ru",
+          "alfabank.ru",
+          "avito.ru",
+          "cbr.ru",
+          "gosuslugi.ru",
+          "nalog.gov.ru",
+          "ozon.ru",
+          "pochta.ru",
+          "sber.ru",
+          "sberbank.ru",
+          "tbank.ru",
+          "tinkoff.ru",
+          "vk.com",
+          "vtb.ru",
+          "wildberries.ru",
+          "ya.ru",
+          "yandex.ru",
+          "ru",
+          "su",
+          "xn--p1ai",
+          "xn--p1acf",
+          "moscow",
+          "xn--80asehdb",
+          "xn--c1avg",
+          "xn--80aswg",
+          "xn--80adxhks",
+          "xn--d1acj3b"
         ],
         "action": "route",
         "server": "local"
@@ -24,7 +58,7 @@
         "tag": "cf-dns",
         "type": "tls",
         "server": "1.1.1.1",
-        "detour": "→ Remnawave"
+        "detour": "direct"
       },
       {
         "tag": "local",
@@ -36,8 +70,7 @@
         "inet4_range": "198.18.0.0/15",
         "inet6_range": "fc00::/18"
       }
-    ],
-    "independent_cache": true
+    ]
   },
   "log": {
     "level": "warn",
@@ -58,118 +91,120 @@
           "localhost",
           "local",
           "lan",
-          "home.arpa"
+          "home.arpa",
+          "arpa"
         ],
-        "action": "route",
         "outbound": "direct"
-      },
-      {
-        "rule_set": [
-          "garasu-rkn-domains",
-          "garasu-youtube",
-          "garasu-discord",
-          "garasu-ai",
-          "garasu-crypto",
-          "garasu-proxy"
-        ],
-        "action": "route",
-        "outbound": "→ Remnawave"
       },
       {
         "ip_cidr": [
+          "127.0.0.0/8",
+          "10.0.0.0/8",
+          "172.16.0.0/12",
+          "192.168.0.0/16",
           "100.64.0.0/10",
-          "169.254.0.0/16"
+          "169.254.0.0/16",
+          "::1/128",
+          "fc00::/7",
+          "fe80::/10"
         ],
-        "action": "route",
         "outbound": "direct"
-      },
-      {
-        "ip_is_private": true,
-        "action": "route",
-        "outbound": "direct"
-      },
-      {
-        "domain_suffix": [
-          "ru",
-          "su",
-          "moscow",
-          "xn--p1ai",
-          "xn--p1acf",
-          "xn--80asehdb",
-          "xn--c1avg",
-          "xn--80aswg",
-          "xn--80adxhks",
-          "xn--d1acj3b"
-        ],
-        "action": "resolve",
-        "server": "local"
-      },
-      {
-        "action": "resolve",
-        "server": "cf-dns",
-        "domain_suffix": [
-          "ru",
-          "su",
-          "moscow",
-          "xn--p1ai",
-          "xn--p1acf",
-          "xn--80asehdb",
-          "xn--c1avg",
-          "xn--80aswg",
-          "xn--80adxhks",
-          "xn--d1acj3b"
-        ],
-        "invert": true
-      },
-      {
-        "ip_is_private": true,
-        "action": "route",
-        "outbound": "→ Remnawave"
-      },
-      {
-        "ip_cidr": [
-          "100.64.0.0/10",
-          "169.254.0.0/16"
-        ],
-        "action": "route",
-        "outbound": "→ Remnawave"
-      },
-      {
-        "rule_set": [
-          "garasu-rkn-ips",
-          "garasu-proxy-ips"
-        ],
-        "action": "route",
-        "outbound": "→ Remnawave"
       },
       {
         "rule_set": [
           "garasu-ads"
         ],
-        "action": "reject",
-        "method": "default"
+        "action": "reject"
+      },
+      {
+        "rule_set": [
+          "garasu-rkn-domains"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-youtube"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-discord"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-ai"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-crypto"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-proxy"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-rkn-ips"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-proxy-ips"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "domain_suffix": [
+          "2gis.ru",
+          "alfabank.ru",
+          "avito.ru",
+          "cbr.ru",
+          "gosuslugi.ru",
+          "nalog.gov.ru",
+          "ozon.ru",
+          "pochta.ru",
+          "sber.ru",
+          "sberbank.ru",
+          "tbank.ru",
+          "tinkoff.ru",
+          "vk.com",
+          "vtb.ru",
+          "wildberries.ru",
+          "ya.ru",
+          "yandex.ru"
+        ],
+        "outbound": "direct"
       },
       {
         "domain_suffix": [
           "ru",
           "su",
-          "moscow",
           "xn--p1ai",
           "xn--p1acf",
+          "moscow",
           "xn--80asehdb",
           "xn--c1avg",
           "xn--80aswg",
           "xn--80adxhks",
           "xn--d1acj3b"
         ],
-        "action": "route",
         "outbound": "direct"
       },
       {
         "rule_set": [
           "garasu-ru-ips"
         ],
-        "action": "route",
         "outbound": "direct"
       }
     ],
@@ -178,97 +213,87 @@
     "rule_set": [
       {
         "type": "remote",
+        "tag": "garasu-ads",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ads.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
         "tag": "garasu-rkn-domains",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/rkn-domains.json",
-        "update_interval": "6h"
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/rkn-domains.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-rkn-ips",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/rkn-ips.json",
-        "update_interval": "6h"
-      },
-      {
-        "type": "remote",
-        "tag": "garasu-youtube",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/youtube.json",
-        "update_interval": "6h"
-      },
-      {
-        "type": "remote",
-        "tag": "garasu-discord",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/discord.json",
-        "update_interval": "6h"
-      },
-      {
-        "type": "remote",
-        "tag": "garasu-ai",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/ai.json",
-        "update_interval": "6h"
-      },
-      {
-        "type": "remote",
-        "tag": "garasu-crypto",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/crypto.json",
-        "update_interval": "6h"
-      },
-      {
-        "type": "remote",
-        "tag": "garasu-proxy",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/proxy.json",
-        "update_interval": "6h"
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/rkn-ips.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-proxy-ips",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/proxy-ips.json",
-        "update_interval": "6h"
-      },
-      {
-        "type": "remote",
-        "tag": "garasu-ads",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/ads.json",
-        "update_interval": "6h"
-      },
-      {
-        "type": "remote",
-        "tag": "garasu-games",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/games.json",
-        "update_interval": "6h"
-      },
-      {
-        "type": "remote",
-        "tag": "garasu-direct",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/direct.json",
-        "update_interval": "6h"
-      },
-      {
-        "type": "remote",
-        "tag": "garasu-direct-ips",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/direct-ips.json",
-        "update_interval": "6h"
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/proxy-ips.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-ru-ips",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/singbox/ru-ips.json",
-        "update_interval": "6h"
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ru-ips.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-youtube",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/youtube.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-discord",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/discord.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-ai",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ai.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-crypto",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/crypto.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-proxy",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/proxy.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
       }
     ],
-    "final": "→ Remnawave"
+    "final": "→ Remnawave",
+    "default_http_client": "garasu-rules"
   },
   "inbounds": [
     {
@@ -304,9 +329,13 @@
   "outbounds": [
     {
       "tag": "→ Remnawave",
-      "type": "selector",
+      "type": "urltest",
       "outbounds": null,
-      "interrupt_exist_connections": true
+      "interrupt_exist_connections": true,
+      "url": "https://cp.cloudflare.com/generate_204",
+      "interval": "3m",
+      "tolerance": 150,
+      "idle_timeout": "30m"
     },
     {
       "tag": "direct",
@@ -327,5 +356,11 @@
       "cache_id": "remnawave",
       "store_fakeip": true
     }
-  }
+  },
+  "http_clients": [
+    {
+      "tag": "garasu-rules",
+      "detour": "→ Remnawave"
+    }
+  ]
 }

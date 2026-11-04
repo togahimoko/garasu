@@ -24,7 +24,12 @@ class OneProductionDelivery(unittest.TestCase):
             root = Path(directory)
             for name in ("release/incy/config.json", "release/happ/config.json",
                          "release/remnawave/srr.json", "clients/incy.json",
-                         "clients/happ.json", "install/manifest.json",
+                         "clients/happ.json",
+                         "release/mihomo/config.yaml", "release/stash/config.yaml",
+                         "release/singbox/config.json", "release/shadowrocket/config.conf",
+                         "clients/mihomo-remnawave.yaml", "clients/stash-remnawave.yaml",
+                         "clients/singbox-remnawave.json", "clients/singbox-remnawave-1.14.json",
+                         "clients/shadowrocket.conf", "install/manifest.json",
                          "install/links.json"):
                 target = root / name
                 target.parent.mkdir(parents=True, exist_ok=True)
@@ -38,8 +43,10 @@ class OneProductionDelivery(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="garasu-srr-") as directory:
             root = Path(directory)
             for name in ("release/incy/config.json", "release/happ/config.json",
-                         "release/remnawave/srr.json", "install/manifest.json",
-                         "install/links.json"):
+                         "release/remnawave/srr.json",
+                         "release/mihomo/config.yaml", "release/stash/config.yaml",
+                         "release/singbox/config.json", "release/shadowrocket/config.conf",
+                         "install/manifest.json", "install/links.json"):
                 dest = root / name
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / name, dest)

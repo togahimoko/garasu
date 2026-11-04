@@ -18,9 +18,9 @@ class UniversalRoutingContract(unittest.TestCase):
         cls.mihomo = yaml.safe_load((ROOT / "release/mihomo/config.yaml").read_text())
         cls.stash = yaml.safe_load((ROOT / "release/stash/config.yaml").read_text())
 
-    def test_exactly_one_canonical_policy_for_seven_formats(self):
+    def test_exactly_one_canonical_policy_for_eight_formats(self):
         self.assertEqual(self.policy["profiles"], 1)
-        self.assertEqual(len(TARGETS), 7)
+        self.assertEqual(len(TARGETS), 8)
         for rel, content in self.desired.items():
             with self.subTest(client=rel):
                 self.assertEqual((ROOT / rel).read_text(encoding="utf-8"), content)

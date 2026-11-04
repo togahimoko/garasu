@@ -85,6 +85,7 @@ def expected_files(root=ROOT):
         "incy": "incy://autorouting/onadd/" + BASE + "/release/incy/config.json",
         "happ": happ_header,
         "mihomo_template": BASE + "/release/mihomo/config.yaml",
+        "clash_template": BASE + "/release/clash/config.yaml",
         "stash_template": BASE + "/release/stash/config.yaml",
         "singbox_template": BASE + "/release/singbox/config.json",
         "xray_advanced_template": BASE + "/release/xray/config.json",

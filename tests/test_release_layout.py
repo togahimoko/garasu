@@ -28,13 +28,14 @@ class ReleaseLayoutTest(unittest.TestCase):
         expected = {
             "mihomo/config.yaml", "mihomo/build.py",
             "mihomo/.mrs/README.md", "mihomo/.mrs/manifest.json",
-            "stash/config.yaml", "incy/config.json", "happ/config.json",
+            "stash/config.yaml", "clash/config.yaml", "incy/config.json", "happ/config.json",
             "shadowrocket/config.conf", "singbox/config.json", "xray/config.json",
             "README.md", "remnawave/srr.json", "remnawave/README.md",
         }
         providers = ("ads", "rkn-domains", "rkn-ips", "proxy-ips", "ru-ips",
                      "youtube", "discord", "ai", "crypto", "proxy")
         expected.update("providers/" + name + ".txt" for name in providers)
+        expected.update("clash/providers/" + name + ".yaml" for name in providers)
         expected.update("singbox/rules/" + name + ".json" for name in providers)
         expected.update("singbox/rules/" + name + ".srs" for name in providers)
         actual = {p.relative_to(RELEASE).as_posix()

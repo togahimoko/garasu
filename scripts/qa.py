@@ -157,6 +157,8 @@ def main() -> None:
         if not core.is_file():
             parser.error("Mihomo binary not found: " + str(core))
         check_native(core)
+        run("Classic Clash YAML provider parser / 1,2,5 synthetic nodes",
+            [PYTHON, "scripts/check_clash_template.py", "--core", str(core)], env=env)
         run("Native offline DIRECT / PROXY / REJECT routing",
             [PYTHON, "scripts/smoke_universal_mihomo.py", "--core", str(core)],
             env=env)

@@ -20,5 +20,6 @@
     "proxy-ips": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/proxy-ips.list",
     "ads": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/ads.list",
     "ru-ips": "https://raw.githubusercontent.com/togahimoko/garasu/main/rules/surge/ru-ips.list"
-  }
+  },
+  "clash_template": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/config.yaml"
 }

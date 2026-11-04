@@ -66,6 +66,20 @@ class GarasuOneControlContract(unittest.TestCase):
         self.assertEqual(group["type"], "url-test")
         self.assertEqual(group["proxies"], ["REJECT"])
         self.assertEqual(p["rules"][-1], "MATCH,Garasu")
+        providers = p["rule-providers"]
+        self.assertEqual(len(providers), 13)
+        for name, item in providers.items():
+            self.assertEqual(item["format"], "mrs")
+            self.assertEqual(item["type"], "http")
+            self.assertEqual(
+                item["behavior"], "ipcidr" if name.endswith("-ips") else "domain"
+            )
+            self.assertEqual(
+                item["url"],
+                "https://raw.githubusercontent.com/togahimoko/garasu/"
+                "garasu-one-control-20261104/rules/mrs/" + name + ".mrs",
+            )
+            self.assertEqual(item["path"], "./garasu/" + name + ".mrs")
 
     def test_incy_happ_policy_consistency(self):
         a, b = js("incy.json"), js("happ.json")

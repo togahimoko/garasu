@@ -30,7 +30,8 @@ class ReleaseLayoutTest(unittest.TestCase):
             "mihomo/.mrs/README.md", "mihomo/.mrs/manifest.json",
             "stash/config.yaml", "incy/config.json", "happ/config.json",
             "shadowrocket/config.conf", "singbox/config.json", "xray/config.json",
-            "README.md",
+            "README.md", "remnawave/srr.json", "remnawave/srr-canary.json",
+            "remnawave/README.md",
         }
         actual = {p.relative_to(RELEASE).as_posix()
                   for p in RELEASE.rglob("*") if p.is_file()}
@@ -69,7 +70,9 @@ class ReleaseLayoutTest(unittest.TestCase):
         self.assertIsNone(data["proxies"])
         self.assertEqual([g["name"] for g in data["proxy-groups"]
                           if not g.get("hidden")], ["Garasu"])
-        self.assertEqual(data["proxy-groups"][1]["empty-fallback"], "REJECT")
+        self.assertEqual(len(data["proxy-groups"]), 1)
+        self.assertEqual(data["proxy-groups"][0]["type"], "url-test")
+        self.assertEqual(data["proxy-groups"][0]["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         self.assertNotIn("tun", data)
         self.assertTrue(all(x["proxy"] == "DIRECT"

@@ -114,9 +114,12 @@ def scan_release(root=ROOT):
     root = Path(root)
     items = list((root / "clients").rglob("*")) if (root / "clients").exists() else []
     items += list((root / "install").rglob("*")) if (root / "install").exists() else []
+    items += list((root / "release").rglob("*")) if (root / "release").exists() else []
     findings = []
     for file in sorted(items):
         if not file.is_file():
+            continue
+        if file.suffix.lower() in (".mrs", ".dat"):
             continue
         if file.stat().st_size > 1_000_000:
             findings.append(file.relative_to(root).as_posix() + ": oversized public asset")

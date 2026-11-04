@@ -1,4 +1,4 @@
-# Garasu ONE CONTROL | Remnawave MIHOMO template — STAGING ONLY.
+# Garasu | Remnawave Mihomo subscription template.
 # One visible group: Garasu, with native built-in health-based node selection.
 # Subscriber nodes are injected by Remnawave, not committed to GitHub.
 # TUN lifecycle belongs to the client GUI: never force-toggle an existing session.
@@ -27,7 +27,7 @@ dns:
     - https://dns.google/dns-query
     - https://cloudflare-dns.com/dns-query
   # Resolve Remnawave-provided node endpoints without depending on proxy DoH bootstrap.
-  # This is a canary fallback to the local system resolver; test on real ISPs.
+  # Bootstrap uses the system resolver; verify on actual client networks.
   proxy-server-nameserver:
     - system
   # DIRECT destinations should resolve using the local network resolver.

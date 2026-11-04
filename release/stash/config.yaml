@@ -1,4 +1,4 @@
-# Garasu ONE CONTROL | Stash Remnawave template — STAGING ONLY.
+# Garasu | Remnawave Stash subscription template.
 # Native MRS rule sets (domain and ipcidr); verified format per Stash docs.
 # One visible Garasu group; Stash handles url-test internally.
 # Never auto-fallback to DIRECT on foreign traffic.

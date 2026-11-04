@@ -30,7 +30,7 @@ class ReleaseLayoutTest(unittest.TestCase):
             "mihomo/.mrs/README.md", "mihomo/.mrs/manifest.json",
             "stash/config.yaml", "incy/config.json", "happ/config.json",
             "shadowrocket/config.conf", "singbox/config.json", "xray/config.json",
-            "README.md", "remnawave/srr.json", "remnawave/srr-canary.json",
+            "README.md", "remnawave/srr.json", "remnawave/srr-test.json",
             "remnawave/README.md",
         }
         actual = {p.relative_to(RELEASE).as_posix()

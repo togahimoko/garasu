@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Canonical route oracle used to check Garasu client adapters.
 
 ``categories`` contains sets named ``lan``, ``blocked``, ``ads``, ``direct``

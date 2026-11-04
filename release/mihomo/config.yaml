@@ -1,5 +1,5 @@
 # Garasu | Remnawave Mihomo subscription template.
-# One visible group: Garasu, with native built-in health-based node selection.
+# One visible Garasu selector: choose Auto or any authorized node manually.
 # Subscriber nodes are injected by Remnawave, not committed to GitHub.
 # TUN lifecycle belongs to the client GUI: never force-toggle an existing session.
 # Import as MIHOMO TEMPLATE in Remnawave; Remnawave injects each user's nodes.
@@ -14,7 +14,7 @@ ipv6: false
 unified-delay: true
 tcp-concurrent: true
 profile:
-  store-selected: false
+  store-selected: true
   store-fake-ip: true
 dns:
   enable: true
@@ -51,11 +51,18 @@ dns:
 proxies: # LEAVE THIS LINE!
 
 proxy-groups:
+  # Single visible control. Remnawave inserts all authorized nodes here.
   - name: Garasu
+    type: select
+    default-selected: Garasu Auto
+    proxies: # LEAVE THIS LINE!
+      - Garasu Auto
+      # Remnawave appends all subscriber-authorized nodes.
+
+  # Automatic failover hidden from the top-level group list.
+  - name: Garasu Auto
     type: url-test
-    # One visible group. Remnawave supplies each subscriber's personal nodes.
-    # XUDP / VLESS / REALITY / UDP are properties of those injected nodes,
-    # not properties of this URL-test group.
+    hidden: true
     url: https://cp.cloudflare.com/generate_204
     interval: 180
     tolerance: 150
@@ -68,7 +75,7 @@ proxy-groups:
     remnawave:
       include-proxies: false
     proxies: # LEAVE THIS LINE!
-      # All available subscriber nodes are evaluated automatically.
+      # Mihomo core includes every subscriber-authorized node.
 rule-providers:
   # Real compiled MRS rule assets, generated from Garasu source sets.
   # Rule updates deliberately use DIRECT, avoiding a bootstrap loop when VPN

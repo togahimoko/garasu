@@ -28,6 +28,7 @@ class ReleaseIntegrityTests(unittest.TestCase):
                 shutil.copy2(source, tmp / "rules" / source.name)
             for source in (ROOT / "rules").glob("*.cidr"):
                 shutil.copy2(source, tmp / "rules" / source.name)
+            shutil.copytree(ROOT / "release/providers", tmp / "release/providers")
             with (tmp / "release/mihomo/.mrs/youtube.mrs").open("ab") as f:
                 f.write(b"corrupted")
             with self.assertRaisesRegex(ReleaseError, "integrity mismatch"):

@@ -214,80 +214,80 @@
       {
         "type": "remote",
         "tag": "garasu-ads",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ads.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ads.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-rkn-domains",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/rkn-domains.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/rkn-domains.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-rkn-ips",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/rkn-ips.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/rkn-ips.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-proxy-ips",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/proxy-ips.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/proxy-ips.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-ru-ips",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ru-ips.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ru-ips.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-youtube",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/youtube.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/youtube.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-discord",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/discord.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/discord.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-ai",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ai.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ai.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-crypto",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/crypto.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/crypto.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       },
       {
         "type": "remote",
         "tag": "garasu-proxy",
-        "format": "source",
-        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/proxy.json",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/proxy.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
       }

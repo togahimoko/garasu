@@ -116,15 +116,14 @@ class DeliveryProbe(unittest.TestCase):
                   b"  - MATCH,Garasu\n"])
         raw = (b"proxies:\n  - name: PrivateOne\n    type: vless\n    server: hidden\n    port: 443\n"
                b"  - name: PrivateTwo\n    type: vless\n    server: hidden\n    port: 443\n"
-               b"proxy-groups:\n  - name: Garasu\n    type: select\n"
-               b"  - name: Garasu Auto\n    type: url-test\n"
+               b"proxy-groups:\n  - name: Garasu\n    type: url-test\n"
                b"rule-providers:\n" +
-               b"".join(("  %s:\n    type: http\n    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/providers/%s.txt\n" % (n,n)).encode() for n in providers) +
+               b"".join(("  %s:\n    type: http\n    format: mrs\n    interval: 21600\n    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/%s.mrs\n" % (n,n)).encode() for n in providers) +
                b"rules:\n" + b"".join(rules))
         result = probe.request_once(SECRET, "clash", "proxy",
                                     opener=FakeOpener(raw, kind="application/x-yaml"))
         self.assertEqual(result["yaml_counts"], {
-            "proxies": 2, "proxy_providers": 0, "proxy_groups": 2,
+            "proxies": 2, "proxy_providers": 0, "proxy_groups": 1,
             "rule_providers": 10, "rules": 16})
         self.assertTrue(probe._clash_ready(result))
         self.assertTrue(all(result["yaml_checks"].values()))

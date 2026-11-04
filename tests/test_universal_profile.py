@@ -33,8 +33,8 @@ class UniversalRoutingContract(unittest.TestCase):
             self.assertLess(len((ROOT / ("release/" + fmt + "/config.yaml")).read_bytes()), 12000)
             for name, provider in providers.items():
                 with self.subTest(client=fmt, provider=name):
-                    self.assertEqual(provider["url"], PROVIDERS_BASE + name + ".txt")
-                    self.assertEqual(provider["format"], "text")
+                    self.assertEqual(provider["url"], "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/" + name + ".mrs")
+                    self.assertEqual(provider["format"], "mrs")
                     self.assertEqual(provider["behavior"], provider_sets(self.policy)[name][0])
                     self.assertNotIn("payload", provider)
                     self.assertEqual((provider.get("type") or "http"), "http")
@@ -72,8 +72,8 @@ class UniversalRoutingContract(unittest.TestCase):
         for key, (behavior, values) in provider_sets(self.policy).items():
             item = sets["garasu-" + key]
             self.assertEqual(item["type"], "remote")
-            self.assertEqual(item["format"], "source")
-            self.assertEqual(item["url"], SINGBOX_BASE + key + ".json")
+            self.assertEqual(item["format"], "binary")
+            self.assertEqual(item["url"], SINGBOX_BASE + key + ".srs")
             self.assertEqual(item["http_client"], "garasu-rules")
             src = json.loads((ROOT / "release/singbox/rules" / (key+".json")).read_text())
             self.assertEqual(src["rules"][0]["domain_suffix" if behavior=="domain" else "ip_cidr"],values)

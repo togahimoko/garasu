@@ -142,8 +142,6 @@ def main() -> None:
             "port": sockd.server_address[1],
         }]
         config["proxy-groups"][0]["proxies"] = ["LOCAL_TEST_PROXY"]
-        config["proxy-groups"][0]["default-selected"] = "LOCAL_TEST_PROXY"
-        config["proxy-groups"][1]["proxies"] = []
         # Pure domain-routing scenario: remove private-IP rules only in the
         # ephemeral fixture, because all test hosts resolve to loopback.
         config["rules"] = [

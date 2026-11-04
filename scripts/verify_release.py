@@ -127,11 +127,11 @@ def verify_links(root: Path, target_branch: str) -> int:
 
 def verify_contract(root: Path) -> None:
     text = (root / "release/mihomo/config.yaml").read_text(encoding="utf-8")
-    require(text.count("proxies: # LEAVE THIS LINE!") == 3,
+    require(text.count("proxies: # LEAVE THIS LINE!") == 2,
             "Mihomo Remnawave insertion points changed")
-    require("type: select" in text and "name: Garasu Auto" in text
+    require("type: select" not in text and "name: Garasu" in text
             and "type: url-test" in text,
-            "Mihomo manual/automatic groups missing")
+            "Mihomo automatic route missing")
     require("MATCH,Garasu" in text, "Mihomo fallback is missing")
     for p in (root / "release").rglob("*.json"):
         json.loads(p.read_text(encoding="utf-8"))

@@ -13,7 +13,7 @@
 | Xray JSON | [xray/config.json](xray/config.json) — необязательный |
 | Remnawave SSR | [remnawave/](remnawave/) |
 
-Mihomo и Stash получают 10 текстовых rule-providers через [providers/](providers/). Sing-box загружает 10 [JSON source rule-sets](singbox/rules/); Shadowrocket использует ссылки DOMAIN-SET/RULE-SET. Первый запуск требует сети, далее помогает кэш. Архивные [13 MRS](mihomo/.mrs/) сохранены для совместимости. INCY/Happ и Xray используют [Garasu GeoSite/GeoIP](../geo/).
+Mihomo и Stash получают 10 бинарных [MRS](mihomo/.mrs/) с обновлением каждые **6 часов**; sing-box получает 10 бинарных [SRS](singbox/rules/) каждые **6 часов**. Shadowrocket использует удалённые DOMAIN-SET/RULE-SET, INCY/Happ и Xray — [Garasu GeoSite/GeoIP](../geo/). Крупные списки не встраиваются в конфигурации.
 
 **Не применять SSR вслепую:** сначала сверить наличие шаблонов, тип клиента и права на узлы в Remnawave. Коммит на GitHub не меняет живую конфигурацию сервера.
 

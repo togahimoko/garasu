@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.garasu.rules-six-hourly</string>
+  <key>ProgramArguments</key><array><string>__GARASU_SCRIPT__</string></array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>GARASU_PYTHON</key><string>__GARASU_PYTHON__</string>
+    <key>GARASU_MIHOMO_CORE</key><string>__GARASU_MIHOMO__</string>
+    <key>GARASU_SINGBOX_CORE</key><string>__GARASU_SINGBOX__</string>
+  </dict>
+  <key>StartInterval</key><integer>21600</integer>
+  <key>RunAtLoad</key><false/>
+  <key>StandardOutPath</key><string>__GARASU_LOG__</string>
+  <key>StandardErrorPath</key><string>__GARASU_ERROR_LOG__</string>
+</dict>
+</plist>

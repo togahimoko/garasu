@@ -52,6 +52,7 @@ class DeliveryProbe(unittest.TestCase):
             ("mihomo", b"proxies:\n- name: node\n", "yaml"),
             ("mihomo", b"# generated template\nmode: rule\nproxies:\n- name: node\n", "yaml"),
             ("singbox", b'{"outbounds":[]}', "json"),
+            ("xray-json", b'{"routing": {"rules": []}, "outbounds": []}', "json"),
             ("stash", b"proxy-groups:\n- name: group\n", "yaml"),
             ("happ", b"dmxlc3M6Ly90ZXN0Cg==", "base64"),
             ("browser", b"<html><title>Subscription</title></html>", "html"),
@@ -118,7 +119,7 @@ class DeliveryProbe(unittest.TestCase):
                b"  - name: PrivateTwo\n    type: vless\n    server: hidden\n    port: 443\n"
                b"proxy-groups:\n  - name: Garasu\n    type: url-test\n"
                b"rule-providers:\n" +
-               b"".join(("  %s:\n    type: http\n    format: mrs\n    interval: 21600\n    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/%s.mrs\n" % (n,n)).encode() for n in providers) +
+               b"".join(("  %s:\n    type: http\n    interval: 21600\n    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/%s.yaml\n" % (n,n)).encode() for n in providers) +
                b"rules:\n" + b"".join(rules))
         result = probe.request_once(SECRET, "clash", "proxy",
                                     opener=FakeOpener(raw, kind="application/x-yaml"))
@@ -137,7 +138,7 @@ class DeliveryProbe(unittest.TestCase):
 
     def test_live_sized_offline_template_can_be_checked_without_truncation(self):
         release = (Path(__file__).resolve().parents[1] /
-                   "release/mihomo/config.yaml").read_bytes()
+                   "release/clash/config.yaml").read_bytes()
         self.assertGreater(len(release), 3000)
         self.assertLess(len(release), 12000)
         fixtures = (b"proxies:\n"
@@ -151,6 +152,15 @@ class DeliveryProbe(unittest.TestCase):
         self.assertTrue(probe._clash_ready(result))
         self.assertTrue(result["yaml_checks"]["garasu_providers_remote"])
         self.assertNotIn("MOCK_ONE", json.dumps(result))
+
+    def test_classic_clash_and_mihomo_provider_formats_are_never_confused(self):
+        root = Path(__file__).resolve().parents[1]
+        clash = (root / "release/clash/config.yaml").read_bytes()
+        mihomo = (root / "release/mihomo/config.yaml").read_bytes()
+        self.assertTrue(probe._yaml_checks(clash, "clash")["garasu_providers_remote"])
+        self.assertFalse(probe._yaml_checks(clash, "mihomo")["garasu_providers_remote"])
+        self.assertTrue(probe._yaml_checks(mihomo, "mihomo")["garasu_providers_remote"])
+        self.assertFalse(probe._yaml_checks(mihomo, "clash")["garasu_providers_remote"])
 
     def test_rejects_remote_provider_with_missing_or_untrusted_urls(self):
         providers = sorted(probe.EXPECTED_GARASU_PROVIDERS)

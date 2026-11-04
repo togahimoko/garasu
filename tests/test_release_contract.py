@@ -109,7 +109,12 @@ class NativeReleaseContract(unittest.TestCase):
             "mihomo/1.0": "MIHOMO",
             "clash-verge-rev/2.0": "MIHOMO",
             "FlClash/1.0": "MIHOMO",
-            "clash/1.0": "MIHOMO",
+            "clash/1.0": "CLASH",
+            "ClashX/1.0": "CLASH",
+            "clash-premium/1.0": "CLASH",
+            "clashx meta/1.0": "MIHOMO",
+            "garasu-xray-json/1.0": "XRAY_JSON",
+            "xray-core/1.0": "XRAY_JSON",
             "stash/1.0": "STASH",
             "karing/1.0": "SINGBOX",
             "incy/1.0": "XRAY_BASE64",
@@ -124,12 +129,27 @@ class NativeReleaseContract(unittest.TestCase):
         self.assertEqual(rules[-1]["conditions"], [])
         for ua, expected in mapping.items():
             with self.subTest(ua=ua):
-                match = next(x for x in rules if self._match(x, ua))
+                match = next(x for x in rules if x["enabled"] and self._match(x, ua))
                 self.assertEqual(match["responseType"], expected)
         self.assertEqual(
             next(x for x in rules if self._match(x, "mihomo/1.0", "text/html"))["responseType"],
             "BROWSER"
         )
+
+    def test_response_rules_no_ambiguous_client_overlaps(self):
+        cases = ("mihomo/1.0", "clash-verge-rev/2.0", "FlClash/1.0",
+                 "clash/1.0", "ClashX/1.0", "clash-premium/1.0",
+                 "stash/2.0", "sfa/1.0", "karing/1.0",
+                 "garasu-xray-json/1.0", "xray/1.0", "xray-core/1.0",
+                 "incy/1.0", "happ/1.0", "Shadowrocket/1.0", "v2rayN/7.0")
+        rules = self.ssr["rules"]
+        self.assertEqual(sum(r["enabled"] and not r["conditions"] for r in rules), 1)
+        for ua in cases:
+            with self.subTest(ua=ua):
+                matches = [r for r in rules if r["enabled"] and r["conditions"]
+                           and self._match(r, ua)]
+                self.assertLessEqual(len(matches), 1, "Ambiguous User-Agent match")
+        self.assertEqual(rules[-1]["name"], "Fallback Base64")
 
     def test_happ_subscriber_header_equals_generated_profile(self):
         target = json.loads((RELEASE / "happ/config.json").read_text(encoding="utf-8"))
@@ -145,8 +165,8 @@ class NativeReleaseContract(unittest.TestCase):
         self.assertGreater(int(target["LastUpdated"]), 1793761499)
 
     def test_production_srr_has_no_missing_named_templates(self):
-        # Production SSR refers only to the known installed Default records.
-        # Optional Xray JSON is disabled until its template is deployed.
+        # SSR may reference only installed Default templates; five formats must
+        # be enabled while Xray-compatible apps can opt in explicitly.
         for rule in self.ssr["rules"]:
             if not rule.get("enabled", False):
                 continue
@@ -155,7 +175,13 @@ class NativeReleaseContract(unittest.TestCase):
                 self.assertEqual(template, "Default", rule["name"])
         xray = [r for r in self.ssr["rules"] if r["responseType"] == "XRAY_JSON"]
         self.assertEqual(len(xray), 1)
-        self.assertFalse(xray[0]["enabled"])
+        self.assertEqual({r["responseType"] for r in self.ssr["rules"] if r["enabled"]} &
+                         {"MIHOMO", "STASH", "SINGBOX", "CLASH", "XRAY_JSON"},
+                         {"MIHOMO", "STASH", "SINGBOX", "CLASH", "XRAY_JSON"})
+        self.assertEqual(next(r for r in self.ssr["rules"] if r["name"] == "Clash Core Clients")["responseType"], "CLASH")
+        self.assertTrue(xray[0]["enabled"])
+        self.assertEqual(xray[0]["responseModifications"]["subscriptionTemplate"], "Default")
+        self.assertTrue(xray[0]["responseModifications"]["ignoreHostXrayJsonTemplate"])
 
     def test_only_one_production_srr(self):
         self.assertEqual([p.name for p in

@@ -1,0 +1,57 @@
+name: Ошибка в Garasu
+description: Сообщить о дефекте публичной конфигурации, правилах или способе публикации
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Безопасность:** не вставляйте в Issue URL личных подписок, ключи REALITY,
+        UUID пользователей, IP личных серверов, SSH-токены или необработанные логи.
+        Проблемы с приватными данными сообщайте только по закрытому каналу.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Компонент
+      options:
+        - Mihomo / Clash Verge
+        - Stash
+        - sing-box
+        - INCY / Happ
+        - Shadowrocket
+        - Remnawave template / SSR
+        - Наборы правил / MRS
+        - Документация / инструменты
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Версия клиента и ОС
+      placeholder: "Например: Mihomo 1.x, macOS 15"
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Как воспроизвести
+      description: Опишите шаги без личных адресов и секретов
+      placeholder: "1. Импортировать тестовый шаблон ... 2. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Ожидаемый и фактический результат
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostic
+    attributes:
+      label: Безопасная диагностика
+      description: Только обезличенные выдержки журналов и результаты QA
+      render: text
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Защита данных
+      options:
+        - label: Я удалил из описания персональные подписки, ключи, токены и приватные IP
+          required: true

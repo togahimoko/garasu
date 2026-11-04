@@ -1,0 +1,35 @@
+name: Предложение по Garasu
+description: Предложить совместимую возможность для публичных шаблонов или правил
+title: "[Feature] "
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Область
+      options:
+        - Маршрутизация и категории
+        - Mihomo / Stash / sing-box
+        - INCY / Happ / Shadowrocket
+        - Remnawave SSR
+        - Проверки, сборка и публикация
+        - Документация
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу решает изменение?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Предлагаемый вариант
+      description: Опишите механизм, не раскрывая личные VPN-данные
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Совместимость и проверка
+      description: Укажите затронутые клиенты, публичные URL и способ тестирования

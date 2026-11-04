@@ -1,0 +1,17 @@
+# Generated lists and binary geodata are reproducible vendor-derived artifacts.
+*.mrs binary
+*.dat binary
+rules/** linguist-generated=true
+geo/** linguist-vendored=true
+reports/** linguist-generated=true
+release/mihomo/.mrs/** linguist-generated=true
+
+# Normalize editable text on every platform.
+*.py text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.conf text eol=lf
+*.list text eol=lf
+*.cidr text eol=lf

@@ -21,15 +21,28 @@ Remnawave выдаёт пользователю **его собственные 
 | [clients/](clients/) · [install/](install/) | Совместимость со старыми опубликованными ссылками |
 | [reports/](reports/) | Отчёты проверки наборов правил |
 
-## Проверка релиза
+## Проверка качества
+
+**Одна команда** запускает полный офлайн-контроль: 62 файла манифеста, 13 MRS, ссылки, контракт SSR, тесты Python и сканирование секретов.
 
 ```bash
-python3 -m unittest discover -s tests -v
-python3 scripts/audit_public_exposure.py
-python3 scripts/audit_rules.py --check
+python3 -m pip install 'PyYAML>=6,<7'
+python3 scripts/qa.py --branch main
 ```
 
-Требуются Python 3.10+ и PyYAML. Бинарные MRS проверяются по SHA-256; запуск нативного ядра Mihomo описан в [эксплуатации](docs/operations.md).
+С установленным Mihomo проверяются воспроизводимая пересборка MRS и четыре нативные конфигурации с синтетическими узлами:
+
+```bash
+python3 scripts/qa.py --branch main --core /path/to/mihomo
+```
+
+После публикации — сравнение с публичным GitHub Raw:
+
+```bash
+python3 scripts/probe_release_assets.py --branch main
+```
+
+Эти команды не используют личные подписки и не изменяют VPN-серверы. [Подробный чек-лист](docs/release-checklist.md).
 
 ## Выпуск и безопасность
 
@@ -39,4 +52,9 @@ python3 scripts/audit_rules.py --check
 
 ## Документация
 
+- [Порядок выпуска](docs/release-checklist.md): контроль качества, публикация и откат.
+- [Участие в проекте](CONTRIBUTING.md): требования к изменениям.
+- [Безопасность](SECURITY.md): работа с ключами и сообщение об уязвимости.
+- [GitHub Issues](https://github.com/togahimoko/garasu/issues/new/choose): структурированные отчёты без личных данных.
+- [Настройки GitHub](docs/github-maintenance.md): защита main, права и проверка метаданных.
 [Архитектура](docs/architecture.md) · [Эксплуатация и выпуск](docs/operations.md) · [Технический аудит](docs/audit.md) · [Источники данных](SOURCES.md)

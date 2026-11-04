@@ -30,7 +30,7 @@ A single YAML file cannot control different cores. A single Remnawave subscripti
 - Mihomo: Garasu Auto hidden. Rule-providers fetch over DIRECT rather than requiring the same potentially broken VPN; this breaks the bootstrap cycle. Failed DIRECT GitHub requests still need cached rule sets; no universal mirror fallback is claimed. Only Garasu is visible.
 - Stash: single native Garasu URL-test group preserved, with REJECT when zero subscribers' nodes are injected.
 - INCY/Happ: identical routing policies named Garasu; personal node delivery remains Remnawave's job.
-- Shadowrocket: native PROXY routing, not a complete VLESS subscription. Managed update URL refers to clients/one-control/shadowrocket.conf after merge.
+- Shadowrocket: native PROXY routing, not a complete VLESS subscription. Managed update URL points to the staging branch only. Switch to an immutable promoted release before production rollout.
 - sing-box: switch one injected selector to urltest, move rule-set HTTP fetching and DNS bootstrap to direct, and delete contradictory private-IP-to-VPN rules. Keep the Remnawave injection placeholder tag; a literal Garasu UI label is not proven.
 - Xray advanced: delete contradictory route sending private-IP answers over VPN. Virtual host injection required; not a replacement for XRAY_BASE64.
 

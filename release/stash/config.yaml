@@ -1,0 +1,156 @@
+# Garasu ONE CONTROL | Stash Remnawave template — STAGING ONLY.
+# Native MRS rule sets (domain and ipcidr); verified format per Stash docs.
+# One visible Garasu group; Stash handles url-test internally.
+# Never auto-fallback to DIRECT on foreign traffic.
+# User nodes are inserted at the two Remnawave anchors below.
+mode: rule
+log-level: warning
+allow-lan: false
+ipv6: false
+dns:
+  default-nameserver:
+    - 1.1.1.1
+    - 8.8.8.8
+  nameserver:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+proxies: # LEAVE THIS LINE!
+proxy-groups:
+  - name: Garasu
+    # Remnawave injects every subscriber node at this anchor.
+    # Native Stash url-test automatically selects a healthy server.
+    type: url-test
+    url: https://cp.cloudflare.com/generate_204
+    interval: 180
+    tolerance: 150
+    lazy: false
+    proxies: # LEAVE THIS LINE!
+      # An empty Stash group otherwise behaves as DIRECT.
+      # Explicit reject protects VPN-only destinations when no nodes exist.
+      - REJECT
+rule-providers:
+  rkn-domains:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/rkn-domains.mrs
+    path: ./rule-providers/rkn-domains.mrs
+    interval: 21600
+  youtube:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/youtube.mrs
+    path: ./rule-providers/youtube.mrs
+    interval: 21600
+  discord:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/discord.mrs
+    path: ./rule-providers/discord.mrs
+    interval: 21600
+  ai:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/ai.mrs
+    path: ./rule-providers/ai.mrs
+    interval: 21600
+  crypto:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/crypto.mrs
+    path: ./rule-providers/crypto.mrs
+    interval: 21600
+  proxy:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/proxy.mrs
+    path: ./rule-providers/proxy.mrs
+    interval: 21600
+  ads:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/ads.mrs
+    path: ./rule-providers/ads.mrs
+    interval: 21600
+  games:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/games.mrs
+    path: ./rule-providers/games.mrs
+    interval: 21600
+  direct:
+    type: http
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/direct.mrs
+    path: ./rule-providers/direct.mrs
+    interval: 21600
+  rkn-ips:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/rkn-ips.mrs
+    path: ./rule-providers/rkn-ips.mrs
+    interval: 21600
+  proxy-ips:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/proxy-ips.mrs
+    path: ./rule-providers/proxy-ips.mrs
+    interval: 21600
+  direct-ips:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/direct-ips.mrs
+    path: ./rule-providers/direct-ips.mrs
+    interval: 21600
+  ru-ips:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/staging/release/mihomo/.mrs/ru-ips.mrs
+    path: ./rule-providers/ru-ips.mrs
+    interval: 21600
+rules:
+  # Local device/network domains must bypass the VPN at first match.
+  - DOMAIN-SUFFIX,localhost,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,lan,DIRECT
+  - DOMAIN-SUFFIX,home.arpa,DIRECT
+  - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
+  - IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+  - RULE-SET,rkn-domains,Garasu
+  - RULE-SET,rkn-ips,Garasu
+  - RULE-SET,youtube,Garasu
+  - RULE-SET,discord,Garasu
+  - RULE-SET,ai,Garasu
+  - RULE-SET,crypto,Garasu
+  - RULE-SET,proxy,Garasu
+  - RULE-SET,proxy-ips,Garasu
+  - RULE-SET,ads,REJECT
+  - GEOIP,LAN,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,ru,DIRECT
+  - DOMAIN-SUFFIX,su,DIRECT
+  - DOMAIN-SUFFIX,moscow,DIRECT
+  - DOMAIN-SUFFIX,xn--p1ai,DIRECT
+  - DOMAIN-SUFFIX,xn--p1acf,DIRECT
+  - DOMAIN-SUFFIX,xn--80asehdb,DIRECT
+  - DOMAIN-SUFFIX,xn--c1avg,DIRECT
+  - DOMAIN-SUFFIX,xn--80aswg,DIRECT
+  - DOMAIN-SUFFIX,xn--80adxhks,DIRECT
+  - DOMAIN-SUFFIX,xn--d1acj3b,DIRECT
+  - RULE-SET,ru-ips,DIRECT,no-resolve
+  - MATCH,Garasu

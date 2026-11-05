@@ -8,6 +8,8 @@ import argparse
 import json
 import os
 import time
+import http.client
+import socket
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
 from urllib.request import ProxyHandler, Request, build_opener
@@ -16,11 +18,34 @@ PORTS = (9097, 9090)
 TEST_URL = "https://www.gstatic.com/generate_204"
 
 
+class UnixHTTPConnection(http.client.HTTPConnection):
+    def __init__(self, path, timeout=4):
+        super().__init__("localhost", timeout=timeout)
+        self.socket_path = path
+
+    def connect(self):
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.settimeout(self.timeout)
+        sock.connect(self.socket_path)
+        self.sock = sock
+
+
 def api_get(port, endpoint, secret="", timeout=4):
-    request = Request(
-        f"http://127.0.0.1:{port}{endpoint}",
-        headers={"Accept": "application/json", **({"Authorization": f"Bearer {secret}"} if secret else {})},
-    )
+    headers = {"Accept": "application/json"}
+    if secret:
+        headers["Authorization"] = f"Bearer {secret}"
+    if isinstance(port, str):
+        conn = UnixHTTPConnection(port, timeout=timeout)
+        try:
+            conn.request("GET", endpoint, headers=headers)
+            response = conn.getresponse()
+            if response.status >= 400:
+                raise HTTPError("http://localhost" + endpoint, response.status,
+                                response.reason, response.headers, None)
+            return json.loads(response.read(1024 * 1024))
+        finally:
+            conn.close()
+    request = Request(f"http://127.0.0.1:{port}{endpoint}", headers=headers)
     with build_opener(ProxyHandler({})).open(request, timeout=timeout) as response:
         return json.load(response)
 
@@ -49,7 +74,7 @@ def group_summary(data, node):
 def diagnose(port, secret, fragment, count, interval):
     data = api_get(port, "/proxies", secret)
     node, matches = choose_node(data, fragment)
-    report = {"controller_port": port, "matches": matches, "samples": []}
+    report = {"controller": "unix" if isinstance(port, str) else f"tcp:{port}", "matches": matches, "samples": []}
     if node is None:
         report["status"] = "NOT_FOUND_OR_AMBIGUOUS"
         return report
@@ -79,13 +104,21 @@ def main():
     p = argparse.ArgumentParser(description="Test one Mihomo node without switching Garasu")
     p.add_argument("--name-contains", required=True, help="Unique substring of node name")
     p.add_argument("--port", type=int, default=0, help="Mihomo local external-controller port")
+    p.add_argument("--unix-socket", default="", help="Local Unix controller socket (Clash Verge Rev)")
     p.add_argument("--count", type=int, default=3)
     p.add_argument("--interval", type=float, default=5)
     args = p.parse_args()
     if not 1 <= args.count <= 100 or not 0 <= args.interval <= 120:
         p.error("count must be 1..100 and interval 0..120")
     secret = os.environ.get("GARASU_MIHOMO_API_SECRET", "")
-    for port in ((args.port,) if args.port else PORTS):
+    default_socket = f"/var/run/clash-verge-service/users/{os.getuid()}/verge-mihomo.sock"
+    if args.unix_socket:
+        targets = [args.unix_socket]
+    elif args.port:
+        targets = [args.port]
+    else:
+        targets = ([default_socket] if os.path.exists(default_socket) else []) + list(PORTS)
+    for port in targets:
         try:
             report = diagnose(port, secret, args.name_contains, args.count, args.interval)
             print(json.dumps(report, ensure_ascii=False, indent=2))
@@ -96,7 +129,7 @@ def main():
                 return
         except (URLError, OSError, TimeoutError, ValueError, json.JSONDecodeError):
             continue
-    print(json.dumps({"status": "CONTROLLER_UNREACHABLE", "ports_checked": [args.port] if args.port else PORTS}))
+    print(json.dumps({"status": "CONTROLLER_UNREACHABLE", "tried_unix": any(isinstance(x, str) for x in targets), "tcp_ports": [x for x in targets if isinstance(x, int)]}))
 
 
 if __name__ == "__main__":

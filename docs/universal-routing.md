@@ -6,9 +6,11 @@
 ## Приоритеты
 1. LAN, localhost, private IPv4/IPv6 → DIRECT
 2. Реклама без четырёх исключённых API Ozon/Wildberries → REJECT
-3. RKN, YouTube, Discord, AI, crypto, proxy и заблокированные IP → VPN
-4. Обычные российские домены и IP → DIRECT
-5. Всё остальное, включая зарубежный трафик → VPN
+3. RKN, геоограниченные, YouTube, Discord, Telegram (и IP), GitHub, AI и blocked IP → VPN
+4. Twitch Ads и Google Play → VPN **раньше** Twitch DIRECT и Push DIRECT
+5. Apple, Microsoft, Twitch, Pinterest, игры, torrent trackers, системный Push/FCM → DIRECT
+6. Российские банки, обычные RU домены и IP → DIRECT, после заблокированных исключений
+7. Всё неизвестное → VPN; при отказе VPN узла не возвращаться автоматически в DIRECT
 
 ## Ссылочные наборы правил
 
@@ -37,8 +39,25 @@ python3 scripts/sync_public_links.py --check
 python3 scripts/qa.py --branch main --core /path/to/mihomo
 ```
 
-QA проверяет содержимое 20 rule-set файлов и клиентские ссылки, а
-для офлайн-проверки Mihomo использует **временную** локальную копию
-содержимого провайдеров, не меняя опубликованную конфигурацию.
+QA проверяет 37 наборов и клиентские ссылки; офлайн-проверка Mihomo
+использует **временную** локальную копию провайдеров. Матрица тестируется
+в `tests/test_foreign_routes.py` и `tests/test_mobile_ru_matrix.py`.
 
 [Выпуск и откат](release-checklist.md) · [Покрытие](../reports/routing-coverage.md)
+
+## Матрица РФ (Garasu V2)
+
+| Маршрут | Категории | Приоритет |
+|---|---|---|
+| DIRECT | LAN/private, банки/госуслуги, RU сервисы, Apple, Microsoft, Twitch, Pinterest, Push/FCM, Steam/Epic/Origin/Riot/EfT/Faceit, torrent trackers | После точечных RKN/geo-restricted исключений |
+| PROXY | Заблокированные RU домены/IP, geo-restricted, YouTube, Discord, Telegram CIDR, GitHub, AI/Copilot, Google Play, Twitch Ads | До общего DIRECT |
+| REJECT | Реклама, category-ads, win-spy | С известными Ozon/Wildberries исключениями |
+| PROXY | Неизвестные ресурсы | Последнее правило |
+
+База: [roscomvpn-routing](https://github.com/hydraponique/roscomvpn-routing),
+[roscomvpn-geosite](https://github.com/hydraponique/roscomvpn-geosite) и
+[DigneZzZ/routing](https://github.com/DigneZzZ/routing). DigneZzZ выбирает
+для Google Play другой маршрут в некоторых профилях; Garasu использует
+вариант RoscomVPN.
+
+До проверки реального VPN-соединения активный профиль Mac не заменяется.

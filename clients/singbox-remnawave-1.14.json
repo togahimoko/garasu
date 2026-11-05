@@ -227,37 +227,37 @@
         "rule_set": [
           "garasu-epicgames"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
           "garasu-origin"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
           "garasu-riot"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
           "garasu-escapefromtarkov"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
           "garasu-steam"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
           "garasu-faceit"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
@@ -269,19 +269,25 @@
         "rule_set": [
           "garasu-torrent-domains"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
           "garasu-microsoft"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
           "garasu-apple"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-push"
+        ],
+        "outbound": "direct"
       },
       {
         "rule_set": [
@@ -293,19 +299,13 @@
         "rule_set": [
           "garasu-twitch"
         ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
           "garasu-pinterest"
         ],
-        "outbound": "→ Remnawave"
-      },
-      {
-        "rule_set": [
-          "garasu-push"
-        ],
-        "outbound": "→ Remnawave"
+        "outbound": "direct"
       },
       {
         "rule_set": [
@@ -327,6 +327,10 @@
       },
       {
         "domain_suffix": [
+          "apple.com",
+          "microsoft.com",
+          "icloud.com",
+          "outlook.com",
           "2gis.ru",
           "alfabank.ru",
           "avito.ru",

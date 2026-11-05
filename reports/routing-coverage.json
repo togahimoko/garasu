@@ -841,12 +841,12 @@
       "clients": {
         "Mihomo": {
           "actions": {
-            "DIRECT": 174,
-            "PROXY": 3110
+            "DIRECT": 178,
+            "PROXY": 3106
           },
-          "deviations": 3110,
+          "deviations": 3106,
           "reasons": {
-            "MATCH": 3094,
+            "MATCH": 3090,
             "SET:rkn-domains": 16
           },
           "samples": [
@@ -904,12 +904,12 @@
         },
         "Stash": {
           "actions": {
-            "DIRECT": 174,
-            "PROXY": 3110
+            "DIRECT": 178,
+            "PROXY": 3106
           },
-          "deviations": 3110,
+          "deviations": 3106,
           "reasons": {
-            "MATCH": 3094,
+            "MATCH": 3090,
             "SET:rkn-domains": 16
           },
           "samples": [
@@ -967,12 +967,12 @@
         },
         "Clash": {
           "actions": {
-            "DIRECT": 174,
-            "PROXY": 3110
+            "DIRECT": 178,
+            "PROXY": 3106
           },
-          "deviations": 3110,
+          "deviations": 3106,
           "reasons": {
-            "MATCH": 3094,
+            "MATCH": 3090,
             "SET:rkn-domains": 16
           },
           "samples": [
@@ -1030,12 +1030,12 @@
         },
         "Shadowrocket": {
           "actions": {
-            "DIRECT": 174,
-            "PROXY": 3110
+            "DIRECT": 178,
+            "PROXY": 3106
           },
-          "deviations": 3110,
+          "deviations": 3106,
           "reasons": {
-            "MATCH": 3094,
+            "MATCH": 3090,
             "SET:rkn-domains": 16
           },
           "samples": [
@@ -1093,12 +1093,12 @@
         },
         "sing-box": {
           "actions": {
-            "DIRECT": 174,
-            "PROXY": 3110
+            "DIRECT": 178,
+            "PROXY": 3106
           },
-          "deviations": 3110,
+          "deviations": 3106,
           "reasons": {
-            "FINAL": 3094,
+            "FINAL": 3090,
             "SET:rkn-domains": 16
           },
           "samples": [

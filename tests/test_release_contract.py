@@ -165,7 +165,8 @@ class NativeReleaseContract(unittest.TestCase):
         self.assertLess(len(value.encode("ascii")), 3500)
         profile = json.loads(base64.b64decode(value.split("/onadd/", 1)[1]))
         self.assertEqual(profile, target)
-        self.assertEqual(profile["BlockSites"], ["geosite:garasu-ads"])
+        self.assertEqual(profile["BlockSites"],
+                         ["geosite:garasu-ads","geosite:category-ads","geosite:win-spy"])
         self.assertGreater(int(target["LastUpdated"]), 1793761499)
 
     def test_production_srr_has_no_missing_named_templates(self):

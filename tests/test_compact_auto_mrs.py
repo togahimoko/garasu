@@ -33,8 +33,9 @@ class CompactAutoMRSTests(unittest.TestCase):
 
     def test_mobile_routing_revision_advances_with_source_revision(self):
         from scripts.sync_universal_routing import route_incy
-        policy = {"critical_ru_direct_domains": ["sber.ru"],
-                  "_last_updated": "1794000001"}
+        from scripts.sync_universal_routing import load_policy
+        policy = load_policy(ROOT)
+        policy["_last_updated"] = "1794000001"
         config = {"LastUpdated": "1793815000"}
         output = route_incy(config, policy)
         self.assertEqual(output["LastUpdated"], "1794000001")

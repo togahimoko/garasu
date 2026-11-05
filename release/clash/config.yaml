@@ -286,23 +286,27 @@ rules:
   - RULE-SET,github-patterns,Garasu
   - RULE-SET,telegram,Garasu
   - RULE-SET,twitch-ads,Garasu
-  - RULE-SET,epicgames,Garasu
-  - RULE-SET,origin,Garasu
-  - RULE-SET,riot,Garasu
-  - RULE-SET,escapefromtarkov,Garasu
-  - RULE-SET,steam,Garasu
-  - RULE-SET,faceit,Garasu
+  - RULE-SET,epicgames,DIRECT
+  - RULE-SET,origin,DIRECT
+  - RULE-SET,riot,DIRECT
+  - RULE-SET,escapefromtarkov,DIRECT
+  - RULE-SET,steam,DIRECT
+  - RULE-SET,faceit,DIRECT
   - RULE-SET,telegram-ips,Garasu,no-resolve
-  - RULE-SET,torrent-domains,Garasu
-  - RULE-SET,microsoft,Garasu
-  - RULE-SET,apple,Garasu
+  - RULE-SET,torrent-domains,DIRECT
+  - RULE-SET,microsoft,DIRECT
+  - RULE-SET,apple,DIRECT
+  - RULE-SET,push,DIRECT
   - RULE-SET,google-play,Garasu
-  - RULE-SET,twitch,Garasu
-  - RULE-SET,pinterest,Garasu
-  - RULE-SET,push,Garasu
+  - RULE-SET,twitch,DIRECT
+  - RULE-SET,pinterest,DIRECT
   - RULE-SET,ru-whitelist,DIRECT
   - RULE-SET,ru-services,DIRECT
   - RULE-SET,direct-ips,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,apple.com,DIRECT
+  - DOMAIN-SUFFIX,microsoft.com,DIRECT
+  - DOMAIN-SUFFIX,icloud.com,DIRECT
+  - DOMAIN-SUFFIX,outlook.com,DIRECT
   - DOMAIN-SUFFIX,2gis.ru,DIRECT
   - DOMAIN-SUFFIX,alfabank.ru,DIRECT
   - DOMAIN-SUFFIX,avito.ru,DIRECT

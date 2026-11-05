@@ -63,9 +63,12 @@ def load_policy(root: Path) -> dict:
         raise ValueError("Only one fail-closed Garasu policy is supported")
     tlds = p["russian_tlds"]
     direct = p["critical_ru_direct_domains"]
+    system_direct = p["system_direct_domains"]
     if not tlds or len(tlds) != len(set(tlds)) or len(direct) != len(set(direct)):
         raise ValueError("Duplicate/empty Russian direct category")
-    for name in tlds + direct + p["ad_exempt_domains"]:
+    if not system_direct or len(set(system_direct))!=len(system_direct):
+        raise ValueError("Missing or duplicate system DIRECT domains")
+    for name in tlds + direct + system_direct + p["ad_exempt_domains"]:
         if not re.fullmatch(r"[a-z0-9-]+(?:\.[a-z0-9-]+)*", name):
             raise ValueError("Invalid policy domain: " + name)
     for cidr in p["private_ipv4"] + p["private_ipv6"]:
@@ -154,7 +157,8 @@ def native_rules(p: dict, group: str) -> list[str]:
         action=group if target=="Garasu" else target
         result.append("RULE-SET,"+name+","+action+
                       (",no-resolve" if behavior=="ipcidr" else ""))
-    result += ["DOMAIN-SUFFIX,"+d+",DIRECT" for d in p["critical_ru_direct_domains"]]
+    result += ["DOMAIN-SUFFIX,"+d+",DIRECT" for d in
+               p["system_direct_domains"]+p["critical_ru_direct_domains"]]
     result += ["DOMAIN-SUFFIX,"+d+",DIRECT" for d in p["russian_tlds"]]
     result += ["RULE-SET,ru-ips,DIRECT,no-resolve","MATCH,"+group]
     return result
@@ -291,7 +295,7 @@ def render_shadow(src: str, p: dict) -> str:
         else:
             raise ValueError("No Shadowrocket IP provider for "+name)
     output += ["DOMAIN-SUFFIX,"+x+",DIRECT" for x in
-               p["critical_ru_direct_domains"]+p["russian_tlds"]]
+               p["system_direct_domains"]+p["critical_ru_direct_domains"]+p["russian_tlds"]]
     output.append("RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.list,DIRECT")
     output.append("FINAL,PROXY,dns-failed")
     return prefix+marker+"\n".join(output)+"\n"
@@ -332,7 +336,8 @@ def route_singbox(cfg: dict, p: dict) -> dict:
         else:
             routes.append({"rule_set":["garasu-"+key],
                            "outbound":"→ Remnawave" if target=="Garasu" else "direct"})
-    routes.extend([{"domain_suffix": p["critical_ru_direct_domains"], "outbound": "direct"},
+    routes.extend([{"domain_suffix": p["system_direct_domains"]+p["critical_ru_direct_domains"],
+                    "outbound": "direct"},
                    {"domain_suffix": p["russian_tlds"], "outbound": "direct"},
                    {"rule_set": ["garasu-ru-ips"], "outbound": "direct"}])
     cfg["route"]["rules"] = routes
@@ -347,47 +352,64 @@ def route_singbox(cfg: dict, p: dict) -> dict:
     return cfg
 
 
+def mobile_routing_matrix(p: dict) -> dict[str,list[str]]:
+    """Compact GeoSite-based policy; mobile formats cannot use MRS directly.
+
+    GeoSite category existence and consistency are separately checked by
+    scripts/audit_geodata.py. Prefixes are explicit to prevent accidental
+    overbroad DIRECTs for geo-blocked Russian or foreign domains.
+    """
+    direct_geo=("private","category-ru","whitelist","garasu-ru",
+                "microsoft","apple","twitch","pinterest",
+                "steam","epicgames","origin","riot","escapefromtarkov","faceit")
+    proxy_geo=("banned-ru","category-geoblock-ru","youtube","discord",
+               "ai","crypto","telegram","github","google-play",
+               "twitch-ads","google-deepmind")
+    block_geo=("garasu-ads","category-ads","win-spy")
+    # Push must precede Google Play PROXY to preserve FCM connectivity.
+    direct_domains=(p["system_direct_domains"]+
+                    p["critical_ru_direct_domains"]+
+                    p["_extra_sets"]["push"][1])
+    return {"direct":["geosite:"+x for x in direct_geo]+
+                     ["domain:"+x for x in direct_domains],
+            "proxy":["geosite:"+x for x in proxy_geo],
+            "block":["geosite:"+x for x in block_geo]}
+
+
 def route_incy(cfg: dict, p: dict) -> dict:
     cfg["Name"] = "Garasu"
-    # Happ applies updated routing only when LastUpdated increases.
     cfg["LastUpdated"] = p["_last_updated"]
     cfg["GlobalProxy"] = "true"
     cfg["RouteOrder"] = "block-proxy-direct"
     cfg["DomainStrategy"] = "IPIfNonMatch"
-    cfg["DirectSites"] = ["geosite:private", "geosite:category-ru",
-                          "geosite:garasu-ru"] + ["domain:" + x for x in
-                                                p["critical_ru_direct_domains"]]
-    cfg["DirectIp"] = ["geoip:private", "geoip:ru"]
-    cfg["ProxySites"] = ["geosite:banned-ru", "geosite:youtube",
-                         "geosite:discord", "geosite:ai", "geosite:crypto",
-                         "geosite:telegram", "geosite:github"]
-    cfg["ProxyIp"] = ["geoip:blocked-ru"]
-    cfg["BlockSites"] = ["geosite:garasu-ads"]
-    cfg["BlockIp"] = []
-    cfg["Geoipurl"] = GEO_BASE + "geoip.dat"
-    cfg["Geositeurl"] = GEO_BASE + "geosite.dat"
+    matrix=mobile_routing_matrix(p)
+    cfg["DirectSites"]=matrix["direct"]
+    cfg["DirectIp"]=["geoip:private","geoip:ru"]
+    cfg["ProxySites"]=matrix["proxy"]
+    cfg["ProxyIp"]=["geoip:blocked-ru"]
+    cfg["BlockSites"]=matrix["block"]
+    cfg["BlockIp"]=[]
+    cfg["Geoipurl"]=GEO_BASE+"geoip.dat"
+    cfg["Geositeurl"]=GEO_BASE+"geosite.dat"
     return cfg
 
 
 def route_xray(cfg: dict, p: dict) -> dict:
-    cfg["routing"]["domainStrategy"] = "AsIs"
-    cfg["routing"]["rules"] = [
-        {"type": "field", "domain": ["domain:" + x for x in p["private_domains"]],
-         "outboundTag": "direct"},
-        {"type": "field", "ip": p["private_ipv4"] + p["private_ipv6"],
-         "outboundTag": "direct"},
-        {"type": "field", "domain": ["geosite:garasu-ads"],
-         "outboundTag": "block"},
-        {"type": "field", "domain": ["geosite:banned-ru", "geosite:youtube",
-                                      "geosite:discord", "geosite:ai", "geosite:crypto"],
-         "outboundTag": "proxy"},
-        {"type": "field", "ip": ["geoip:blocked-ru"], "outboundTag": "proxy"},
-        {"type": "field",
-         "domain": ["geosite:category-ru", "geosite:garasu-ru"] +
-                   ["domain:" + x for x in p["critical_ru_direct_domains"]],
-         "outboundTag": "direct"},
-        {"type": "field", "ip": ["geoip:ru"], "outboundTag": "direct"},
-        {"type": "field", "network": "tcp,udp", "outboundTag": "proxy"},
+    cfg["routing"]["domainStrategy"]="AsIs"
+    matrix=mobile_routing_matrix(p)
+    cfg["routing"]["rules"]=[
+        {"type":"field","domain":["domain:"+x for x in p["private_domains"]],
+         "outboundTag":"direct"},
+        {"type":"field","ip":p["private_ipv4"]+p["private_ipv6"],
+         "outboundTag":"direct"},
+        {"type":"field","domain":matrix["block"],"outboundTag":"block"},
+        # A blocked/go-restricted domain has priority over broad RU or
+        # service-level DIRECT. Keep all PROXY GeoSite categories together.
+        {"type":"field","domain":matrix["proxy"],"outboundTag":"proxy"},
+        {"type":"field","ip":["geoip:blocked-ru"],"outboundTag":"proxy"},
+        {"type":"field","domain":matrix["direct"],"outboundTag":"direct"},
+        {"type":"field","ip":["geoip:ru"],"outboundTag":"direct"},
+        {"type":"field","network":"tcp,udp","outboundTag":"proxy"},
     ]
     return cfg
 

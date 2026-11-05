@@ -15,13 +15,13 @@
     },
     "microsoft": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/microsoft.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "apple": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/apple.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
@@ -33,49 +33,49 @@
     },
     "epicgames": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/epicgames.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "origin": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/origin.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "riot": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/riot.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "escapefromtarkov": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/escapefromtarkov.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "steam": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/steam.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "twitch": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/twitch.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "pinterest": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/pinterest.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "faceit": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/faceit.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
@@ -105,7 +105,7 @@
     },
     "torrent-domains": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/torrent-domains.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
@@ -129,7 +129,7 @@
     },
     "push": {
       "behavior": "domain",
-      "action": "Garasu",
+      "action": "DIRECT",
       "source": "rules/extra/push.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
@@ -185,10 +185,10 @@
     "torrent-domains",
     "microsoft",
     "apple",
+    "push",
     "google-play",
     "twitch",
     "pinterest",
-    "push",
     "ru-whitelist",
     "ru-services",
     "direct-ips"

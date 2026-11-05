@@ -54,7 +54,7 @@ class Coverage(unittest.TestCase):
         self.assertLess(pos('RULE-SET,ru-geoblock,Garasu'),pos('RULE-SET,ru-services,DIRECT'))
         self.assertLess(pos('RULE-SET,telegram,Garasu'),pos('RULE-SET,ru-services,DIRECT'))
         self.assertLess(pos('RULE-SET,telegram-ips,Garasu'),pos('RULE-SET,ru-ips,DIRECT'))
-        self.assertLess(pos('RULE-SET,win-spy,REJECT'),pos('RULE-SET,microsoft,Garasu'))
+        self.assertLess(pos('RULE-SET,win-spy,REJECT'),pos('RULE-SET,microsoft,DIRECT'))
         for category in ('ru-services','ru-whitelist'):
             contents=(ROOT/f'rules/extra/{category}.list').read_text()
             for domain in ('ipify.org','checkip.amazonaws.com','ifconfig.me','ipapi.is','iplocate.io','ip.sb'):

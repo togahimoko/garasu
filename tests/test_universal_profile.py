@@ -111,13 +111,15 @@ class UniversalRoutingContract(unittest.TestCase):
             self.assertIn("geoip:ru", cfg["DirectIp"])
             self.assertTrue(cfg["Geoipurl"].endswith("/geo/geoip.dat"))
             self.assertTrue(cfg["Geositeurl"].endswith("/geo/geosite.dat"))
-            self.assertEqual(cfg["BlockSites"], ["geosite:garasu-ads"])
+            self.assertEqual(cfg["BlockSites"],
+                             ["geosite:garasu-ads","geosite:category-ads","geosite:win-spy"])
 
     def test_xray_uses_paired_geo_for_both_actions(self):
         cfg = json.loads((ROOT / "release/xray/config.json").read_text())
         routes = cfg["routing"]["rules"]
         self.assertEqual(routes[-1]["outboundTag"], "proxy")
-        self.assertEqual(routes[2]["domain"], ["geosite:garasu-ads"])
+        self.assertEqual(routes[2]["domain"],
+                         ["geosite:garasu-ads","geosite:category-ads","geosite:win-spy"])
         self.assertIn("geosite:banned-ru", routes[3]["domain"])
         self.assertIn("geoip:blocked-ru", routes[4]["ip"])
         self.assertIn("geosite:category-ru", routes[5]["domain"])

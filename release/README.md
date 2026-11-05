@@ -20,3 +20,4 @@ Mihomo и Stash получают 10 бинарных [MRS](mihomo/.mrs/) с об
 
 Документы: [архитектура](../docs/architecture.md) · [эксплуатация](../docs/operations.md) · [аудит](../docs/audit.md).
 \nКлассический **Clash** использует 10 отдельных YAML-провайдеров из [clash/providers/](clash/providers/) каждые 21600 секунд: MRS не поддерживается старым ядром. Установка одного маршрута Garasu не делает оригинальный Clash совместимым с VLESS/REALITY; для них используйте Mihomo.\n
+Mihomo скачивает MRS через **DIRECT**; sing-box 1.14 загружает SRS через HTTP-клиент без detour. Независимый холодный запуск двух ядер с заведомо нерабочей тестовой нодой: `scripts/qa.py --cold-network`. Без доступа к GitHub Raw и без кеша наборы не загрузятся.

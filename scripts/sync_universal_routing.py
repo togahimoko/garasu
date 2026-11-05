@@ -178,7 +178,7 @@ def render_yaml(src: str, p: dict, *, stash: bool = False) -> str:
         if not stash:
             parts.extend([
                 "    type: http",
-                "    proxy: Garasu",
+                "    proxy: DIRECT",
             ])
     parts.extend(["", "rules:"])
     for rule in native_rules(p, "Garasu"):
@@ -251,12 +251,14 @@ def route_singbox(cfg: dict, p: dict) -> dict:
         }
         for key in provider_sets(p)
     ]
-    # The existing http_clients tag is required for sing-box >= 1.14.
+    # Explicit direct downloader avoids rule-set bootstrap via a broken VPN (sing-box >= 1.14).
     clients = [item for item in cfg.get("http_clients", [])
                if item.get("tag") == "garasu-rules"]
     if len(clients) != 1:
         raise ValueError("Missing dedicated sing-box HTTP downloader")
-    clients[0]["detour"] = "→ Remnawave"
+    # No explicit detour is needed: sing-box 1.14 HTTP client dials directly.
+    # 'detour: direct' points at an empty direct outbound and fails at runtime.
+    clients[0].pop("detour", None)
     cfg["route"]["default_http_client"] = "garasu-rules"
     routes = [{"action": "sniff"}, {"protocol": "dns", "action": "hijack-dns"},
               {"domain_suffix": p["private_domains"], "outbound": "direct"},
@@ -271,6 +273,11 @@ def route_singbox(cfg: dict, p: dict) -> dict:
     cfg["route"]["rules"] = routes
     cfg["route"]["final"] = "→ Remnawave"
     dns = cfg.get("dns", {})
+    # Modern sing-box DNS transport also fails at runtime on an explicit
+    # detour to the built-in empty direct outbound.
+    for server in dns.get("servers", []):
+        if server.get("detour") == "direct":
+            server.pop("detour")
     dns.pop("independent_cache", None)  # Deprecated as of sing-box 1.14.
     dns["rules"] = [
         {"domain_suffix": p["private_domains"], "action": "route", "server": "local"},

@@ -22,7 +22,7 @@ class CompactAutoMRSTests(unittest.TestCase):
                 self.assertEqual(provider["type"], "http")
                 self.assertEqual(provider["format"], "mrs")
                 self.assertEqual(provider["interval"], 21600)
-                self.assertEqual(provider["proxy"], "Garasu")
+                self.assertEqual(provider["proxy"], "DIRECT")
                 self.assertEqual(provider["url"], RAW + "release/mihomo/.mrs/" + name + ".mrs")
                 self.assertTrue((ROOT / "release/mihomo/.mrs" / (name + ".mrs")).stat().st_size > 20)
         self.assertLess((ROOT / "release/mihomo/config.yaml").stat().st_size, 12000)

@@ -22,12 +22,127 @@ AGENTS = {
     "singbox": "singbox/1.14.2",
     "happ": "happ/1.0",
     "incy": "incy/1.0",
+    "shadowrocket": "shadowrocket/2.2",
     "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36",
     "xray": "v2rayN/7.0",
     "xray-json": "garasu-xray-json/1.0",
 }
-DEFAULT_AGENTS = ("mihomo", "clash", "stash", "singbox", "happ", "incy", "browser", "xray-json")
+DEFAULT_AGENTS = ("mihomo", "clash", "stash", "singbox", "happ", "incy", "shadowrocket", "browser", "xray-json")
 MAX_BYTES = 2_000_000  # Bounded diagnostics; large rule sets must not be inline.
+
+
+# Explicitly track families that need native routing headers or separate managed rules.
+EXPECTED_FORMATS = {
+    "mihomo": "yaml", "clash": "yaml", "stash": "yaml",
+    "singbox": "json", "happ": "base64", "incy": "base64",
+    "shadowrocket": "base64", "browser": "html",
+    "xray": "base64", "xray-json": "json",
+}
+
+
+def _node_summary(body, kind):
+    """Count generated nodes and supported transports. No identity ever leaves."""
+    summary = {"node_count": 0, "vless_ws_tls_443": 0, "vless_reality_443": 0}
+    nodes = []
+    if kind == "base64":
+        try:
+            decoded = base64.b64decode(b"".join(body.split()), validate=True)
+            for entry in decoded.decode("utf-8", "replace").splitlines():
+                if "://" not in entry:
+                    continue
+                link = urllib.parse.urlsplit(entry.strip())
+                if link.scheme.lower() not in {"vless", "vmess", "trojan", "ss", "socks"}:
+                    continue
+                opts = urllib.parse.parse_qs(link.query)
+                try:
+                    port = link.port
+                except ValueError:
+                    port = None
+                nodes.append({
+                    "proto": link.scheme.lower(), "port": port,
+                    "network": opts.get("type", [""])[0],
+                    "security": opts.get("security", [""])[0],
+                    "path": opts.get("path", [""])[0],
+                })
+        except (ValueError, binascii.Error):
+            return summary
+    elif kind == "yaml":
+        section = None
+        current = None
+        for line in body.decode("utf-8", "replace").splitlines():
+            if re.match(r"^[A-Za-z][\w-]*:", line):
+                section = line.split(":", 1)[0]
+                if section != "proxies" and current:
+                    nodes.append(current)
+                    current = None
+                continue
+            if section != "proxies":
+                continue
+            new_proxy = re.match(r"^  -\s+name\s*:", line)
+            if new_proxy:
+                if current is not None:
+                    nodes.append(current)
+                current = {}
+            if current is None:
+                continue
+            attr = re.match(r"^\s+(type|port|network|tls|path|security):\s*(\S+)", line)
+            if attr:
+                current[attr.group(1)] = attr.group(2).strip("'\"")
+        if current:
+            nodes.append(current)
+    elif kind == "json":
+        try:
+            config = json.loads(body)
+        except (ValueError, UnicodeDecodeError):
+            return summary
+        for outbound in config.get("outbounds", []):
+            if not isinstance(outbound, dict):
+                continue
+            if outbound.get("type") == "vless":
+                tls = outbound.get("tls") or {}
+                transport = outbound.get("transport") or {}
+                nodes.append({"proto": "vless",
+                              "port": outbound.get("server_port"),
+                              "network": transport.get("type"),
+                              "security": "tls" if tls.get("enabled") else "",
+                              "path": transport.get("path")})
+            elif outbound.get("protocol") == "vless":
+                stream = outbound.get("streamSettings") or {}
+                ws = stream.get("wsSettings") or {}
+                nodes.append({"proto": "vless", "port": outbound.get("port"),
+                              "network": stream.get("network"),
+                              "security": stream.get("security"),
+                              "path": ws.get("path")})
+            elif outbound.get("type") in ("trojan", "shadowsocks", "vmess"):
+                nodes.append({"proto": outbound["type"]})
+    summary["node_count"] = len(nodes)
+    for node in nodes:
+        proto = node.get("proto", node.get("type", ""))
+        if proto == "vless" and str(node.get("port", "")) == "443":
+            if node.get("network") == "ws" and str(node.get("path", "")).startswith("/ws") and str(node.get("security", "")).lower() in ("tls", "true"):
+                summary["vless_ws_tls_443"] += 1
+            if node.get("security") == "reality":
+                summary["vless_reality_443"] += 1
+    return summary
+
+
+def _delivery_issues(report):
+    """Pure diagnostics: no mutation, no hidden DIRECT downgrade."""
+    if report.get("status") != 200:
+        return ["SUBSCRIPTION_UNREACHABLE"]
+    expected = EXPECTED_FORMATS[report["client"]]
+    if report.get("format") != expected:
+        return ["FORMAT_MISMATCH"]
+    if report.get("truncated"):
+        return ["TRUNCATED"]
+    if report["client"] != "browser" and (report.get("nodes") or {}).get("node_count", 0) == 0:
+        return ["NO_COMPATIBLE_NODES"]
+    issues = []
+    if report["client"] == "incy" and not report.get("has_autorouting_header"):
+        issues.append("INCY_AUTOROUTING_HEADER_MISSING")
+    if report["client"] == "happ" and not report.get("has_routing_header"):
+        issues.append("HAPP_ROUTING_HEADER_MISSING")
+    return issues
 
 
 class RejectRedirect(urllib.request.HTTPRedirectHandler):
@@ -254,6 +369,9 @@ def request_once(url, client, transport, *, opener=None, timeout=8):
         "has_autorouting_header": False,
         "yaml_counts": None,
         "yaml_checks": None,
+        "nodes": None,
+        "issues": [],
+        "routing_profile": "separate-managed-config" if client == "shadowrocket" else "subscription-header",
         "error": None,
     }
     try:
@@ -267,6 +385,7 @@ def request_once(url, client, transport, *, opener=None, timeout=8):
             data = data[:MAX_BYTES]
             result["read_bytes"] = len(data)
             result["format"] = _format(data, result["mime"])
+            result["nodes"] = _node_summary(data, result["format"])
             if result["format"] == "yaml":
                 result["yaml_counts"] = _yaml_counts(data)
                 result["yaml_checks"] = _yaml_checks(data, client)
@@ -277,6 +396,7 @@ def request_once(url, client, transport, *, opener=None, timeout=8):
     except (OSError, ValueError, TimeoutError) as exc:
         result["error"] = type(exc).__name__
         # Never include exc: its message may contain the private URL.
+    result["issues"] = _delivery_issues(result)
     return result
 
 
@@ -286,6 +406,8 @@ def main():
     parser.add_argument("--timeout", type=float, default=8.0)
     parser.add_argument("--clients", nargs="+", choices=list(AGENTS),
                         default=list(DEFAULT_AGENTS))
+    parser.add_argument("--require-all-ready", action="store_true",
+                        help="exit 3 on missing/empty/wrong client responses")
     parser.add_argument("--require-clash-ready", action="store_true",
                         help="exit 2 unless clash/1.0 returns two nodes and all ten offline Garasu providers")
     args = parser.parse_args()
@@ -300,6 +422,8 @@ def main():
                for transport in transports for client in args.clients]
     print(json.dumps({"diagnostics_only": True, "results": reports},
                      ensure_ascii=False, indent=2))
+    if args.require_all_ready and any(report["issues"] for report in reports):
+        raise SystemExit(3)
     if args.require_clash_ready and not any(_clash_ready(r) for r in reports):
         raise SystemExit(2)
 

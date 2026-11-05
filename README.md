@@ -15,8 +15,8 @@ Remnawave выдаёт пользователю **его собственные 
 | Каталог | Назначение |
 | --- | --- |
 | [release/](release/) | Нативные шаблоны клиентов и правила выдачи Remnawave |
-| [release/mihomo/.mrs/](release/mihomo/.mrs/) | 13 бинарных MRS и манифест SHA-256 |
-| [release/clash/](release/clash/) | Отдельный Clash/Premium YAML и 10 удалённых YAML-наборов (21600 с) |
+| [release/mihomo/.mrs/](release/mihomo/.mrs/) | 37 бинарных MRS и манифест SHA-256 |
+| [release/clash/](release/clash/) | Отдельный Clash/Premium YAML и 37 удалённых YAML-наборов (21600 с) |
 | [release/providers/](release/providers/) | 10 исходных текстовых списков для компиляции MRS |
 | [release/singbox/rules/](release/singbox/rules/) | 10 бинарных SRS и исходные JSON для sing-box |
 | [rules/](rules/) | Исходные домены, CIDR и экспортные форматы |
@@ -40,7 +40,7 @@ Remnawave выдаёт пользователю **его собственные 
 
 ## Проверка качества
 
-**Одна команда** запускает полный офлайн-контроль: 62 файла манифеста, 20 ссылочных наборов, 13 MRS, контракт SSR, тесты и сканирование секретов.
+**Одна команда** запускает полный офлайн-контроль: проверку всех исходников и SHA-256, 37 MRS и 37 SRS, контракт SSR, тесты и сканирование секретов.
 
 ```bash
 python3 -m pip install 'PyYAML>=6,<7'

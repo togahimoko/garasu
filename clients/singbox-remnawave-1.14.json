@@ -57,8 +57,7 @@
       {
         "tag": "cf-dns",
         "type": "tls",
-        "server": "1.1.1.1",
-        "detour": "direct"
+        "server": "1.1.1.1"
       },
       {
         "tag": "local",
@@ -118,7 +117,31 @@
       },
       {
         "rule_set": [
+          "garasu-category-ads"
+        ],
+        "action": "reject"
+      },
+      {
+        "rule_set": [
+          "garasu-win-spy"
+        ],
+        "action": "reject"
+      },
+      {
+        "rule_set": [
           "garasu-rkn-domains"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-rkn-ips"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-proxy-ips"
         ],
         "outbound": "→ Remnawave"
       },
@@ -154,15 +177,153 @@
       },
       {
         "rule_set": [
-          "garasu-rkn-ips"
+          "garasu-ru-geoblock"
         ],
         "outbound": "→ Remnawave"
       },
       {
         "rule_set": [
-          "garasu-proxy-ips"
+          "garasu-ru-geoblock-patterns"
         ],
         "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-youtube-global"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-google-deepmind"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-github"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-github-patterns"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-telegram"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-twitch-ads"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-epicgames"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-origin"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-riot"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-escapefromtarkov"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-steam"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-faceit"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-telegram-ips"
+        ],
+        "outbound": "→ Remnawave"
+      },
+      {
+        "rule_set": [
+          "garasu-torrent-domains"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-microsoft"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-apple"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-google-play"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-twitch"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-pinterest"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-push"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-ru-whitelist"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-ru-services"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": [
+          "garasu-direct-ips"
+        ],
+        "outbound": "direct"
       },
       {
         "domain_suffix": [
@@ -290,6 +451,222 @@
         "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/proxy.srs",
         "update_interval": "6h",
         "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-ru-services",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ru-services.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-ru-whitelist",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ru-whitelist.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-microsoft",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/microsoft.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-apple",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/apple.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-google-play",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/google-play.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-epicgames",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/epicgames.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-origin",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/origin.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-riot",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/riot.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-escapefromtarkov",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/escapefromtarkov.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-steam",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/steam.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-twitch",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/twitch.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-pinterest",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/pinterest.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-faceit",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/faceit.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-github",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/github.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-twitch-ads",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/twitch-ads.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-telegram",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/telegram.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-win-spy",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/win-spy.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-torrent-domains",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/torrent-domains.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-category-ads",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/category-ads.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-ru-geoblock",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ru-geoblock.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-google-deepmind",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/google-deepmind.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-push",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/push.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-youtube-global",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/youtube-global.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-direct-ips",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/direct-ips.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-telegram-ips",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/telegram-ips.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-ru-geoblock-patterns",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/ru-geoblock-patterns.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
+      },
+      {
+        "type": "remote",
+        "tag": "garasu-github-patterns",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/togahimoko/garasu/main/release/singbox/rules/github-patterns.srs",
+        "update_interval": "6h",
+        "http_client": "garasu-rules"
       }
     ],
     "final": "→ Remnawave",
@@ -359,8 +736,7 @@
   },
   "http_clients": [
     {
-      "tag": "garasu-rules",
-      "detour": "→ Remnawave"
+      "tag": "garasu-rules"
     }
   ]
 }

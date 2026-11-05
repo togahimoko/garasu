@@ -68,11 +68,14 @@ def verify_mrs(root: Path) -> int:
     base = root / "release/mihomo/.mrs"
     manifest = json_file(root, "release/mihomo/.mrs/manifest.json")
     records = manifest.get("files", [])
-    require({x["name"] for x in records} == set(CATEGORIES)
-            and len(records) == len(CATEGORIES),
+    extras = json_file(root, "policy/extra_categories.json")["categories"]
+    expected = set(CATEGORIES) | {name for name,info in extras.items()
+                                  if info["behavior"] in ("domain","ipcidr")}
+    require({x["name"] for x in records} == expected
+            and len(records) == len(expected),
             "Unexpected MRS categories or duplicate manifest entries")
     files = {p.name for p in base.glob("*.mrs")}
-    require(files == {x + ".mrs" for x in CATEGORIES},
+    require(files == {x + ".mrs" for x in expected},
             "Missing, extra or stale binary MRS file")
     for record in records:
         name = record["name"]

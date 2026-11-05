@@ -144,9 +144,16 @@ def main() -> None:
         config["proxy-groups"][0]["proxies"] = ["LOCAL_TEST_PROXY"]
         # Pure domain-routing scenario: remove private-IP rules only in the
         # ephemeral fixture, because all test hosts resolve to loopback.
+        # Domain-specific test: all destinations are forced to 127.0.0.1.
+        # Exclude IP-CIDR providers here; otherwise an intentional DIRECT IP
+        # rule intercepts a fake remote destination before domain matching.
+        ip_providers = {name for name, entry in config["rule-providers"].items()
+                        if entry.get("behavior") == "ipcidr"}
         config["rules"] = [
             rule for rule in config["rules"]
             if not rule.startswith(("IP-CIDR,", "IP-CIDR6,", "GEOIP,"))
+            and not (rule.startswith("RULE-SET,")
+                     and rule.split(",")[1] in ip_providers)
         ]
         path = root / "fixture.yaml"
         path.write_text(yaml.safe_dump(config, allow_unicode=True), encoding="utf-8")
@@ -189,7 +196,9 @@ def main() -> None:
                 raise AssertionError("Ad domain was not rejected")
             routed = [item for item in traces if item[1] == httpd.server_port]
             if len(routed) != 2:
-                raise AssertionError("Expected two routed requests; got " + repr(traces))
+                raise AssertionError("Expected two routed requests; got " + repr(traces)
+                                     + "; OUTCOMES=" + repr(outcomes)
+                                     + "; TRACE=" + "\n".join(events.splitlines()[-18:]))
             if "003.su" not in events:
                 raise AssertionError("Blocked Russian domain not seen in native trace")
             print("PASS native offline bank DIRECT / foreign PROXY / blocked RU PROXY / ads REJECT")

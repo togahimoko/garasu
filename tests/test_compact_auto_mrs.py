@@ -20,12 +20,16 @@ class CompactAutoMRSTests(unittest.TestCase):
         for name, provider in cfg["rule-providers"].items():
             with self.subTest(name=name):
                 self.assertEqual(provider["type"], "http")
-                self.assertEqual(provider["format"], "mrs")
+                classical = provider["behavior"]=="classical"
+                self.assertEqual(provider["format"], "yaml" if classical else "mrs")
                 self.assertEqual(provider["interval"], 21600)
-                self.assertEqual(provider["proxy"], "Garasu")
-                self.assertEqual(provider["url"], RAW + "release/mihomo/.mrs/" + name + ".mrs")
-                self.assertTrue((ROOT / "release/mihomo/.mrs" / (name + ".mrs")).stat().st_size > 20)
-        self.assertLess((ROOT / "release/mihomo/config.yaml").stat().st_size, 12000)
+                self.assertEqual(provider["proxy"], "DIRECT")
+                url = (RAW+"release/clash/providers/"+name+".yaml" if classical else
+                       RAW+"release/mihomo/.mrs/"+name+".mrs")
+                self.assertEqual(provider["url"],url)
+                if not classical:
+                    self.assertTrue((ROOT/"release/mihomo/.mrs"/(name+".mrs")).stat().st_size>20)
+        self.assertLess((ROOT / "release/mihomo/config.yaml").stat().st_size, 24000)
 
     def test_mobile_routing_revision_advances_with_source_revision(self):
         from scripts.sync_universal_routing import route_incy
@@ -40,9 +44,11 @@ class CompactAutoMRSTests(unittest.TestCase):
         self.assertEqual([g["type"] for g in cfg["proxy-groups"]], ["url-test"])
         for name, provider in cfg["rule-providers"].items():
             with self.subTest(name=name):
-                self.assertEqual(provider["format"], "mrs")
-                self.assertEqual(provider["interval"], 21600)
-                self.assertEqual(provider["url"], RAW + "release/mihomo/.mrs/" + name + ".mrs")
+                classical=provider["behavior"]=="classical"
+                self.assertEqual(provider["format"],"yaml" if classical else "mrs")
+                self.assertEqual(provider["interval"],21600)
+                self.assertEqual(provider["url"],(RAW+"release/clash/providers/"+name+".yaml" if classical else
+                                                   RAW+"release/mihomo/.mrs/"+name+".mrs"))
 
     def test_singbox_uses_binary_remote_srs_refresh(self):
         cfg = json.loads((ROOT / "release/singbox/config.json").read_text())

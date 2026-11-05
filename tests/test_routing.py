@@ -70,10 +70,11 @@ class GarasuTests(unittest.TestCase):
         self.assertEqual(groups["Garasu"]["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         for key, provider in data["rule-providers"].items():
-            self.assertTrue(provider["url"].startswith(
-                "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/"
-            ), key)
-            self.assertEqual(provider["format"], "mrs")
+            fmt="yaml" if provider["behavior"]=="classical" else "mrs"
+            self.assertEqual(provider["format"],fmt)
+            self.assertTrue(provider["url"].endswith(
+                "/release/clash/providers/"+key+".yaml" if fmt=="yaml" else
+                "/release/mihomo/.mrs/"+key+".mrs"),key)
             self.assertEqual(provider["interval"], 21600)
             self.assertEqual(provider["type"], "http")
         self.assertEqual(data["rule-providers"]["rkn-ips"]["behavior"], "ipcidr")
@@ -85,7 +86,7 @@ class GarasuTests(unittest.TestCase):
             return  # first repo bootstrap before initial scheduled build
         manifest = json.loads(path.read_text())
         self.assertEqual(manifest["name"], "Garasu MAX")
-        self.assertEqual(len(manifest["files"]), 62)
+        self.assertGreaterEqual(len(manifest["files"]), 269)
         for filename, record in manifest["files"].items():
             data = (ROOT / filename).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), record["sha256"], filename)
@@ -173,7 +174,8 @@ class GarasuTests(unittest.TestCase):
         self.assertEqual(config["route"]["final"], "→ Remnawave")
         self.assertTrue(config["experimental"]["cache_file"]["enabled"])
         all_tags = {r["tag"] for r in config["route"]["rule_set"]}
-        self.assertEqual(len(all_tags), 10)
+        from scripts.sync_universal_routing import load_policy, provider_sets
+        self.assertEqual(len(all_tags), len(provider_sets(load_policy(ROOT))))
         self.assertIn("garasu-ru-ips", all_tags)
         for provider in config["route"]["rule_set"]:
             self.assertEqual(provider["format"], "binary")
@@ -206,9 +208,7 @@ class GarasuTests(unittest.TestCase):
         self.assertEqual([o["tag"] for o in xray["outbounds"]], ["direct", "block"])
 
     def test_all_singbox_rule_sets_are_published(self):
-        base = ROOT / "rules/singbox"
-        if not base.exists():
-            return
+        base = ROOT / "release/singbox/rules"
         cfg = json.loads((ROOT / "clients/singbox-remnawave.json").read_text())
         for provider in cfg["route"]["rule_set"]:
             filename = base / (provider["tag"].removeprefix("garasu-") + ".json")
@@ -216,9 +216,8 @@ class GarasuTests(unittest.TestCase):
             doc = json.loads(filename.read_text())
             self.assertEqual(doc["version"], 3)
             self.assertTrue(doc["rules"])
-            self.assertTrue(doc["rules"][0].get("domain_suffix") or
-                            doc["rules"][0].get("domain") or
-                            doc["rules"][0].get("ip_cidr"))
+            self.assertTrue(any(doc["rules"][0].get(k) for k in
+                            ("domain_suffix","domain","ip_cidr","domain_keyword","domain_regex")))
 
     def test_surge_and_quantumultx_adapters(self):
         sample = b"# source\n+.example.ru\n+.youtube.com\n"

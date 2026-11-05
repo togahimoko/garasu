@@ -5,6 +5,7 @@ from pathlib import Path
 import unittest
 
 from scripts import probe_subscription_delivery as probe
+from scripts.sync_universal_routing import provider_sets, load_policy
 
 SECRET = "https://example.invalid/access/VERY_PRIVATE_SUBSCRIPTION_TOKEN"
 
@@ -125,7 +126,7 @@ class DeliveryProbe(unittest.TestCase):
                                     opener=FakeOpener(raw, kind="application/x-yaml"))
         self.assertEqual(result["yaml_counts"], {
             "proxies": 2, "proxy_providers": 0, "proxy_groups": 1,
-            "rule_providers": 10, "rules": 16})
+            "rule_providers": len(providers), "rules": 16})
         self.assertTrue(probe._clash_ready(result))
         self.assertTrue(all(result["yaml_checks"].values()))
         self.assertNotIn("PrivateOne", json.dumps(result))

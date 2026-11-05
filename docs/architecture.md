@@ -20,10 +20,10 @@ Garasu публикует нативные профили маршрутизац
 
 ## Форматы
 
-- Mihomo: `release/mihomo/config.yaml` — одна автоматическая группа Garasu (url-test), 10 удалённых бинарных MRS.
+- Mihomo: `release/mihomo/config.yaml` — одна автоматическая группа Garasu (url-test), 35 удалённых бинарных MRS и 2 classical YAML.
 - Classic Clash/Premium: `release/clash/config.yaml`, отдельные YAML rule-providers на GitHub и одна автоматическая группа Garasu; MRS и include-all Mihomo здесь не используются.
 - Stash: `release/stash/config.yaml` — автоматический url-test и 10 бинарных MRS.
-- sing-box: `release/singbox/config.json` — 10 удалённых бинарных SRS.
+- sing-box: `release/singbox/config.json` — 37 удалённых бинарных SRS.
 - INCY/Happ: `release/incy/config.json` и `release/happ/config.json`, нативная политика Xray/geo.
 - Shadowrocket: `release/shadowrocket/config.conf`, отдельная политика при сохранении личной подписки.
 - Xray JSON: `release/xray/config.json`, опциональный шаблон виртуального хоста.

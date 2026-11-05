@@ -52,7 +52,7 @@ def check_native(core: Path) -> None:
                        (record["name"] + ".mrs")).read_bytes()
             if digest(src) != digest(rebuilt):
                 raise RuntimeError("MRS rebuild changed: " + record["name"])
-        print("PASS 13/13 reproduced binary MRS", flush=True)
+        print(f"PASS {len(release['files'])}/{len(release['files'])} reproduced binary MRS", flush=True)
 
         template = yaml.safe_load(
             (ROOT / "release/mihomo/config.yaml").read_text(encoding="utf-8"))
@@ -88,7 +88,9 @@ def check_singbox_native(core: Path) -> None:
     from scripts.sync_universal_routing import SINGBOX_BASE
 
     cfg = json.loads((ROOT / "release/singbox/config.json").read_text())
-    if len(cfg["route"]["rule_set"]) != 10:
+    from scripts.sync_universal_routing import load_policy, provider_sets
+    expected_count=len(provider_sets(load_policy(ROOT)))
+    if len(cfg["route"]["rule_set"]) != expected_count:
         raise RuntimeError("Unexpected sing-box provider count")
     for item in cfg["route"]["rule_set"]:
         name = item["tag"].removeprefix("garasu-")
@@ -113,7 +115,7 @@ def check_singbox_native(core: Path) -> None:
     with tempfile.TemporaryDirectory(prefix="garasu-singbox-native-") as directory:
         dest = Path(directory) / "singbox.json"
         dest.write_text(json.dumps(cfg, ensure_ascii=False), encoding="utf-8")
-        run("sing-box native 1.14 schema + ten source rule-sets",
+        run("sing-box native 1.14 schema + 37 source rule-sets",
             [str(core), "check", "-c", str(dest)])
 
 

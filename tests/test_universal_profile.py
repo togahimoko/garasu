@@ -30,11 +30,15 @@ class UniversalRoutingContract(unittest.TestCase):
         for client, fmt in ((self.mihomo, "mihomo"), (self.stash, "stash")):
             providers = client["rule-providers"]
             self.assertEqual(set(providers), keys)
-            self.assertLess(len((ROOT / ("release/" + fmt + "/config.yaml")).read_bytes()), 12000)
+            self.assertLess(len((ROOT / ("release/" + fmt + "/config.yaml")).read_bytes()), 24000)
             for name, provider in providers.items():
                 with self.subTest(client=fmt, provider=name):
-                    self.assertEqual(provider["url"], "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/" + name + ".mrs")
-                    self.assertEqual(provider["format"], "mrs")
+                    classical=provider["behavior"]=="classical"
+                    url=("https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/"+name+".yaml"
+                         if classical else
+                         "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/"+name+".mrs")
+                    self.assertEqual(provider["url"],url)
+                    self.assertEqual(provider["format"],"yaml" if classical else "mrs")
                     self.assertEqual(provider["behavior"], provider_sets(self.policy)[name][0])
                     self.assertNotIn("payload", provider)
                     self.assertEqual((provider.get("type") or "http"), "http")
@@ -57,7 +61,7 @@ class UniversalRoutingContract(unittest.TestCase):
 
     def test_shadowrocket_uses_ordered_remote_sets(self):
         text = (ROOT / "release/shadowrocket/config.conf").read_text()
-        self.assertLess(len(text.encode()), 8000)
+        self.assertLess(len(text.encode()), 15000)
         self.assertIn("DOMAIN-SET," + PROVIDERS_BASE + "ads.txt,REJECT", text)
         self.assertIn("DOMAIN-SET," + PROVIDERS_BASE + "rkn-domains.txt,PROXY", text)
         self.assertIn("RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/rkn-ips.list,PROXY", text)
@@ -66,9 +70,9 @@ class UniversalRoutingContract(unittest.TestCase):
 
     def test_singbox_remote_source_sets_and_proxy_downloader(self):
         cfg = json.loads((ROOT / "release/singbox/config.json").read_text())
-        self.assertLess(len((ROOT / "release/singbox/config.json").read_bytes()), 12000)
+        self.assertLess(len((ROOT / "release/singbox/config.json").read_bytes()), 24000)
         sets = {s["tag"]: s for s in cfg["route"]["rule_set"]}
-        self.assertEqual(len(sets), 10)
+        self.assertEqual(len(sets), len(provider_sets(self.policy)))
         for key, (behavior, values) in provider_sets(self.policy).items():
             item = sets["garasu-" + key]
             self.assertEqual(item["type"], "remote")
@@ -76,10 +80,17 @@ class UniversalRoutingContract(unittest.TestCase):
             self.assertEqual(item["url"], SINGBOX_BASE + key + ".srs")
             self.assertEqual(item["http_client"], "garasu-rules")
             src = json.loads((ROOT / "release/singbox/rules" / (key+".json")).read_text())
-            self.assertEqual(src["rules"][0]["domain_suffix" if behavior=="domain" else "ip_cidr"],values)
+            if behavior=="classical":
+                from collections import defaultdict
+                expected=defaultdict(list)
+                for r in values:
+                    kind,val=r.split(",",1)
+                    expected["domain_keyword" if kind=="DOMAIN-KEYWORD" else "domain_regex"].append(val)
+                self.assertEqual(src["rules"][0],dict(expected))
+            else:
+                self.assertEqual(src["rules"][0]["domain_suffix" if behavior=="domain" else "ip_cidr"],values)
         self.assertEqual(cfg["route"]["default_http_client"], "garasu-rules")
-        self.assertEqual(next(x for x in cfg["http_clients"] if x["tag"]=="garasu-rules")["detour"],
-                         "→ Remnawave")
+        self.assertNotIn("detour",next(x for x in cfg["http_clients"] if x["tag"]=="garasu-rules"))
         self.assertTrue(cfg["experimental"]["cache_file"]["enabled"])
         self.assertEqual(cfg["route"]["final"], "→ Remnawave")
         rules = cfg["route"]["rules"]

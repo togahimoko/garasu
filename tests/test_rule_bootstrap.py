@@ -14,9 +14,12 @@ class GarasuColdBootstrap(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertEqual(provider["proxy"], "DIRECT")
                 self.assertEqual(provider["type"], "http")
-                self.assertEqual(provider["format"], "mrs")
+                classical=provider["behavior"]=="classical"
+                self.assertEqual(provider["format"], "yaml" if classical else "mrs")
                 self.assertEqual(provider["interval"], 21600)
                 self.assertTrue(provider["url"].startswith(
+                    "https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/"
+                    if classical else
                     "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/"))
 
     def test_singbox_remote_rules_http_client_has_direct_detour(self):

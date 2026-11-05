@@ -34,6 +34,18 @@ CATEGORIES = {
 }
 
 
+def all_categories(root: Path) -> dict[str,str]:
+    extra=json.loads((root/"policy/extra_categories.json").read_text())["categories"]
+    combined=dict(CATEGORIES)
+    for name,spec in extra.items():
+        if spec["behavior"] not in ("domain","ipcidr"):
+            continue  # Classical rules are YAML; MRS cannot encode regexp/keyword.
+        if name in combined and combined[name] != spec["behavior"]:
+            raise ValueError("Conflicting category behavior: " + name)
+        combined[name]=spec["behavior"]
+    return combined
+
+
 def build(core: Path, source_root: Path, output: Path, source_commit: str) -> dict:
     if output.resolve() == (source_root / "release" / "mihomo" / ".mrs").resolve():
         raise ValueError("Refuse in-place replacement of published assets; build in a staging directory")
@@ -43,7 +55,7 @@ def build(core: Path, source_root: Path, output: Path, source_commit: str) -> di
     output.mkdir(parents=True, exist_ok=True)
     version = subprocess.run([str(core), "-v"], capture_output=True, text=True, check=True)
     entries = []
-    for name, kind in CATEGORIES.items():
+    for name, kind in all_categories(source_root).items():
         provider_rel = Path("release/providers") / (name + ".txt")
         source_rel = provider_rel if (source_root / provider_rel).exists() else Path("rules") / (name + (".list" if kind == "domain" else ".cidr"))
         source = source_root / source_rel
@@ -72,6 +84,7 @@ def build(core: Path, source_root: Path, output: Path, source_commit: str) -> di
         })
     manifest = {
         "source_commit": source_commit,
+        "extra_categories_commit": json.loads((source_root/"rules/extra/provenance.json").read_text())["geosite_revision"],
         "format": "mihomo-mrs",
         "compiler": version.stdout.strip().splitlines()[0],
         "command": "mihomo convert-ruleset <domain|ipcidr> text <source> <target.mrs>",

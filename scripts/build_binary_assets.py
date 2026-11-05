@@ -53,7 +53,7 @@ def build_assets(root: Path, mihomo: Path, singbox: Path, *, write: bool) -> int
                      or (root / name).read_bytes() != blob]
             if stale:
                 raise ValueError("Stale binary release assets: " + ", ".join(stale))
-        print(f"PASS {len(generated)} native assets: 13 MRS + 10 SRS + 1 manifest; write={write}")
+        print(f"PASS {len(generated)} native assets: {len(list(mrsdir.glob('*.mrs')))} MRS + {len(list(srsdir.glob('*.srs')))} SRS + 1 manifest; write={write}")
         return len(generated)
 
 

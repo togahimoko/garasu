@@ -90,6 +90,39 @@ def load_policy(root: Path) -> dict:
                             ("youtube", "discord", "ai", "crypto", "proxy")}
     if not set(p["ad_exempt_domains"]) <= set(_domains(root, "ads")):
         raise ValueError("Ad exceptions must be actual source entries")
+    # Every extra source must be a locally committed, validated snapshot.
+    extras = json.loads((root / "policy/extra_categories.json").read_text())
+    if extras.get("schema_version") != 1 or set(extras["order"]) != set(extras["categories"]):
+        raise ValueError("Extra category schema/order mismatch")
+    p["_extra_categories"] = extras["categories"]
+    p["_extra_order"] = extras["order"]
+    p["_extra_sets"] = {}
+    for key,spec in extras["categories"].items():
+        src = root / spec["source"]
+        if not src.is_file() or not src.resolve().is_relative_to(root.resolve()):
+            raise ValueError("Unsafe/missing extra category source " + key)
+        if spec["behavior"] == "domain":
+            values = [x.strip().removeprefix("+.") for x in src.read_text().splitlines()
+                      if x.strip() and not x.startswith("#")]
+            if not values or any("." not in x for x in values):
+                raise ValueError("Incomplete extra domain category " + key)
+        else:
+            values = [x.strip() for x in src.read_text().splitlines()
+                      if x.strip() and not x.startswith("#")]
+            if spec["behavior"]=="ipcidr":
+                for net in values:
+                    ipaddress.ip_network(net,strict=False)
+            elif spec["behavior"]=="classical":
+                if any(not v.startswith(("DOMAIN-KEYWORD,","DOMAIN-REGEX,"))
+                       for v in values):
+                    raise ValueError("Malformed classical rule "+key)
+            else:
+                raise ValueError("Unrecognized extra source behavior "+key)
+            if not values:
+                raise ValueError("Incomplete extra CIDR/classical category " + key)
+        if len(values) != len(set(values)):
+            raise ValueError("Duplicate extra category elements " + key)
+        p["_extra_sets"][key]=(spec["behavior"],values)
     return p
 
 
@@ -100,30 +133,43 @@ def _private_rules(p: dict) -> list[str]:
     return out
 
 
+def ordered_category_actions(p: dict) -> list[tuple[str,str]]:
+    """Single action order for ALL rule engines, independent of provider count."""
+    out=[("ads","REJECT"),("category-ads","REJECT"),("win-spy","REJECT")]
+    out += [(x,"Garasu") for x in
+            ("rkn-domains","rkn-ips","proxy-ips","youtube","discord","ai","crypto","proxy")]
+    out += [(name,p["_extra_categories"][name]["action"])
+            for name in p["_extra_order"] if name not in
+            ("category-ads","win-spy")]
+    return out
+
+
 def native_rules(p: dict, group: str) -> list[str]:
-    # Top-to-bottom priority: private, ads, explicit VPN, blocked sources,
-    # Russian domestic, foreign fallback to VPN. Remote sets must load first.
-    result = ["# GARASU SPLIT: remote RKN before RU, foreign -> VPN."]
+    # Strict first-match order: private -> reject -> blocked/proxy -> specialized
+    # direct -> Russian fallback -> foreign proxy.
+    result = ["# GARASU V2: broad lists are remote providers, never embedded."]
     result += _private_rules(p)
-    result += ["RULE-SET,ads,REJECT"]
-    result += ["RULE-SET," + category + "," + group for category in
-               ("rkn-domains", "youtube", "discord", "ai", "crypto", "proxy")]
-    result += ["RULE-SET,rkn-ips," + group + ",no-resolve",
-               "RULE-SET,proxy-ips," + group + ",no-resolve"]
-    result += ["DOMAIN-SUFFIX," + d + ",DIRECT" for d in p["critical_ru_direct_domains"]]
-    result += ["DOMAIN-SUFFIX," + d + ",DIRECT" for d in p["russian_tlds"]]
-    result += ["RULE-SET,ru-ips,DIRECT,no-resolve", "MATCH," + group]
+    for name,target in ordered_category_actions(p):
+        behavior=provider_sets(p)[name][0]
+        action=group if target=="Garasu" else target
+        result.append("RULE-SET,"+name+","+action+
+                      (",no-resolve" if behavior=="ipcidr" else ""))
+    result += ["DOMAIN-SUFFIX,"+d+",DIRECT" for d in p["critical_ru_direct_domains"]]
+    result += ["DOMAIN-SUFFIX,"+d+",DIRECT" for d in p["russian_tlds"]]
+    result += ["RULE-SET,ru-ips,DIRECT,no-resolve","MATCH,"+group]
     return result
 
 
-def provider_sets(p: dict) -> dict[str, tuple[str, list[str]]]:
-    groups = {"ads": ("domain", p["_ads_domains"]),
-              "rkn-domains": ("domain", p["_rkn_domains"]),
-              "rkn-ips": ("ipcidr", p["_rkn_ips"]),
-              "proxy-ips": ("ipcidr", p["_proxy_ips"]),
-              "ru-ips": ("ipcidr", p["_ru_ips"])}
-    for name, domains in p["_proxy_domains"].items():
-        groups[name] = ("domain", domains)
+def provider_sets(p: dict) -> dict[str, tuple[str,list[str]]]:
+    groups={"ads":("domain",p["_ads_domains"]),
+            "rkn-domains":("domain",p["_rkn_domains"]),
+            "rkn-ips":("ipcidr",p["_rkn_ips"]),
+            "proxy-ips":("ipcidr",p["_proxy_ips"]),
+            "ru-ips":("ipcidr",p["_ru_ips"])}
+    groups.update({k:("domain",v) for k,v in p["_proxy_domains"].items()})
+    groups.update(p["_extra_sets"])
+    if len(groups)<37:
+        raise ValueError("Garasu V2 missing required provider categories")
     return groups
 
 
@@ -143,12 +189,24 @@ def provider_artifacts(p: dict) -> dict[str, str]:
             ("." + v) if behavior == "domain" else v
         ) for v in values)
         out[f"release/clash/providers/{key}.yaml"] = "\n".join(clash_entries) + "\n"
-        source = {
-            "version": 3,
-            "rules": [{"domain_suffix" if behavior == "domain" else "ip_cidr": values}]
-        }
+        if behavior=="classical":
+            from collections import defaultdict
+            groups=defaultdict(list)
+            for entry in values:
+                condition,pattern=entry.split(",",1)
+                groups["domain_keyword" if condition=="DOMAIN-KEYWORD" else "domain_regex"].append(pattern)
+            rule=dict(groups)
+        else:
+            rule={"domain_suffix" if behavior == "domain" else "ip_cidr": values}
+        source = {"version": 3,"rules": [rule]}
         out[f"release/singbox/rules/{key}.json"] = (
             json.dumps(source, ensure_ascii=False, separators=(",", ":")) + "\n")
+    # Shadowrocket RULE-SET expects classical IP-CIDR rules, not bare CIDRs.
+    out["release/shadowrocket/providers/telegram-ips.list"] = "\n".join(
+        "IP-CIDR," + item for item in p["_extra_sets"]["telegram-ips"][1]) + "\n"
+    for name in ("ru-geoblock-patterns","github-patterns"):
+        out["release/shadowrocket/providers/"+name+".list"] = (
+            "\n".join(p["_extra_sets"][name][1])+"\n")
     return out
 
 
@@ -170,10 +228,12 @@ def render_yaml(src: str, p: dict, *, stash: bool = False) -> str:
         parts.extend([
             f"  {key}:",
             "    behavior: " + behavior,
-            "    format: mrs",
-            "    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/" + key + ".mrs",
+            "    format: " + ("yaml" if behavior=="classical" else "mrs"),
+            ("    url: "+CLASH_BASE+key+".yaml"
+             if behavior=="classical" else
+             "    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/" + key + ".mrs"),
             "    interval: 21600",
-            "    path: ./rule-providers/garasu-" + key + ".mrs",
+            "    path: ./rule-providers/garasu-" + key + (".yaml" if behavior=="classical" else ".mrs"),
         ])
         if not stash:
             parts.extend([
@@ -215,28 +275,26 @@ def render_shadow(src: str, p: dict) -> str:
     marker = "\n[Rule]\n"
     if marker not in src:
         raise ValueError("Missing Shadowrocket native section")
-    prefix = src.split(marker, 1)[0]
-    prefix = prefix.replace("Shadowrocket managed routing profile.",
-                            "Shadowrocket remote Garasu routing profile.")
-    out = ["# GARASU SPLIT: remote provider lists; cache required."]
-    out += _private_rules(p)
-    for key in provider_sets(p):
-        if key == "ads":
-            out.append("DOMAIN-SET," + PROVIDERS_BASE + key + ".txt,REJECT")
-        elif key in ("rkn-ips", "proxy-ips", "ru-ips"):
-            action = "DIRECT" if key == "ru-ips" else "PROXY"
-            out.append("RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/" +
-                       key + ".list," + action)
-        elif key != "ru-ips":
-            out.append("DOMAIN-SET," + PROVIDERS_BASE + key + ".txt,PROXY")
-    out += ["DOMAIN-SUFFIX," + x + ",DIRECT" for x in
-            p["critical_ru_direct_domains"] + p["russian_tlds"]]
-    # Place RU IP DIRECT after all blocked IP providers and domain exceptions.
-    ru = "RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.list,DIRECT"
-    out.remove(ru)
-    out.append(ru)
-    out.append("FINAL,PROXY,dns-failed")
-    return prefix + marker + "\n".join(out) + "\n"
+    prefix=src.split(marker,1)[0]
+    output=["# GARASU V2: remote sources, priority matches Mihomo."]
+    output += _private_rules(p)
+    source_sets=provider_sets(p)
+    for name,target in ordered_category_actions(p):
+        behavior=source_sets[name][0]
+        action="PROXY" if target=="Garasu" else target
+        if behavior=="domain":
+            output.append("DOMAIN-SET,"+PROVIDERS_BASE+name+".txt,"+action)
+        elif name in ("rkn-ips","proxy-ips","ru-ips","direct-ips"):
+            output.append("RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/"+name+".list,"+action)
+        elif name in ("telegram-ips","ru-geoblock-patterns","github-patterns"):
+            output.append("RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/release/shadowrocket/providers/"+name+".list,"+action)
+        else:
+            raise ValueError("No Shadowrocket IP provider for "+name)
+    output += ["DOMAIN-SUFFIX,"+x+",DIRECT" for x in
+               p["critical_ru_direct_domains"]+p["russian_tlds"]]
+    output.append("RULE-SET,https://raw.githubusercontent.com/togahimoko/garasu/main/rules/ru-ips.list,DIRECT")
+    output.append("FINAL,PROXY,dns-failed")
+    return prefix+marker+"\n".join(output)+"\n"
 
 
 def route_singbox(cfg: dict, p: dict) -> dict:
@@ -251,33 +309,35 @@ def route_singbox(cfg: dict, p: dict) -> dict:
         }
         for key in provider_sets(p)
     ]
-    # Explicit direct downloader avoids rule-set bootstrap via a broken VPN (sing-box >= 1.14).
+    # The existing http_clients tag is required for sing-box >= 1.14.
     clients = [item for item in cfg.get("http_clients", [])
                if item.get("tag") == "garasu-rules"]
     if len(clients) != 1:
         raise ValueError("Missing dedicated sing-box HTTP downloader")
-    # No explicit detour is needed: sing-box 1.14 HTTP client dials directly.
-    # 'detour: direct' points at an empty direct outbound and fails at runtime.
+    # Direct rule-set downloader: never depend on a broken proxy tunnel at cold start.
     clients[0].pop("detour", None)
+    for item in cfg.get("dns",{}).get("servers",[]):
+        if item.get("detour") == "direct":
+            item.pop("detour",None)
     cfg["route"]["default_http_client"] = "garasu-rules"
     routes = [{"action": "sniff"}, {"protocol": "dns", "action": "hijack-dns"},
               {"domain_suffix": p["private_domains"], "outbound": "direct"},
               {"ip_cidr": p["private_ipv4"] + p["private_ipv6"], "outbound": "direct"},
               {"rule_set": ["garasu-ads"], "action": "reject"}]
-    routes.extend({"rule_set": ["garasu-" + key], "outbound": "→ Remnawave"}
-                  for key in ("rkn-domains", "youtube", "discord", "ai", "crypto", "proxy",
-                              "rkn-ips", "proxy-ips"))
+    for key,target in ordered_category_actions(p):
+        if target=="REJECT" and key=="ads":
+            continue  # Already handled by the initial reject rule.
+        if target=="REJECT":
+            routes.append({"rule_set":["garasu-"+key],"action":"reject"})
+        else:
+            routes.append({"rule_set":["garasu-"+key],
+                           "outbound":"→ Remnawave" if target=="Garasu" else "direct"})
     routes.extend([{"domain_suffix": p["critical_ru_direct_domains"], "outbound": "direct"},
                    {"domain_suffix": p["russian_tlds"], "outbound": "direct"},
                    {"rule_set": ["garasu-ru-ips"], "outbound": "direct"}])
     cfg["route"]["rules"] = routes
     cfg["route"]["final"] = "→ Remnawave"
     dns = cfg.get("dns", {})
-    # Modern sing-box DNS transport also fails at runtime on an explicit
-    # detour to the built-in empty direct outbound.
-    for server in dns.get("servers", []):
-        if server.get("detour") == "direct":
-            server.pop("detour")
     dns.pop("independent_cache", None)  # Deprecated as of sing-box 1.14.
     dns["rules"] = [
         {"domain_suffix": p["private_domains"], "action": "route", "server": "local"},
@@ -337,8 +397,10 @@ def offline_mihomo_fixture(config: dict, root: Path) -> dict:
     import copy
     cfg = copy.deepcopy(config)
     for key, item in cfg["rule-providers"].items():
-        expected = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/" + key + ".mrs"
-        if item.get("type") != "http" or item.get("url") != expected or item.get("format") != "mrs":
+        classical=item["behavior"]=="classical"
+        expected = (CLASH_BASE+key+".yaml" if classical else
+                    "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/" + key + ".mrs")
+        if item.get("type") != "http" or item.get("url") != expected or item.get("format") != ("yaml" if classical else "mrs"):
             raise ValueError("Unrecognized remote Garasu provider: " + key)
         text = (root / "release/providers" / (key + ".txt")).read_text()
         payload = [line for line in text.splitlines() if line and not line.startswith("#")]

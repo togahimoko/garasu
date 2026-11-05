@@ -54,7 +54,7 @@ def check_native(core: Path) -> None:
                        (record["name"] + ".mrs")).read_bytes()
             if digest(src) != digest(rebuilt):
                 raise RuntimeError("MRS rebuild changed: " + record["name"])
-        print("PASS 13/13 reproduced binary MRS", flush=True)
+        print(f"PASS {len(release['files'])}/{len(release['files'])} reproduced binary MRS", flush=True)
 
         template = yaml.safe_load(
             (ROOT / "release/mihomo/config.yaml").read_text(encoding="utf-8"))
@@ -90,7 +90,9 @@ def check_singbox_native(core: Path) -> None:
     from scripts.sync_universal_routing import SINGBOX_BASE
 
     cfg = json.loads((ROOT / "release/singbox/config.json").read_text())
-    if len(cfg["route"]["rule_set"]) != 10:
+    from scripts.sync_universal_routing import load_policy, provider_sets
+    expected_count=len(provider_sets(load_policy(ROOT)))
+    if len(cfg["route"]["rule_set"]) != expected_count:
         raise RuntimeError("Unexpected sing-box provider count")
     for item in cfg["route"]["rule_set"]:
         name = item["tag"].removeprefix("garasu-")
@@ -123,7 +125,7 @@ def check_singbox_native(core: Path) -> None:
         cfg["experimental"]["cache_file"]["path"] = str(tmp / "qa-cache.db")
         dest = tmp / "singbox.json"
         dest.write_text(json.dumps(cfg, ensure_ascii=False), encoding="utf-8")
-        run("sing-box native 1.14 schema + ten source rule-sets",
+        run("sing-box native 1.14 schema + 37 source rule-sets",
             [str(core), "check", "-c", str(dest)])
         proc = subprocess.Popen([str(core), "run", "-c", str(dest)],
                                 cwd=directory, stdout=subprocess.PIPE,
@@ -143,7 +145,7 @@ def check_singbox_native(core: Path) -> None:
                 except subprocess.TimeoutExpired:
                     proc.kill()
                     proc.communicate()
-        print("PASS sing-box real process startup with 10 native rule sets", flush=True)
+        print(f"PASS sing-box real process startup with {expected_count} native rule sets", flush=True)
 
 
 def main() -> None:
@@ -155,7 +157,9 @@ def main() -> None:
     parser.add_argument("--singbox-core", type=Path,
                         help="Optional sing-box 1.14 binary for native source-format checks")
     parser.add_argument("--cold-network", action="store_true",
-                        help="Also run isolated real cold-start 10/10 MRS and 10/10 SRS downloads via DIRECT; requires both cores and internet")
+                        help="Also run isolated public cold-start 35 MRS + 2 YAML + 37 SRS via DIRECT; requires both cores and internet")
+    parser.add_argument("--cold-ref", default="main",
+                        help="Public ref for cold-network test; does not change release configs")
     args = parser.parse_args()
     if args.cold_network and not (args.core and args.singbox_core):
         parser.error("--cold-network needs --core and --singbox-core")
@@ -201,10 +205,11 @@ def main() -> None:
             parser.error("sing-box binary not found: " + str(binary))
         check_singbox_native(binary)
     if args.cold_network:
-        run("Native cold start without a working VPN (10 MRS + 10 SRS)",
+        run("Native cold start without a working VPN (35 MRS + 2 YAML + 37 SRS)",
             [PYTHON, "scripts/smoke_cold_bootstrap.py",
              "--mihomo-core", str(args.core.expanduser().resolve()),
-             "--singbox-core", str(args.singbox_core.expanduser().resolve())],
+             "--singbox-core", str(args.singbox_core.expanduser().resolve()),
+             "--ref", args.cold_ref],
             env=env)
     print("\nPASS Garasu release quality gate", flush=True)
 

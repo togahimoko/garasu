@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "categories": {
+    "ru-services": {
+      "behavior": "domain",
+      "action": "DIRECT",
+      "source": "rules/extra/ru-services.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "ru-whitelist": {
+      "behavior": "domain",
+      "action": "DIRECT",
+      "source": "rules/extra/ru-whitelist.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "microsoft": {
+      "behavior": "domain",
+      "action": "DIRECT",
+      "source": "rules/extra/microsoft.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "apple": {
+      "behavior": "domain",
+      "action": "DIRECT",
+      "source": "rules/extra/apple.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "google-play": {
+      "behavior": "domain",
+      "action": "DIRECT",
+      "source": "rules/extra/google-play.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "epicgames": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/epicgames.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "origin": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/origin.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "riot": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/riot.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "escapefromtarkov": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/escapefromtarkov.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "steam": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/steam.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "twitch": {
+      "behavior": "domain",
+      "action": "DIRECT",
+      "source": "rules/extra/twitch.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "pinterest": {
+      "behavior": "domain",
+      "action": "DIRECT",
+      "source": "rules/extra/pinterest.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "faceit": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/faceit.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "github": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/github.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "twitch-ads": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/twitch-ads.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "telegram": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/telegram.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "win-spy": {
+      "behavior": "domain",
+      "action": "REJECT",
+      "source": "rules/extra/win-spy.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "torrent-domains": {
+      "behavior": "domain",
+      "action": "DIRECT",
+      "source": "rules/extra/torrent-domains.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "category-ads": {
+      "behavior": "domain",
+      "action": "REJECT",
+      "source": "rules/extra/category-ads.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "ru-geoblock": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/ru-geoblock.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "google-deepmind": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/google-deepmind.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "push": {
+      "behavior": "domain",
+      "action": "DIRECT",
+      "source": "rules/extra/push.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "youtube-global": {
+      "behavior": "domain",
+      "action": "Garasu",
+      "source": "rules/extra/youtube-global.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "direct-ips": {
+      "behavior": "ipcidr",
+      "action": "DIRECT",
+      "source": "rules/direct-ips.cidr",
+      "upstream": "DigneZzZ/routing"
+    },
+    "telegram-ips": {
+      "behavior": "ipcidr",
+      "action": "Garasu",
+      "source": "rules/extra/telegram-ips.cidr",
+      "upstream": "core.telegram.org/resources/cidr.txt"
+    },
+    "ru-geoblock-patterns": {
+      "behavior": "classical",
+      "action": "Garasu",
+      "source": "rules/extra/ru-geoblock-patterns.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    },
+    "github-patterns": {
+      "behavior": "classical",
+      "action": "Garasu",
+      "source": "rules/extra/github-patterns.list",
+      "upstream": "hydraponique/roscomvpn-geosite"
+    }
+  },
+  "order": [
+    "category-ads",
+    "win-spy",
+    "ru-geoblock",
+    "ru-geoblock-patterns",
+    "youtube-global",
+    "google-deepmind",
+    "github",
+    "github-patterns",
+    "telegram",
+    "twitch-ads",
+    "epicgames",
+    "origin",
+    "riot",
+    "escapefromtarkov",
+    "steam",
+    "faceit",
+    "telegram-ips",
+    "torrent-domains",
+    "microsoft",
+    "apple",
+    "google-play",
+    "twitch",
+    "pinterest",
+    "push",
+    "ru-whitelist",
+    "ru-services",
+    "direct-ips"
+  ]
+}

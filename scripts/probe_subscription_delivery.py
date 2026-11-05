@@ -95,10 +95,10 @@ def _yaml_counts(body):
     return counts
 
 
-EXPECTED_GARASU_PROVIDERS = frozenset((
-    "rkn-domains", "youtube", "discord", "ai", "crypto", "proxy",
-    "ads", "rkn-ips", "proxy-ips", "ru-ips",
-))
+from pathlib import Path
+from scripts.sync_universal_routing import load_policy, provider_sets
+ROOT = Path(__file__).resolve().parents[1]
+EXPECTED_GARASU_PROVIDERS = frozenset(provider_sets(load_policy(ROOT)))
 
 
 def _yaml_checks(body, client="mihomo"):
@@ -177,10 +177,15 @@ def _yaml_checks(body, client="mihomo"):
         )
     else:
         provider_base = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/"
+        classical_base = "https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/"
+        behavior_map={name:kind for name,(kind,_) in provider_sets(load_policy(ROOT)).items()}
         remote_valid = all(
             (provider_types.get(name) == "http" or (client == "stash" and name not in provider_types))
-            and provider_urls.get(name) == provider_base + name + ".mrs"
-            and provider_formats.get(name) == "mrs"
+            and provider_urls.get(name) == (
+                classical_base + name + ".yaml" if behavior_map[name]=="classical" else
+                provider_base + name + ".mrs"
+            )
+            and provider_formats.get(name) == ("yaml" if behavior_map[name]=="classical" else "mrs")
             and provider_intervals.get(name) == 21600
             for name in providers
         )

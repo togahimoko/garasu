@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class ReleaseIntegrityTests(unittest.TestCase):
     def test_checkout_is_complete(self):
         result = verify(ROOT, branch="main")
-        self.assertEqual(result["binary_mrs"], 13)
+        self.assertGreaterEqual(result["binary_mrs"], 35)
         self.assertGreaterEqual(result["manifest_assets"], 50)
         self.assertGreater(result["checked_links"], 40)
 
@@ -29,6 +29,8 @@ class ReleaseIntegrityTests(unittest.TestCase):
             for source in (ROOT / "rules").glob("*.cidr"):
                 shutil.copy2(source, tmp / "rules" / source.name)
             shutil.copytree(ROOT / "release/providers", tmp / "release/providers")
+            shutil.copytree(ROOT / "policy", tmp / "policy")
+            shutil.copytree(ROOT / "rules/extra", tmp / "rules/extra")
             with (tmp / "release/mihomo/.mrs/youtube.mrs").open("ab") as f:
                 f.write(b"corrupted")
             with self.assertRaisesRegex(ReleaseError, "integrity mismatch"):

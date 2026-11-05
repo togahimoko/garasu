@@ -13,10 +13,10 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "release"
 MRS = RELEASE / "mihomo" / ".mrs"
-CATEGORIES = (
-    "rkn-domains", "youtube", "discord", "ai", "crypto", "proxy", "ads",
-    "games", "direct", "rkn-ips", "proxy-ips", "direct-ips", "ru-ips"
-)
+from release.mihomo.build import all_categories
+from scripts.sync_universal_routing import load_policy, provider_sets
+CATEGORIES = tuple(all_categories(ROOT))
+PROVIDER_NAMES = tuple(provider_sets(load_policy(ROOT)))
 
 
 def load_yaml(rel):
@@ -32,8 +32,9 @@ class ReleaseLayoutTest(unittest.TestCase):
             "shadowrocket/config.conf", "singbox/config.json", "xray/config.json",
             "README.md", "remnawave/srr.json", "remnawave/README.md",
         }
-        providers = ("ads", "rkn-domains", "rkn-ips", "proxy-ips", "ru-ips",
-                     "youtube", "discord", "ai", "crypto", "proxy")
+        providers = PROVIDER_NAMES
+        expected.update("shadowrocket/providers/"+name+".list" for name in
+                        ("telegram-ips","ru-geoblock-patterns","github-patterns"))
         expected.update("providers/" + name + ".txt" for name in providers)
         expected.update("clash/providers/" + name + ".yaml" for name in providers)
         expected.update("singbox/rules/" + name + ".json" for name in providers)
@@ -56,10 +57,13 @@ class ReleaseLayoutTest(unittest.TestCase):
         for client in ("mihomo","stash"):
             data = load_yaml(client + "/config.yaml")
             providers = data["rule-providers"]
-            self.assertEqual(len(providers), 10)
-            self.assertTrue(all(p["format"] == "mrs" and p["url"].startswith(
-                "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/")
-                and "payload" not in p for p in providers.values()))
+            self.assertEqual(len(providers), len(PROVIDER_NAMES))
+            for name,p in providers.items():
+                self.assertNotIn("payload",p)
+                self.assertEqual(p["format"],"yaml" if p["behavior"]=="classical" else "mrs")
+                expected_url=("/release/clash/providers/"+name+".yaml" if p["behavior"]=="classical" else
+                              "/release/mihomo/.mrs/"+name+".mrs")
+                self.assertTrue(p["url"].endswith(expected_url))
 
     def test_mihomo_only_one_automatic_policy(self):
         text = (RELEASE / "mihomo/config.yaml").read_text(encoding="utf-8")

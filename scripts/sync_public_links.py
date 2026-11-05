@@ -26,6 +26,8 @@ def sha(data):
 def expected_files(root=ROOT):
     """Return dependent public files with all production pointers synchronized."""
     release = root / "release"
+    if (release/"remnawave/srr-test.json").exists():
+        raise ValueError("A separate test SSR must not be shipped")
     mobile = {
         app: json.loads((release / app / "config.json").read_text(encoding="utf-8"))
         for app in ("incy", "happ")
@@ -52,6 +54,22 @@ def expected_files(root=ROOT):
         raise ValueError("Production SSR Happ profile diverges from release")
 
     manifest = json.loads((root / "install/manifest.json").read_text(encoding="utf-8"))
+    # Every published binary, rule-set and licensed extra category is hashed
+    # independently. An absent/stale file must fail publication/QA.
+    tracked = []
+    if (root/"policy/extra_categories.json").exists():
+        tracked = ["policy/extra_categories.json",
+                   "docs/licenses/roscomvpn-geosite-MIT.txt"]
+        for directory in ("rules/extra", "release/providers", "release/clash/providers",
+                          "release/singbox/rules", "release/mihomo/.mrs",
+                          "release/shadowrocket/providers"):
+            tracked.extend(p.relative_to(root).as_posix() for p in
+                           (root / directory).rglob("*") if p.is_file())
+    for relative in sorted(set(tracked)):
+        blob=(root / relative).read_bytes()
+        record=manifest["files"].setdefault(relative,{})
+        record["sha256"]=sha(blob)
+        record["bytes"]=len(blob)
     output = {}
     # Legacy public URLs must not leak old manual selectors or text providers.
     # Keep the exact native template at each compatibility path.

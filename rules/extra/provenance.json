@@ -1,0 +1,214 @@
+{
+  "categories": {
+    "apple": {
+      "domains": 92,
+      "skipped": {
+        "domain": 92
+      },
+      "source": "data/apple",
+      "source_sha256": "fd06cb6a757a185969fa4bf11d6fceb63148aa08571a7c7c2d8f4111dff8bdc8"
+    },
+    "category-ads": {
+      "domains": 2,
+      "skipped": {
+        "domain": 2
+      },
+      "source": "data/category-ads",
+      "source_sha256": "c071863c1332f4a8b6a3c39bb5b9e8344f12e47ddeb6bd4d660d61c5518f4dc9"
+    },
+    "epicgames": {
+      "domains": 27,
+      "skipped": {
+        "domain": 27
+      },
+      "source": "data/epicgames",
+      "source_sha256": "a6812f95e0de9994f8858c11b2610a55ef5ebddd1d99ea80082285724843e8fe"
+    },
+    "escapefromtarkov": {
+      "domains": 4,
+      "skipped": {
+        "domain": 4
+      },
+      "source": "data/escapefromtarkov",
+      "source_sha256": "d24e7485d809c99f2a8469bce532b216acaa85a15e88e4d32ace375658595c97"
+    },
+    "faceit": {
+      "domains": 2,
+      "skipped": {
+        "domain": 2
+      },
+      "source": "data/faceit",
+      "source_sha256": "68bbfaaefe77158b1ce2d86de7f1856f4255f7e3417f5ad8992c5d41b08ef6d2"
+    },
+    "github": {
+      "domains": 27,
+      "skipped": {
+        "domain": 27,
+        "regexp_omitted": 1
+      },
+      "source": "data/github",
+      "source_sha256": "54c72f1e63d19765682181edada4530dfe858a5cfa2cfe936f40fadce4f40f18"
+    },
+    "github-patterns": {
+      "source": "data/github",
+      "source_sha256": "54c72f1e63d19765682181edada4530dfe858a5cfa2cfe936f40fadce4f40f18",
+      "typed_classical_rules": 1
+    },
+    "google-deepmind": {
+      "domains": 41,
+      "skipped": {
+        "domain": 41
+      },
+      "source": "data/google-deepmind",
+      "source_sha256": "8143d046e8680767cfd998376a70442fd032f7f9f355e05b00db97913cc17685"
+    },
+    "google-play": {
+      "domains": 29,
+      "skipped": {
+        "domain": 29
+      },
+      "source": "data/google-play",
+      "source_sha256": "163bfff8f05b7b3eae5ce1f871d28d7d13844202a0020676b6741038338323a9"
+    },
+    "microsoft": {
+      "domains": 65,
+      "skipped": {
+        "domain": 66,
+        "invalid_omitted": 1
+      },
+      "source": "data/microsoft",
+      "source_sha256": "5670e008afed98158b1b4f75bffa1c3886eeceeecb27fd59f613445479995480"
+    },
+    "origin": {
+      "domains": 154,
+      "skipped": {
+        "domain": 160
+      },
+      "source": "data/origin",
+      "source_sha256": "d95d42409be686be387e1dc563ea5b0304074cad0f7f843b501fde9186cc0908"
+    },
+    "pinterest": {
+      "domains": 50,
+      "skipped": {
+        "domain": 50
+      },
+      "source": "data/pinterest",
+      "source_sha256": "d16557a1140aa9c33eccb62d98d14dd1f2939459d4a90a931e9cedfe1900eab7"
+    },
+    "push": {
+      "domains": 17,
+      "skipped": {
+        "domain": 17
+      },
+      "source": "data/push",
+      "source_sha256": "ee46a21483cb5f3917c96b001024c43f4ef5bc078a8c23f55e878009b80f24ae"
+    },
+    "riot": {
+      "domains": 54,
+      "skipped": {
+        "domain": 54
+      },
+      "source": "data/riot",
+      "source_sha256": "c3e80714858b936c9bc39a7781b118bbe3e98336169e0616b30f048afe487042"
+    },
+    "ru-geoblock": {
+      "domains": 772,
+      "skipped": {
+        "domain": 773,
+        "keyword_omitted": 105,
+        "regexp_omitted": 5
+      },
+      "source": "data/category-geoblock-ru",
+      "source_sha256": "c71fcf9db06e5f4524a337384595959efb15a85a20a8390fbe44ea64f7af5cbc"
+    },
+    "ru-geoblock-patterns": {
+      "source": "data/category-geoblock-ru",
+      "source_sha256": "c71fcf9db06e5f4524a337384595959efb15a85a20a8390fbe44ea64f7af5cbc",
+      "typed_classical_rules": 110
+    },
+    "ru-services": {
+      "domains": 54,
+      "skipped": {
+        "domain": 60,
+        "ipcheck_excluded": 6
+      },
+      "source": "data/category-ru",
+      "source_sha256": "6ea0b0dbaac9e240255f023da7cfba2b1801d7c72e74be3ffa150edc87627614"
+    },
+    "ru-whitelist": {
+      "domains": 450,
+      "skipped": {
+        "bare_omitted": 9,
+        "domain": 458,
+        "invalid_omitted": 2,
+        "ipcheck_excluded": 6
+      },
+      "source": "data/whitelist",
+      "source_sha256": "c369ee5b0c1991eeac520135cbdeb8bb34655cc37f53bc1e6bc1d947da97b50b"
+    },
+    "steam": {
+      "domains": 41,
+      "skipped": {
+        "domain": 41
+      },
+      "source": "data/steam",
+      "source_sha256": "a1619c2883942a9914cd5126a973d9a046ece2e650e2e6017afc18909b24e121"
+    },
+    "telegram": {
+      "domains": 26,
+      "skipped": {
+        "domain": 26
+      },
+      "source": "data/telegram",
+      "source_sha256": "0dc8201fa080ab4ae8579f96fe41c707bee0a1f2a4b1b2bd4542b9cf66b9b043"
+    },
+    "torrent-domains": {
+      "domains": 431,
+      "skipped": {
+        "domain": 434
+      },
+      "source": "data/torrent",
+      "source_sha256": "c180313389e1101615ca6081740d303f81000cfcf79c44d63ebfa165134f77c9"
+    },
+    "twitch": {
+      "domains": 40,
+      "skipped": {
+        "domain": 40
+      },
+      "source": "data/twitch",
+      "source_sha256": "3e172691e81c6606a45462f3e529c49d9785afd7381677809ea7a3a24270f754"
+    },
+    "twitch-ads": {
+      "domains": 5,
+      "skipped": {
+        "domain": 5
+      },
+      "source": "data/twitch-ads",
+      "source_sha256": "cb78b9d9a637371991f368b7d6c629379a9a9993e245dc08f0e729bdc492104e"
+    },
+    "win-spy": {
+      "domains": 376,
+      "skipped": {
+        "domain": 376
+      },
+      "source": "data/win-spy",
+      "source_sha256": "2d1782b3a1a86c92eb7fb74cf27e8763a4ecbbc4bf4a70c3c3c147aed9475adf"
+    },
+    "youtube-global": {
+      "domains": 176,
+      "skipped": {
+        "domain": 177,
+        "invalid_omitted": 1
+      },
+      "source": "data/youtube",
+      "source_sha256": "0c96a8afafe52d85cdf8fa6c9f827b5a91bc467776e11f70b2ad9d18dd0fbbba"
+    }
+  },
+  "geosite_license": "MIT (docs/licenses/roscomvpn-geosite-MIT.txt)",
+  "geosite_origin": "hydraponique/roscomvpn-geosite",
+  "geosite_revision": "300324058785ffab06df8725e18969f835d73618",
+  "telegram_mirror": "https://raw.githubusercontent.com/disposable/cloud-ip-ranges/master/txt/telegram.txt",
+  "telegram_source": "https://core.telegram.org/resources/cidr.txt",
+  "telegram_source_sha256": "8de6d9323cad3e6f590011d187f76f87ed128f471217d39385c4abd9a33af3fe",
+  "telegram_source_used": "https://raw.githubusercontent.com/disposable/cloud-ip-ranges/master/txt/telegram.txt"
+}

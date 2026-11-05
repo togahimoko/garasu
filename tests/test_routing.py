@@ -122,7 +122,7 @@ class GarasuTests(unittest.TestCase):
     def test_srr_release_preserves_client_fallback(self):
         full = json.loads((ROOT / "release/remnawave/srr.json").read_text())
         self.assertEqual(full["version"], "1")
-        self.assertEqual(full["rules"][0]["responseType"], "BROWSER")
+        self.assertEqual(full["rules"][-2]["responseType"], "BROWSER")
         self.assertEqual(full["rules"][-1]["name"], "Fallback Base64")
         self.assertEqual(full["rules"][-1]["responseType"], "XRAY_BASE64")
         self.assertEqual(full["rules"][-1]["conditions"], [])

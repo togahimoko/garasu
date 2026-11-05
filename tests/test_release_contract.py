@@ -122,12 +122,13 @@ class NativeReleaseContract(unittest.TestCase):
             "stash/1.0": "STASH",
             "karing/1.0": "SINGBOX",
             "incy/1.0": "XRAY_BASE64",
+            "incy": "XRAY_BASE64",
             "happ/1.0": "XRAY_BASE64",
             "Shadowrocket/1.0": "XRAY_BASE64",
             "v2rayN/1.0": "XRAY_BASE64",
         }
         rules = self.ssr["rules"]
-        self.assertEqual(rules[0]["responseType"], "BROWSER")
+        self.assertEqual(rules[-2]["responseType"], "BROWSER")
         self.assertEqual(rules[-1]["name"], "Fallback Base64")
         self.assertEqual(rules[-1]["responseType"], "XRAY_BASE64")
         self.assertEqual(rules[-1]["conditions"], [])
@@ -137,7 +138,7 @@ class NativeReleaseContract(unittest.TestCase):
                 self.assertEqual(match["responseType"], expected)
         self.assertEqual(
             next(x for x in rules if self._match(x, "mihomo/1.0", "text/html"))["responseType"],
-            "BROWSER"
+            "MIHOMO"
         )
 
     def test_response_rules_no_ambiguous_client_overlaps(self):

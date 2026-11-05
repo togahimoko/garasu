@@ -2,21 +2,6 @@
   "version": "1",
   "rules": [
     {
-      "name": "Browser Subscription",
-      "description": "System critical: do not delete or disable this rule.",
-      "enabled": true,
-      "operator": "AND",
-      "conditions": [
-        {
-          "headerName": "accept",
-          "operator": "CONTAINS",
-          "value": "text/html",
-          "caseSensitive": true
-        }
-      ],
-      "responseType": "BROWSER"
-    },
-    {
       "name": "Mihomo Clients",
       "description": "Garasu native Mihomo YAML with personal VLESS/REALITY nodes and MRS rule assets",
       "enabled": true,
@@ -97,7 +82,7 @@
         {
           "headerName": "user-agent",
           "operator": "STARTS_WITH",
-          "value": "incy/",
+          "value": "incy",
           "caseSensitive": false
         }
       ],
@@ -174,6 +159,21 @@
       "responseModifications": {
         "ignoreServeJsonAtBaseSubscription": true
       }
+    },
+    {
+      "name": "Browser Subscription",
+      "description": "System critical: do not delete or disable this rule.",
+      "enabled": true,
+      "operator": "AND",
+      "conditions": [
+        {
+          "headerName": "accept",
+          "operator": "CONTAINS",
+          "value": "text/html",
+          "caseSensitive": true
+        }
+      ],
+      "responseType": "BROWSER"
     },
     {
       "name": "Fallback Base64",

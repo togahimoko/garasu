@@ -140,7 +140,7 @@ def verify_contract(root: Path) -> None:
         json.loads(p.read_text(encoding="utf-8"))
     srr = json_file(root, "release/remnawave/srr.json")
     active = [rule for rule in srr["rules"] if rule.get("enabled")]
-    require(active[0]["responseType"] == "BROWSER"
+    require(active[-2]["responseType"] == "BROWSER"
             and active[-1]["responseType"] == "XRAY_BASE64",
             "SSR browser/fallback policy changed")
     require(all(rule.get("responseModifications", {})

@@ -763,5 +763,3 @@ def run():
 
 if __name__ == "__main__":
     run()
-
-[executed on device: MacBook-Air-Toga.local (fa6523e4-5a4e-400c-9421-cf9f5f760f70)]

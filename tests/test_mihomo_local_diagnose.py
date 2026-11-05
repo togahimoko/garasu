@@ -30,6 +30,18 @@ class MihomoLocalReportTests(unittest.TestCase):
         self.assertNotIn("AUTO_GROUP_EMPTY",report["issues"])
         self.assertEqual(report["auto_member_count"],1)
 
+    def test_current_production_single_urltest_group_is_valid(self):
+        config = {"mixed-port":7897,"mode":"rule","tun":{"enable":False}}
+        groups = {"proxies":{
+            "Garasu":{"type":"URLTest","all":["AEON CDN WS","Previous node"],
+                      "now":"Previous node"}
+        }}
+        report=diagnose_mihomo.analyze(config,groups)
+        self.assertTrue(report["garasu_auto_selected"])
+        self.assertEqual(report["auto_member_count"],2)
+        self.assertNotIn("AUTO_GROUP_MISSING", report["issues"])
+        self.assertNotIn("AUTO_GROUP_EMPTY", report["issues"])
+
     def test_finds_single_open_local_proxy_without_controller_access(self):
         self.assertEqual(
             diagnose_mihomo.choose_port(None, 0, {"7897": True, "7890": False}),

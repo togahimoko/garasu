@@ -55,6 +55,14 @@ python3 scripts/qa.py --branch main --core /path/to/mihomo
 
 При изменении списков сначала пересобрать источники и бинарные наборы: `scripts/sync_universal_routing.py --write`, затем `scripts/build_binary_assets.py --write` с путями к двум ядрам; после этого запустить полный QA.
 
+Отдельно проверяется **реальный холодный запуск без работающего VPN**: Mihomo и sing-box запускаются с тестовой недоступной нодой и должны независимо скачать 35/35 MRS, 2/2 classical YAML и 37/37 SRS:
+
+```bash
+python3 scripts/qa.py --branch main --core /path/to/mihomo --singbox-core /path/to/sing-box --cold-network
+```
+
+Обычный QA работает без интернета; `--cold-network` — необязательная сетевая проверка. Интервал 21600 секунд означает повторную загрузку опубликованных файлов клиентом, а не гарантию регулярной публикации свежих списков.
+
 После публикации — сравнение с публичным GitHub Raw:
 
 ```bash
@@ -83,4 +91,4 @@ python3 scripts/probe_release_assets.py --branch main
 
 ## Единый профиль Garasu
 
-[Политика universal](policy/universal.json) · [Генератор семи клиентских конфигураций](scripts/sync_universal_routing.py) · [Нативный smoke-тест](scripts/smoke_universal_mihomo.py). Перед выпуском обязательно проверять импорт каждого клиента и реальную выдачу Remnawave.
+[Политика universal](policy/universal.json) · [Генератор восьми клиентских конфигураций](scripts/sync_universal_routing.py) · [Нативный smoke-тест](scripts/smoke_universal_mihomo.py). Перед выпуском обязательно проверять импорт каждого клиента и реальную выдачу Remnawave.

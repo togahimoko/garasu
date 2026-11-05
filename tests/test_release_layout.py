@@ -73,7 +73,7 @@ class ReleaseLayoutTest(unittest.TestCase):
         self.assertEqual(len(data["proxy-groups"]), 1)
         group = data["proxy-groups"][0]
         self.assertEqual((group["name"], group["type"]), ("Garasu", "url-test"))
-        self.assertTrue(group["include-all"])
+        self.assertNotIn("include-all", group)
         self.assertEqual(group["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         self.assertNotIn("tun", data)

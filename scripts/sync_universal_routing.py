@@ -219,6 +219,8 @@ def render_yaml(src: str, p: dict, *, stash: bool = False) -> str:
     if marker not in src or "\nrules:\n" not in src:
         raise ValueError("Invalid Remnawave YAML template")
     prefix = src.split(marker, 1)[0].rstrip("\n")
+    if not stash:
+        prefix = prefix.replace("    include-all: true\n", "")
     if prefix.count("proxies: # LEAVE THIS LINE!") < 2:
         raise ValueError("Missing Remnawave node injection markers")
     prefix = prefix.replace(

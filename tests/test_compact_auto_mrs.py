@@ -14,7 +14,7 @@ class CompactAutoMRSTests(unittest.TestCase):
         self.assertEqual(len(cfg["proxy-groups"]), 1)
         group = cfg["proxy-groups"][0]
         self.assertEqual((group["name"], group["type"]), ("Garasu", "url-test"))
-        self.assertTrue(group["include-all"])
+        self.assertNotIn("include-all", group)
         self.assertEqual(cfg["rules"][-1], "MATCH,Garasu")
         self.assertNotIn("select", [g["type"] for g in cfg["proxy-groups"]])
         for name, provider in cfg["rule-providers"].items():

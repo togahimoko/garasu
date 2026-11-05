@@ -29,7 +29,7 @@ class NativeReleaseContract(unittest.TestCase):
         self.assertEqual(len(config["proxy-groups"]), 1)
         auto = config["proxy-groups"][0]
         self.assertEqual((auto["name"], auto["type"]), ("Garasu", "url-test"))
-        self.assertTrue(auto["include-all"])
+        self.assertNotIn("include-all", auto)
         self.assertFalse(auto["lazy"])
         self.assertEqual(auto["empty-fallback"], "REJECT")
         self.assertNotIn("DIRECT", auto.get("proxies") or [])

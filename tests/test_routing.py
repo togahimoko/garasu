@@ -51,7 +51,7 @@ class GarasuTests(unittest.TestCase):
         conf = (ROOT / "clients/mihomo-remnawave.yaml").read_text()
         self.assertLess(conf.index("RULE-SET,rkn-domains,Garasu"),
                         conf.index("DOMAIN-SUFFIX,ru,DIRECT"))
-        self.assertIn("include-all: true", conf)
+        self.assertNotIn("include-all: true", conf)
         self.assertIn("MATCH,Garasu", conf)
         self.assertNotIn("dialer-proxy", conf)
         self.assertNotIn("DST-PORT,443,REJECT", conf)
@@ -66,7 +66,7 @@ class GarasuTests(unittest.TestCase):
         self.assertIn("Garasu", groups)
         self.assertEqual(set(groups), {"Garasu"})
         self.assertEqual(groups["Garasu"]["type"], "url-test")
-        self.assertTrue(groups["Garasu"]["include-all"])
+        self.assertNotIn("include-all", groups["Garasu"])
         self.assertEqual(groups["Garasu"]["empty-fallback"], "REJECT")
         self.assertEqual(data["rules"][-1], "MATCH,Garasu")
         for key, provider in data["rule-providers"].items():

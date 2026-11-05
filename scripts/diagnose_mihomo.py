@@ -23,7 +23,9 @@ def analyze(config, groups):
     """Safe aggregate report; never returns any individual proxy identifier."""
     proxies = groups.get("proxies", {}) if isinstance(groups, dict) else {}
     garasu = proxies.get("Garasu", {})
-    auto = proxies.get("Garasu Auto", {})
+    # Production template uses one URLTest group; older profiles had Selector -> Garasu Auto.
+    direct_auto = str(garasu.get("type", "")).lower().replace("-", "") == "urltest"
+    auto = garasu if direct_auto else proxies.get("Garasu Auto", {})
     issues = []
     port = config.get("mixed-port", 0)
     if not isinstance(port, int) or port < 1 or port > 65535:
@@ -45,7 +47,7 @@ def analyze(config, groups):
         "mixed_port": port,
         "tun_enabled": bool(tun.get("enable", False)),
         "garasu_present": bool(garasu),
-        "garasu_auto_selected": garasu.get("now") == "Garasu Auto",
+        "garasu_auto_selected": direct_auto or garasu.get("now") == "Garasu Auto",
         "auto_member_count": len(auto.get("all", [])) if isinstance(auto.get("all", []), list) else 0,
         "issues": issues,
     }

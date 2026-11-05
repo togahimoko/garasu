@@ -78,8 +78,8 @@ class UniversalRoutingContract(unittest.TestCase):
             src = json.loads((ROOT / "release/singbox/rules" / (key+".json")).read_text())
             self.assertEqual(src["rules"][0]["domain_suffix" if behavior=="domain" else "ip_cidr"],values)
         self.assertEqual(cfg["route"]["default_http_client"], "garasu-rules")
-        self.assertEqual(next(x for x in cfg["http_clients"] if x["tag"]=="garasu-rules")["detour"],
-                         "→ Remnawave")
+        self.assertNotIn("detour",
+                         next(x for x in cfg["http_clients"] if x["tag"]=="garasu-rules"))
         self.assertTrue(cfg["experimental"]["cache_file"]["enabled"])
         self.assertEqual(cfg["route"]["final"], "→ Remnawave")
         rules = cfg["route"]["rules"]

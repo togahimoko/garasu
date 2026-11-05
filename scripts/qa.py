@@ -11,6 +11,8 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
+import socket
 
 ROOT = Path(__file__).resolve().parents[1]
 # Running "python scripts/qa.py --core ..." puts scripts/ on sys.path,
@@ -107,14 +109,41 @@ def check_singbox_native(core: Path) -> None:
     })
     group = next(x for x in cfg["outbounds"] if x["tag"] == "→ Remnawave")
     group["outbounds"] = ["OFFLINE_TEST_NODE"]
-    for item in cfg["http_clients"]:
-        if item["tag"] == "garasu-rules":
-            item["detour"] = "OFFLINE_TEST_NODE"
+    # Do not rewrite HTTP client detour: that hid a production runtime bug.
+    # The local rule fixtures allow startup without downloading from a proxy.
     with tempfile.TemporaryDirectory(prefix="garasu-singbox-native-") as directory:
-        dest = Path(directory) / "singbox.json"
+        tmp = Path(directory)
+        def free_local_port() -> int:
+            with socket.socket() as server:
+                server.bind(("127.0.0.1", 0))
+                return server.getsockname()[1]
+        cfg["inbounds"] = [{"type": "mixed", "tag": "QA_MIXED",
+                            "listen": "127.0.0.1", "listen_port": free_local_port()}]
+        cfg["experimental"].pop("clash_api", None)
+        cfg["experimental"]["cache_file"]["path"] = str(tmp / "qa-cache.db")
+        dest = tmp / "singbox.json"
         dest.write_text(json.dumps(cfg, ensure_ascii=False), encoding="utf-8")
         run("sing-box native 1.14 schema + ten source rule-sets",
             [str(core), "check", "-c", str(dest)])
+        proc = subprocess.Popen([str(core), "run", "-c", str(dest)],
+                                cwd=directory, stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT, text=True,
+                                stdin=subprocess.DEVNULL)
+        try:
+            time.sleep(2.5)
+            if proc.poll() is not None:
+                output = proc.communicate(timeout=5)[0]
+                raise RuntimeError("sing-box native runtime cannot start: " +
+                                   output[-1600:])
+        finally:
+            if proc.poll() is None:
+                proc.terminate()
+                try:
+                    proc.communicate(timeout=6)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    proc.communicate()
+        print("PASS sing-box real process startup with 10 native rule sets", flush=True)
 
 
 def main() -> None:
@@ -125,7 +154,11 @@ def main() -> None:
                         help="Optional local Mihomo binary for native offline tests")
     parser.add_argument("--singbox-core", type=Path,
                         help="Optional sing-box 1.14 binary for native source-format checks")
+    parser.add_argument("--cold-network", action="store_true",
+                        help="Also run isolated real cold-start 10/10 MRS and 10/10 SRS downloads via DIRECT; requires both cores and internet")
     args = parser.parse_args()
+    if args.cold_network and not (args.core and args.singbox_core):
+        parser.error("--cold-network needs --core and --singbox-core")
     env = os.environ.copy()
     env["PYTHONPATH"] = str(ROOT) + os.pathsep + env.get("PYTHONPATH", "")
 
@@ -167,6 +200,12 @@ def main() -> None:
         if not binary.is_file():
             parser.error("sing-box binary not found: " + str(binary))
         check_singbox_native(binary)
+    if args.cold_network:
+        run("Native cold start without a working VPN (10 MRS + 10 SRS)",
+            [PYTHON, "scripts/smoke_cold_bootstrap.py",
+             "--mihomo-core", str(args.core.expanduser().resolve()),
+             "--singbox-core", str(args.singbox_core.expanduser().resolve())],
+            env=env)
     print("\nPASS Garasu release quality gate", flush=True)
 
 

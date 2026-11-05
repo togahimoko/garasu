@@ -57,8 +57,7 @@
       {
         "tag": "cf-dns",
         "type": "tls",
-        "server": "1.1.1.1",
-        "detour": "direct"
+        "server": "1.1.1.1"
       },
       {
         "tag": "local",
@@ -359,8 +358,7 @@
   },
   "http_clients": [
     {
-      "tag": "garasu-rules",
-      "detour": "→ Remnawave"
+      "tag": "garasu-rules"
     }
   ]
 }

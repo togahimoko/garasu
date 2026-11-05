@@ -10,8 +10,11 @@ import base64
 import hashlib
 import json
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0,str(ROOT))
 BASE = "https://raw.githubusercontent.com/togahimoko/garasu/main"
 
 
@@ -26,12 +29,25 @@ def sha(data):
 def expected_files(root=ROOT):
     """Return dependent public files with all production pointers synchronized."""
     release = root / "release"
+    if (release/"remnawave/srr-test.json").exists():
+        raise ValueError("A separate test SSR must not be shipped")
     mobile = {
         app: json.loads((release / app / "config.json").read_text(encoding="utf-8"))
         for app in ("incy", "happ")
     }
+    from scripts.sync_universal_routing import load_policy, mobile_routing_matrix
+    # Thin fixture copies can omit source policy, but full release validates
+    # every field against the canonical generator; both clients must match.
+    matrix = (mobile_routing_matrix(load_policy(root))
+              if (root/"policy/universal.json").exists() else None)
     for app, profile in mobile.items():
-        if profile["Name"] != "Garasu" or profile["BlockSites"] != ["geosite:garasu-ads"]:
+        if (profile["Name"] != "Garasu"
+            or profile["RouteOrder"] != "block-proxy-direct"
+            or not {"geosite:garasu-ads","geosite:category-ads","geosite:win-spy"} <= set(profile["BlockSites"])
+            or (matrix is not None and (
+                profile["BlockSites"] != matrix["block"]
+                or profile["ProxySites"] != matrix["proxy"]
+                or profile["DirectSites"] != matrix["direct"]))):
             raise ValueError(f"{app}: not the canonical Garasu mobile policy")
         for field, dataset in (("Geositeurl", "geosite.dat"), ("Geoipurl", "geoip.dat")):
             if profile[field] != BASE + "/geo/" + dataset:
@@ -52,6 +68,22 @@ def expected_files(root=ROOT):
         raise ValueError("Production SSR Happ profile diverges from release")
 
     manifest = json.loads((root / "install/manifest.json").read_text(encoding="utf-8"))
+    # Every published binary, rule-set and licensed extra category is hashed
+    # independently. An absent/stale file must fail publication/QA.
+    tracked = []
+    if (root/"policy/extra_categories.json").exists():
+        tracked = ["policy/universal.json","policy/extra_categories.json",
+                   "docs/licenses/roscomvpn-geosite-MIT.txt"]
+        for directory in ("rules/extra", "release/providers", "release/clash/providers",
+                          "release/singbox/rules", "release/mihomo/.mrs",
+                          "release/shadowrocket/providers"):
+            tracked.extend(p.relative_to(root).as_posix() for p in
+                           (root / directory).rglob("*") if p.is_file())
+    for relative in sorted(set(tracked)):
+        blob=(root / relative).read_bytes()
+        record=manifest["files"].setdefault(relative,{})
+        record["sha256"]=sha(blob)
+        record["bytes"]=len(blob)
     output = {}
     # Legacy public URLs must not leak old manual selectors or text providers.
     # Keep the exact native template at each compatibility path.

@@ -380,18 +380,898 @@
     },
     "clients/incy.json": {
       "source": "garasu:profile-template:incy",
-      "sha256": "b04031063a319396d78ac709847fedb51547e73acfa8d68270c36d7d33f02a59",
-      "bytes": 1616
+      "sha256": "f8b12f86caa5e654454e066e566a98e4d160cd98645c5b879fa0702c9340855e",
+      "bytes": 2794
     },
     "clients/happ.json": {
       "source": "garasu:profile-template:happ",
-      "sha256": "b04031063a319396d78ac709847fedb51547e73acfa8d68270c36d7d33f02a59",
-      "bytes": 1616
+      "sha256": "f8b12f86caa5e654454e066e566a98e4d160cd98645c5b879fa0702c9340855e",
+      "bytes": 2794
     },
     "clients/shadowrocket.conf": {
       "source": "garasu:managed-config:shadowrocket",
-      "sha256": "e23367d03a2e5fc705546dce6f7c7dba97e48ce9203aca140d2e73d0087ea2d7",
-      "bytes": 3280
+      "sha256": "a501947614f08aa77738fc093c1bda26a0544d799440d096b2060da2c4720bdc",
+      "bytes": 6337
+    },
+    "docs/licenses/roscomvpn-geosite-MIT.txt": {
+      "sha256": "b9d84a22870d3f21c91a4c6e410c9cc51d00902f5233ad0c84011479244bf7d2",
+      "bytes": 1067
+    },
+    "policy/extra_categories.json": {
+      "sha256": "61934656c7989d67f2dff5c33e44febe032c1cfa84d853ea1c24b06743319035",
+      "bytes": 5370
+    },
+    "release/clash/providers/ads.yaml": {
+      "sha256": "bd3ecf1b8c93f6da28b2d781ebebf1404a192080b5f5aa5f2a592ce32151e738",
+      "bytes": 32975
+    },
+    "release/clash/providers/ai.yaml": {
+      "sha256": "c3389a83a768654882b59235900ccc80b27142b8f7e2b4d1317de3fa0326576d",
+      "bytes": 5066
+    },
+    "release/clash/providers/apple.yaml": {
+      "sha256": "5ca0a44f3f06c48be4c52f611705d4b865cd0ffffbb8810c18c4aa9ea0981e03",
+      "bytes": 2097
+    },
+    "release/clash/providers/category-ads.yaml": {
+      "sha256": "83804fd384636344da2e085db165cdb09fb1e9b56c47a23765383b1a414301ad",
+      "bytes": 49
+    },
+    "release/clash/providers/crypto.yaml": {
+      "sha256": "dfe9294aead5a323622111a0cf2fb93bcdd63d211648b5592cacc1dbbc58c8c6",
+      "bytes": 1832
+    },
+    "release/clash/providers/direct-ips.yaml": {
+      "sha256": "632b1022de09ee4829bdb3271a3d843c913b844e90596376669124d0cdbad55a",
+      "bytes": 532
+    },
+    "release/clash/providers/discord.yaml": {
+      "sha256": "e4d7b652382bdf178e41efe2c9aeaf48910e92b3a095e555533aced35730c855",
+      "bytes": 696
+    },
+    "release/clash/providers/epicgames.yaml": {
+      "sha256": "a6a25e0921770f8352299ea325be4c9d6792656804fe64cb9d33d8218310883f",
+      "bytes": 594
+    },
+    "release/clash/providers/escapefromtarkov.yaml": {
+      "sha256": "eea47c21f3111692a6358fc953cbadf17abfd9904df121dbadc0ae447d66795b",
+      "bytes": 99
+    },
+    "release/clash/providers/faceit.yaml": {
+      "sha256": "f535f05f3e4e06f17244ff9ebf605af2961f39a518150cf3da8e741a98e16ce0",
+      "bytes": 49
+    },
+    "release/clash/providers/github.yaml": {
+      "sha256": "d9280d43bc0de5242338a90a96b2b8d785b87eda5adf34c4861a3f9691af03b2",
+      "bytes": 603
+    },
+    "release/clash/providers/google-deepmind.yaml": {
+      "sha256": "acb0af25a852159aff37f876d62da51c902ffd01ef947ee7517b75e2120f3177",
+      "bytes": 1202
+    },
+    "release/clash/providers/google-play.yaml": {
+      "sha256": "0e531a88cbd1c2dd474c8f2ff84e30ad7d9b6de8a31c5133340f31f8d5c5b59a",
+      "bytes": 1027
+    },
+    "release/clash/providers/microsoft.yaml": {
+      "sha256": "a4d33501d44c9faa414e910874bcc679410f7b643dbc5aa5c01542916aa8ec4f",
+      "bytes": 1655
+    },
+    "release/clash/providers/origin.yaml": {
+      "sha256": "b4774357355e32d23bfdac0a5e4fd541e01dbacbe650419afa36d338cfb072e5",
+      "bytes": 3734
+    },
+    "release/clash/providers/pinterest.yaml": {
+      "sha256": "28f2fa15ea9e65095495914061902dc49998a38a0aaa588eb7ed8986f1311208",
+      "bytes": 1066
+    },
+    "release/clash/providers/proxy-ips.yaml": {
+      "sha256": "26afd64c41076544b8059446c115bf4526fc303ebe6c00b8786da3416a819f87",
+      "bytes": 139
+    },
+    "release/clash/providers/proxy.yaml": {
+      "sha256": "8e40db08263a949e0bec646cdd0f890a4c9929633d82a296db4c54f0bbc9ffe9",
+      "bytes": 3946
+    },
+    "release/clash/providers/push.yaml": {
+      "sha256": "5ff02467f16e4e4fea7d8f51effe6dc4543dc1c88459c3781f3d7ead8349519f",
+      "bytes": 534
+    },
+    "release/clash/providers/riot.yaml": {
+      "sha256": "dd154de8b0dd3650f2d23594720a7908aca9dd5ba90755f4d44fe68ed5661c23",
+      "bytes": 1244
+    },
+    "release/clash/providers/rkn-domains.yaml": {
+      "sha256": "ab8b4d20e49f735f7f90ab4cf0e2448e37f21b250f69ec36122edd163cd94294",
+      "bytes": 502351
+    },
+    "release/clash/providers/rkn-ips.yaml": {
+      "sha256": "2bf41fb4b2998fec520f6ea331e63c517f514e8614710f94d475a2cc12e15cea",
+      "bytes": 589739
+    },
+    "release/clash/providers/ru-geoblock.yaml": {
+      "sha256": "4e38a6f012c4e29301c334759e953622196820f9d88c933e026aca01c071d8ad",
+      "bytes": 17021
+    },
+    "release/clash/providers/ru-ips.yaml": {
+      "sha256": "6627bb087e847729560c71f95d136216470b4b5652a81ea0a37903351eb1deb1",
+      "bytes": 597849
+    },
+    "release/clash/providers/ru-services.yaml": {
+      "sha256": "260b7cd679d40b70aef06a3e00c232daa0585843a9e3ca342dc14fd0a2aa5bca",
+      "bytes": 1092
+    },
+    "release/clash/providers/ru-whitelist.yaml": {
+      "sha256": "d87936ae3f09555d7d79b888cfd0899ee0da3223c5cd34ac144741d75f1b71b0",
+      "bytes": 8345
+    },
+    "release/clash/providers/steam.yaml": {
+      "sha256": "d4adb94e816538041c13430cb75021f8b1d796223f3dc8e3807f5be7cbc64e30",
+      "bytes": 1115
+    },
+    "release/clash/providers/telegram-ips.yaml": {
+      "sha256": "e0a3e447355dd4220f26d3dc9629c68d3631e6f0f8bcf81c67cd48bafbfb419d",
+      "bytes": 320
+    },
+    "release/clash/providers/telegram.yaml": {
+      "sha256": "e1d6fb101614412109eacdf3cb5ca20576d20f410193501d8dd0e53bf8e1f2f4",
+      "bytes": 508
+    },
+    "release/clash/providers/torrent-domains.yaml": {
+      "sha256": "22c3d07c62781846182a206190a3a84894eeb3c3e0fa302612a787f8c3a238e8",
+      "bytes": 10965
+    },
+    "release/clash/providers/twitch-ads.yaml": {
+      "sha256": "64bf638bf856639789602c5ac3bc0e3aa6daef8258a9386fa1c1ed7bb0b770d8",
+      "bytes": 128
+    },
+    "release/clash/providers/twitch.yaml": {
+      "sha256": "90ae584b7bcf74f0ae84d2f6d3068b03a34988945e788978886e9300fdb46cb2",
+      "bytes": 1344
+    },
+    "release/clash/providers/win-spy.yaml": {
+      "sha256": "3f645eb1bc7050565021d71b9c124efc72645092c01bdf7b2076ec151a54e148",
+      "bytes": 12998
+    },
+    "release/clash/providers/youtube-global.yaml": {
+      "sha256": "9f88ab4120b1ca2c3922cc514e22b5abc90b0f88c7694728f70bc934af061988",
+      "bytes": 3607
+    },
+    "release/clash/providers/youtube.yaml": {
+      "sha256": "9f88ab4120b1ca2c3922cc514e22b5abc90b0f88c7694728f70bc934af061988",
+      "bytes": 3607
+    },
+    "release/mihomo/.mrs/README.md": {
+      "sha256": "f43ce0a82bee15daffb390ce52edcd1a2153b0fd5bb5551c83b2b3783d3cd153",
+      "bytes": 741
+    },
+    "release/mihomo/.mrs/ads.mrs": {
+      "sha256": "4d77154a4b0a81b0cb71acc40716468a926b07b2c5188fdc947314ce769c0c8e",
+      "bytes": 11057
+    },
+    "release/mihomo/.mrs/ai.mrs": {
+      "sha256": "f57fc203d75705d8458636f9c5c6cda4d9c89747e61ed2dce479b348b6a505ae",
+      "bytes": 2250
+    },
+    "release/mihomo/.mrs/apple.mrs": {
+      "sha256": "da0a538edc1f223ce3e7a3579a1bfa283635946dd980cc5399a0649f0e266477",
+      "bytes": 893
+    },
+    "release/mihomo/.mrs/category-ads.mrs": {
+      "sha256": "0b604ab3f8630e21e304004a44d7ff742fc5aca40af1c52d901f2573479c3ab2",
+      "bytes": 65
+    },
+    "release/mihomo/.mrs/crypto.mrs": {
+      "sha256": "9da53d4e58421dbea6037f8d33254eb68d68f794d896e37758e2929b05af2b51",
+      "bytes": 879
+    },
+    "release/mihomo/.mrs/direct-ips.mrs": {
+      "sha256": "65027bee3076ec49024935c0eb9e4b85a447687db384d4b8d2763b6c2566ec1f",
+      "bytes": 236
+    },
+    "release/mihomo/.mrs/direct.mrs": {
+      "sha256": "c0860271cfce4652e4f787531397aa63047b63ed7677d21cce2228446ede5894",
+      "bytes": 30971
+    },
+    "release/mihomo/.mrs/discord.mrs": {
+      "sha256": "10f9478b352f961327d611c4c503b3b53ad4f20af0914849d5df533a9275db46",
+      "bytes": 451
+    },
+    "release/mihomo/.mrs/epicgames.mrs": {
+      "sha256": "b347a3b793dc1997935b483c8903e9ef4658220d3846756e03afa15f4c600440",
+      "bytes": 358
+    },
+    "release/mihomo/.mrs/escapefromtarkov.mrs": {
+      "sha256": "899ea36051c3f05a6c4abeb4b98fefd5194f9abd59e7f110ce711af8b0eeac53",
+      "bytes": 110
+    },
+    "release/mihomo/.mrs/faceit.mrs": {
+      "sha256": "af106f9f6c0238672ac14fa72e5681e31575c260868731ff0f3e6ffd80b7411d",
+      "bytes": 78
+    },
+    "release/mihomo/.mrs/games.mrs": {
+      "sha256": "a7077189540308c5a9f5e5a971e6d4e516a61d4e5a4f21485954900d6ca49d40",
+      "bytes": 1439
+    },
+    "release/mihomo/.mrs/github.mrs": {
+      "sha256": "fdfb28a7fda4ee6ea13b04a143bed8de8f583a029355929f7a38322406cec35c",
+      "bytes": 393
+    },
+    "release/mihomo/.mrs/google-deepmind.mrs": {
+      "sha256": "de2c47343b156277bbb01a1698f4a17745dcdeeb1b7bcafb31e7c1581ab016d2",
+      "bytes": 536
+    },
+    "release/mihomo/.mrs/google-play.mrs": {
+      "sha256": "d6b5ff4688423ae8b0fb59970347cb88cca74bf3f23054a6ab5ccc5287e9936c",
+      "bytes": 531
+    },
+    "release/mihomo/.mrs/manifest.json": {
+      "sha256": "15b1728187669bcdc561990d9812fc8fe769db1c4ecf865a2075cd642136b159",
+      "bytes": 9525
+    },
+    "release/mihomo/.mrs/microsoft.mrs": {
+      "sha256": "8f50644aaf50015e2c31faaa8aecc6e3a6661f582b5f58f7a1270cbd8f5d4082",
+      "bytes": 782
+    },
+    "release/mihomo/.mrs/origin.mrs": {
+      "sha256": "1912b03536bc394b0c71368ffa10267e841f7f6ea1378b426b5e4f1fb6eb1a26",
+      "bytes": 1771
+    },
+    "release/mihomo/.mrs/pinterest.mrs": {
+      "sha256": "190fa32629796a31b56bd42b130ae5a07f05a987c915ec2d7e600757d0086f7d",
+      "bytes": 544
+    },
+    "release/mihomo/.mrs/proxy-ips.mrs": {
+      "sha256": "d26763e945c0c04b9b6990ec32e2cb8036dd1e71eee1f92270a2974a4f416467",
+      "bytes": 92
+    },
+    "release/mihomo/.mrs/proxy.mrs": {
+      "sha256": "53074f28fbb5b190d505708e22eb4a85ad815c9176003e844328d5b9d1665ef7",
+      "bytes": 1699
+    },
+    "release/mihomo/.mrs/push.mrs": {
+      "sha256": "a37df3e7c1264cf5a5d2202f3ed751e7d4169b58fb4dab16ef516d624af44e7a",
+      "bytes": 258
+    },
+    "release/mihomo/.mrs/riot.mrs": {
+      "sha256": "b7261fc009609dc80e55035454d6af17771348eafd9b3dcf263691e66212c2a0",
+      "bytes": 669
+    },
+    "release/mihomo/.mrs/rkn-domains.mrs": {
+      "sha256": "04ddd3b5b538eae617877ae16dac22164fb241761f3b895167e0ab9d3cd3d88e",
+      "bytes": 175541
+    },
+    "release/mihomo/.mrs/rkn-ips.mrs": {
+      "sha256": "89ce824f9deb539c8fe73cd9e10a90c53b9f91a6a510be9952fd32db750ab575",
+      "bytes": 51444
+    },
+    "release/mihomo/.mrs/ru-geoblock.mrs": {
+      "sha256": "4eb578d38adf243635059517a24381ab0cdfa1e6ee56a9041a2c74d04547c077",
+      "bytes": 7011
+    },
+    "release/mihomo/.mrs/ru-ips.mrs": {
+      "sha256": "442fc9debeaa18f8f0afdbb1fd23f46964dc3eb8bbe3b79f403217369f507ffb",
+      "bytes": 119656
+    },
+    "release/mihomo/.mrs/ru-services.mrs": {
+      "sha256": "fa5f8a54201fc73a87afb11d6ba72570af7e641173e6f95893ddf39860eeca46",
+      "bytes": 601
+    },
+    "release/mihomo/.mrs/ru-whitelist.mrs": {
+      "sha256": "2fe4c9fd03ef6ba0a61eb7296ddd476941b3cd1fe3f720d22e65ec2085355339",
+      "bytes": 3537
+    },
+    "release/mihomo/.mrs/steam.mrs": {
+      "sha256": "2447814ed71cb00556e88b646bc06574d2b01256455aaf85f49ce158c013aabd",
+      "bytes": 644
+    },
+    "release/mihomo/.mrs/telegram-ips.mrs": {
+      "sha256": "7f1c8e4cdb66c579a56f9c6214ac98d4a6f527ca4aa788a51a172fef29ecffc1",
+      "bytes": 136
+    },
+    "release/mihomo/.mrs/telegram.mrs": {
+      "sha256": "a8f9fb1b83af8a3e6f8f5274abf7ad4a1b3ce5e49966fedd23cd6402925f1e98",
+      "bytes": 333
+    },
+    "release/mihomo/.mrs/torrent-domains.mrs": {
+      "sha256": "b92db446e10fb7047af8159b0d560b0e2c08244a9cfedf092d458dfbf1775a34",
+      "bytes": 5376
+    },
+    "release/mihomo/.mrs/twitch-ads.mrs": {
+      "sha256": "1c774a43019c56371c9c6edd3a847c081d105169d4f5bbd95098581c6cfb427b",
+      "bytes": 122
+    },
+    "release/mihomo/.mrs/twitch.mrs": {
+      "sha256": "0b7ff18c42bcb0d19872182379a5a5685b21448e856102798468f1eea763cf8b",
+      "bytes": 605
+    },
+    "release/mihomo/.mrs/win-spy.mrs": {
+      "sha256": "ef83021ce3a116a8c2bb30d259963f3061c7f4a71e17d3a4f5f90abbf3d11a24",
+      "bytes": 2954
+    },
+    "release/mihomo/.mrs/youtube-global.mrs": {
+      "sha256": "edf6856fda88a0bce1879febc71338ba2d3729a908943dbababc659f09c72233",
+      "bytes": 1332
+    },
+    "release/mihomo/.mrs/youtube.mrs": {
+      "sha256": "edf6856fda88a0bce1879febc71338ba2d3729a908943dbababc659f09c72233",
+      "bytes": 1332
+    },
+    "release/providers/ads.txt": {
+      "sha256": "adced247414cee399ad3ec13b68f8c6a6f94f8e62402aca21146e60457c750ec",
+      "bytes": 26881
+    },
+    "release/providers/ai.txt": {
+      "sha256": "e6904c91908048e974d9509834d4a4a2840f9fe026e974125f65babb5ba44816",
+      "bytes": 3982
+    },
+    "release/providers/apple.txt": {
+      "sha256": "7f90d71f920d7815ed855ee83b60377e3b8c7bf2d3b1e8d9c15573924b58afa4",
+      "bytes": 1628
+    },
+    "release/providers/category-ads.txt": {
+      "sha256": "be34611613c1631e8878db5533b00d882fa52ea98083ce32450db18210107cf5",
+      "bytes": 30
+    },
+    "release/providers/crypto.txt": {
+      "sha256": "1ae670f7335b2082821ce924779a9b3a9279cf812570314cec1b37cd226d3267",
+      "bytes": 1343
+    },
+    "release/providers/direct-ips.txt": {
+      "sha256": "dcde78bca5ce41e7505b5612b0fa2f0f71761abfdb3cdad641759c929ec12440",
+      "bytes": 355
+    },
+    "release/providers/discord.txt": {
+      "sha256": "b870b965e27b7f64c015e34044b62238c6beb373e67a5909c5af5e355af017e5",
+      "bytes": 547
+    },
+    "release/providers/epicgames.txt": {
+      "sha256": "7ff3bda15d2282c59f3183cee64a67cb471a1683d81d2cbd6864b4bb84ab1294",
+      "bytes": 450
+    },
+    "release/providers/escapefromtarkov.txt": {
+      "sha256": "d6dcc3de326bcda995c642a7a73eab84a0234f47f60df59ccb98f71e90d4c563",
+      "bytes": 70
+    },
+    "release/providers/faceit.txt": {
+      "sha256": "9bd304df62d8165f4ab670fce3a8f95781558caaa42fed5bc4f2759f93aae843",
+      "bytes": 30
+    },
+    "release/providers/github.txt": {
+      "sha256": "67d2b3fefed455918e62abe5454547e2d6983d2e2544aee2a98fef0a9ca84bb4",
+      "bytes": 459
+    },
+    "release/providers/google-deepmind.txt": {
+      "sha256": "0af45b46331368a0eada1997e83bafd8207f58ac6e685699eaee034e124dc351",
+      "bytes": 988
+    },
+    "release/providers/google-play.txt": {
+      "sha256": "4f03dd2b3c4c3df31180b2e31056172334439984e7bf813199d19af5c4952607",
+      "bytes": 873
+    },
+    "release/providers/microsoft.txt": {
+      "sha256": "07d249c415b8ba5fbeee9157c2a144feb0b2058ca78799b5a4de50446fb1b5f4",
+      "bytes": 1321
+    },
+    "release/providers/origin.txt": {
+      "sha256": "323130f2de1cba092383124000ee0b1cf8b67f012384234341ee8ad42ef1de9b",
+      "bytes": 2955
+    },
+    "release/providers/pinterest.txt": {
+      "sha256": "7c4c8813b64ad08c0b964f5c5e41a625b93142c3e0846ede7b28528be12591ca",
+      "bytes": 807
+    },
+    "release/providers/proxy-ips.txt": {
+      "sha256": "70f72c3a957107c5a70c39f5658d3f5540faa828901d99aba187589c392de177",
+      "bytes": 94
+    },
+    "release/providers/proxy.txt": {
+      "sha256": "5500871564ee9cef052673fed6fbeb9ae720b3af56a3f8b700b9f8c8bff66bbf",
+      "bytes": 3167
+    },
+    "release/providers/push.txt": {
+      "sha256": "98f5d34bcf55e38e813fd8b3a03124b7b5f94971380fbae9de286103bc17e8a9",
+      "bytes": 440
+    },
+    "release/providers/riot.txt": {
+      "sha256": "624d49e1edb5c69cac3800d53ef09865a90df4640fe276af57ec61397851eec0",
+      "bytes": 965
+    },
+    "release/providers/rkn-domains.txt": {
+      "sha256": "50684c753d43fe3410411f2f672f8e51ee085207f48647dcab9f1448e94d2c5c",
+      "bytes": 392657
+    },
+    "release/providers/rkn-ips.txt": {
+      "sha256": "070350aea393bd08f099f55cdb6c68363ba045944eb7e693c7c21883c018d4b7",
+      "bytes": 437384
+    },
+    "release/providers/ru-geoblock.txt": {
+      "sha256": "80ae2bfc837d7f680c7385b38b0a812545b21e3027dd7c342a2fe9dce197cf68",
+      "bytes": 13152
+    },
+    "release/providers/ru-ips.txt": {
+      "sha256": "eca2fe5ae0de752a6b3fa4fcac181c768dd4559bf6b191201c470c854c16a24d",
+      "bytes": 446898
+    },
+    "release/providers/ru-services.txt": {
+      "sha256": "c6bab9e660d0588cd08b4da0d3cff04a465aa8522b291c46fcaa4f36261fb99f",
+      "bytes": 813
+    },
+    "release/providers/ru-whitelist.txt": {
+      "sha256": "087a89a55c55828ba082e4a3e1a1bf9a3f206a49cdb8e0e52858dc51e0391815",
+      "bytes": 6086
+    },
+    "release/providers/steam.txt": {
+      "sha256": "efbef458466a79c495e82dbd7972397563eaf533c95be04485d52cd5d5918d64",
+      "bytes": 901
+    },
+    "release/providers/telegram-ips.txt": {
+      "sha256": "944e783ec310de571f597b1b6ccc72e32daf0a85e891aa542837bd6ce396484e",
+      "bytes": 227
+    },
+    "release/providers/telegram.txt": {
+      "sha256": "b07c2c59b8738fd6438fede9391ed5c8f15a2f42fd8602cc05835aa82c69a256",
+      "bytes": 369
+    },
+    "release/providers/torrent-domains.txt": {
+      "sha256": "2a72f666b32399922d210d10c7e67d2b71507a29e7b9a938d2392dea82bd9226",
+      "bytes": 8801
+    },
+    "release/providers/twitch-ads.txt": {
+      "sha256": "54194793297c26be893f0c0be5ec6c8f0bbdbdee3664f526c2629323225a4867",
+      "bytes": 94
+    },
+    "release/providers/twitch.txt": {
+      "sha256": "75ea0d88b8defa1eae8a6134363035e839fac9dc122933885ecb431a40832418",
+      "bytes": 1135
+    },
+    "release/providers/win-spy.txt": {
+      "sha256": "ad6e06eef4acc854ed0a465651c160f1055a9302572ea74690d175d02b370a01",
+      "bytes": 11109
+    },
+    "release/providers/youtube-global.txt": {
+      "sha256": "290b27a0e0fac4f1a70557d2b949a03b93a1dd35821ca0e3152cf7f9c9cf5704",
+      "bytes": 2718
+    },
+    "release/providers/youtube.txt": {
+      "sha256": "290b27a0e0fac4f1a70557d2b949a03b93a1dd35821ca0e3152cf7f9c9cf5704",
+      "bytes": 2718
+    },
+    "release/shadowrocket/providers/telegram-ips.list": {
+      "sha256": "e28c7f9cd50e5bfeb0a705a6065750821f1d3a9afbfe32de2e5d892a219a5cc3",
+      "bytes": 339
+    },
+    "release/singbox/rules/ads.json": {
+      "sha256": "810c5a30dbe83b6a13b9b845baf425b18ff3cdbeaa36fe6334099733e174a913",
+      "bytes": 26925
+    },
+    "release/singbox/rules/ads.srs": {
+      "sha256": "58042186e17a05bb6418b20f1a492ce1ef4ec345ae7626783ba814919a4d6792",
+      "bytes": 9579
+    },
+    "release/singbox/rules/ai.json": {
+      "sha256": "03671db731433ca19c7bda9d54b6a0a9093fff66c1b537d46c43fefe2443f69f",
+      "bytes": 4026
+    },
+    "release/singbox/rules/ai.srs": {
+      "sha256": "0982f72139097e202cd00677d348c459b82ca1b1e6a0aae8103f73099652f00c",
+      "bytes": 1989
+    },
+    "release/singbox/rules/apple.json": {
+      "sha256": "5fbf49e9286701680755a9af74e280b7ddf21abf8b9384283258ddfb01da5274",
+      "bytes": 1672
+    },
+    "release/singbox/rules/apple.srs": {
+      "sha256": "40cfb2d3da761de70f23fa3749cff19890f9c59a00363a94f0b1824a7bd95e55",
+      "bytes": 780
+    },
+    "release/singbox/rules/category-ads.json": {
+      "sha256": "50a5ca61b3b2bc69071d525276d6471b4fa507eb059bb36b8de691934cf66357",
+      "bytes": 74
+    },
+    "release/singbox/rules/category-ads.srs": {
+      "sha256": "706db78c5f2c78b9b7d3a82fbe525fd099d8479da0c1c788b996a90ba81e064c",
+      "bytes": 52
+    },
+    "release/singbox/rules/crypto.json": {
+      "sha256": "aa5634cb7f65fa08627f36d347182b87c87b276d9c845298f4e2f7404b628e10",
+      "bytes": 1387
+    },
+    "release/singbox/rules/crypto.srs": {
+      "sha256": "cf1a97dc61d9a8eab8396f68aad9f38526b3bc33d964eaa0a190759bfe8cf593",
+      "bytes": 775
+    },
+    "release/singbox/rules/direct-ips.json": {
+      "sha256": "7bf03825961a45eb17ea73d65af761302eae11bc62a9ea19fa2eb63ad656f7dd",
+      "bytes": 449
+    },
+    "release/singbox/rules/direct-ips.srs": {
+      "sha256": "1d58c04f581fcdd678549e6ed1ae21519637cc31818d11a0de1eb7a4eaf0444e",
+      "bytes": 225
+    },
+    "release/singbox/rules/discord.json": {
+      "sha256": "28312ba7d54638b873f19b5702ea0a9fd40902230bf0e0d99797a0481cd54553",
+      "bytes": 591
+    },
+    "release/singbox/rules/discord.srs": {
+      "sha256": "b80231da1076e259becdc655bf2ad26daaf0c850adfeacbb033dd825c3c912a3",
+      "bytes": 411
+    },
+    "release/singbox/rules/epicgames.json": {
+      "sha256": "48ce78ba07b3d179540e726684e00b91a9548c87e788459ae062b4b802735f7b",
+      "bytes": 494
+    },
+    "release/singbox/rules/epicgames.srs": {
+      "sha256": "cef378e72506d0818cd90389710ee69d38b1b0feb42e1124376d0bca6b8c784f",
+      "bytes": 325
+    },
+    "release/singbox/rules/escapefromtarkov.json": {
+      "sha256": "fea5fc2ec3b06e34e6dba0052253032c84c45487cda181b1306f444348dfd2a2",
+      "bytes": 114
+    },
+    "release/singbox/rules/escapefromtarkov.srs": {
+      "sha256": "09d5bed1730dd70a1bd1803694d467e8f71728ad74211b7a83629834f49e5819",
+      "bytes": 90
+    },
+    "release/singbox/rules/faceit.json": {
+      "sha256": "6fee313dfdcbbdf9acf11ed3368a52b7de745396f452f09588594d1931cc3ce9",
+      "bytes": 74
+    },
+    "release/singbox/rules/faceit.srs": {
+      "sha256": "e76b0991c84b6ccc8a6e677469f59284b3edde2155d88f90bfa11a11f373d7a5",
+      "bytes": 67
+    },
+    "release/singbox/rules/github.json": {
+      "sha256": "e82dc3564ee0ed9d14aeecbad99b5adc15025476ede3a7db32c4c43f895a28bc",
+      "bytes": 503
+    },
+    "release/singbox/rules/github.srs": {
+      "sha256": "022e63ea34228d9aac51aedde49a312c9ca4ed4e41b0ad10fe7fecebbc611a55",
+      "bytes": 356
+    },
+    "release/singbox/rules/google-deepmind.json": {
+      "sha256": "290c3018ada704b93a21a8746f76a7b3d8efd7feaa42948da86ec15a4599355e",
+      "bytes": 1032
+    },
+    "release/singbox/rules/google-deepmind.srs": {
+      "sha256": "0ae22833cb298d4f73a9a77b3d433a86987ecdad32b78f5f00fbf6d4dd543966",
+      "bytes": 477
+    },
+    "release/singbox/rules/google-play.json": {
+      "sha256": "ab992fffa1eb4f680b78a2479781fc4b629ea60518b4555e41222382ced91283",
+      "bytes": 917
+    },
+    "release/singbox/rules/google-play.srs": {
+      "sha256": "570739b018de4b27dcbf6c8c1769faacda342a546630a8f48ec828d61880eab6",
+      "bytes": 479
+    },
+    "release/singbox/rules/microsoft.json": {
+      "sha256": "357072735702705cdcf442ce35b21aa1a28c195e479649113ceb888203d00e5b",
+      "bytes": 1365
+    },
+    "release/singbox/rules/microsoft.srs": {
+      "sha256": "b0a156f80c33516ecf4fc1d14caffb497f83902eb8a0296e261521dad925cfb1",
+      "bytes": 693
+    },
+    "release/singbox/rules/origin.json": {
+      "sha256": "51da9938cd56a3dfa2542549cf76f567f3001413a6af5b9ae6dfb846c2a19610",
+      "bytes": 2999
+    },
+    "release/singbox/rules/origin.srs": {
+      "sha256": "a229ed757770f201cc7209dff199bee0326f9bca1f34e4374d685153dec649ec",
+      "bytes": 1566
+    },
+    "release/singbox/rules/pinterest.json": {
+      "sha256": "c5f278fd892e5de2e12ca08ce7e26ad5149fddbf674ad38cc25f071de735087e",
+      "bytes": 851
+    },
+    "release/singbox/rules/pinterest.srs": {
+      "sha256": "f7c53c975453e88da0631bbdfda462a38b4f51c1cae9e71bfa38a204e416fcb0",
+      "bytes": 458
+    },
+    "release/singbox/rules/proxy-ips.json": {
+      "sha256": "5a5bc2338204a928e4d5f0bca6a910c0448f91c470541c07ca25b07fbcbe91b6",
+      "bytes": 144
+    },
+    "release/singbox/rules/proxy-ips.srs": {
+      "sha256": "f82493dfb3e709235a6ef6a685d6a2990376af3faf5b961ef151a1bd0172f18e",
+      "bytes": 76
+    },
+    "release/singbox/rules/proxy.json": {
+      "sha256": "bb224d8f6ea596d37a1834a87326dd746dce99bcc1419d3a9b92e314e7311d8c",
+      "bytes": 3211
+    },
+    "release/singbox/rules/proxy.srs": {
+      "sha256": "c3d3ed4821fe520c8dca948e729e9a6544972f4e76c74e1342db6695b331d432",
+      "bytes": 1473
+    },
+    "release/singbox/rules/push.json": {
+      "sha256": "87eaa46d1b308f62eb47b2617ec9b9a1efbc76251eb58707960ffa2d40b668fd",
+      "bytes": 484
+    },
+    "release/singbox/rules/push.srs": {
+      "sha256": "4d34e63a67d90734126be77e60cd3c7f580fc721307e8431387f9c81636f39da",
+      "bytes": 228
+    },
+    "release/singbox/rules/riot.json": {
+      "sha256": "cb13f1fdbe0d8beb9ef4bdee63fcbf41a683e4eaa39cf029032f86df38e6940d",
+      "bytes": 1009
+    },
+    "release/singbox/rules/riot.srs": {
+      "sha256": "ebc11a540e1ddb83875baed86778adbb6d9d39ba48185dddcf11792423ea402d",
+      "bytes": 604
+    },
+    "release/singbox/rules/rkn-domains.json": {
+      "sha256": "18f2d497ea74670b73dca0efccda93c7669d72fd57aaa6617aef825b5388e3e1",
+      "bytes": 392701
+    },
+    "release/singbox/rules/rkn-domains.srs": {
+      "sha256": "97ff565ba4a95b7f7565a52c9707e1d3ea574e476ce52b6b21a497bdf32ab2e8",
+      "bytes": 144165
+    },
+    "release/singbox/rules/rkn-ips.json": {
+      "sha256": "b04b2cc142a8d044cc7f9f4fc3c8503769daddd55ea523de56762f303597d1d4",
+      "bytes": 488204
+    },
+    "release/singbox/rules/rkn-ips.srs": {
+      "sha256": "434ffded636a9db33917256b77632a62280ed5f4aa732de34334acc17d65cfb6",
+      "bytes": 66846
+    },
+    "release/singbox/rules/ru-geoblock.json": {
+      "sha256": "6588f2127d61a3220074e47b357933a435b250958335721a1625ce1fe3d06c58",
+      "bytes": 13196
+    },
+    "release/singbox/rules/ru-geoblock.srs": {
+      "sha256": "345338644a423bd05178623d357267b20eb753447348e9795e21b175b99797e2",
+      "bytes": 6120
+    },
+    "release/singbox/rules/ru-ips.json": {
+      "sha256": "16c631a7b5b6a430b994cc0658e8117c0fccc1938a257c72fdfb8749903d4a63",
+      "bytes": 497250
+    },
+    "release/singbox/rules/ru-ips.srs": {
+      "sha256": "f397f935b5d484930134652a8535f744020ddba691b995d2cfcb279752162636",
+      "bytes": 106297
+    },
+    "release/singbox/rules/ru-services.json": {
+      "sha256": "3b0992fc700cd98b200fba08e9506f7ca7d5b5c42e2a39471f67b85bdaf3b869",
+      "bytes": 857
+    },
+    "release/singbox/rules/ru-services.srs": {
+      "sha256": "7cc129a943ece76133049bf632813c84a9700667457b5022cc13328732cd7cd0",
+      "bytes": 533
+    },
+    "release/singbox/rules/ru-whitelist.json": {
+      "sha256": "4826d0956f8b0cd1b1a66995fdbad9f970c29fb3030246be2fe7f95862efa3da",
+      "bytes": 6130
+    },
+    "release/singbox/rules/ru-whitelist.srs": {
+      "sha256": "911490fd5d8397e7a815b74183c7809160902ba22ac779ca2fed86f8d731e976",
+      "bytes": 3075
+    },
+    "release/singbox/rules/steam.json": {
+      "sha256": "8e7a41bfbcbdf810ca1ceef22211cd08fc6fb50e84cfc02befd0a5d04a80bf1c",
+      "bytes": 945
+    },
+    "release/singbox/rules/steam.srs": {
+      "sha256": "2e0aeabd1337e7afa715006d820ca29cb8f4c7b249d41ba69192e198d42cd1ea",
+      "bytes": 589
+    },
+    "release/singbox/rules/telegram-ips.json": {
+      "sha256": "bd236c658f33d2aa9089c0a850586a56969894a21f493e732e999e41a75a6430",
+      "bytes": 293
+    },
+    "release/singbox/rules/telegram-ips.srs": {
+      "sha256": "95a0011cd94f862f0a4f8ae801d24b153bc632f97c80f73220a704ef09167217",
+      "bytes": 117
+    },
+    "release/singbox/rules/telegram.json": {
+      "sha256": "2204896d9875a7f0f820ad0094901da710afcb0ffafd1cd05b462bef6c5180ec",
+      "bytes": 413
+    },
+    "release/singbox/rules/telegram.srs": {
+      "sha256": "509c175319e44e7dea0168e0bda5b97b0b544a54bc50ae98f274175b1701f7d5",
+      "bytes": 287
+    },
+    "release/singbox/rules/torrent-domains.json": {
+      "sha256": "f5d2698b65a96c37df5896bac4bc2720787af3f8ebb8ded4d9f05b1b622ad397",
+      "bytes": 8845
+    },
+    "release/singbox/rules/torrent-domains.srs": {
+      "sha256": "d441b7809bfef3ed72128a37ac2d86eca4a2253ab582fb983e3df26a0dbeaf35",
+      "bytes": 4891
+    },
+    "release/singbox/rules/twitch-ads.json": {
+      "sha256": "be52a967a41c0a85c4115291adc891ddd951928623510510a0f4a0ed28119461",
+      "bytes": 138
+    },
+    "release/singbox/rules/twitch-ads.srs": {
+      "sha256": "fb4acdbddacb1b7bbeeeab1e318b4bfb557a41c62253e7d39bd7b0e11cf340f5",
+      "bytes": 104
+    },
+    "release/singbox/rules/twitch.json": {
+      "sha256": "3ce86b89ec8ab2da4bfcf1cbe116c5a1c20dc62dbee1aed9ea21dc52614c3007",
+      "bytes": 1179
+    },
+    "release/singbox/rules/twitch.srs": {
+      "sha256": "b8d2642be6ce3bc53652457982f175e6bdc9552529ec611e206fbe1038661b14",
+      "bytes": 527
+    },
+    "release/singbox/rules/win-spy.json": {
+      "sha256": "254fc78444b0a19b49f57116471efa69a4c20210753ed6594c7d3353c4c9efa8",
+      "bytes": 11153
+    },
+    "release/singbox/rules/win-spy.srs": {
+      "sha256": "5686c2bc25a142301ffdf5075aae6f060b1f0623ee23c6962dbc0644662a97fc",
+      "bytes": 2494
+    },
+    "release/singbox/rules/youtube-global.json": {
+      "sha256": "8cc91aba4ed0bfc8d37192df2e5c2e4317f71f5518c397a3a9b513817323a68a",
+      "bytes": 2762
+    },
+    "release/singbox/rules/youtube-global.srs": {
+      "sha256": "f8c518107f9e9ff4a304fe27f494884f23b07ffee4138d5794517e3907da5c96",
+      "bytes": 1129
+    },
+    "release/singbox/rules/youtube.json": {
+      "sha256": "8cc91aba4ed0bfc8d37192df2e5c2e4317f71f5518c397a3a9b513817323a68a",
+      "bytes": 2762
+    },
+    "release/singbox/rules/youtube.srs": {
+      "sha256": "f8c518107f9e9ff4a304fe27f494884f23b07ffee4138d5794517e3907da5c96",
+      "bytes": 1129
+    },
+    "rules/extra/apple.list": {
+      "sha256": "60144d2de7137d7fe5b5f8b59fc62e28fcd3cb5aff95fc6c0e0794a7c4d859e8",
+      "bytes": 1698
+    },
+    "rules/extra/category-ads.list": {
+      "sha256": "03dbd6c3a170b82a919c18e3f5431aea8b01c6fd63016f99ea90b7b3dd154bdc",
+      "bytes": 100
+    },
+    "rules/extra/epicgames.list": {
+      "sha256": "aee4a908e7158f9e38bcc8283d05b3dc8fdbaa28eb6a5c1652e463eff44c06a5",
+      "bytes": 520
+    },
+    "rules/extra/escapefromtarkov.list": {
+      "sha256": "34f052693f1fbbf62d5f4878dcac106d2b225b5e1e28bf3a2ad0087fd4d520e4",
+      "bytes": 140
+    },
+    "rules/extra/faceit.list": {
+      "sha256": "8af65d73e8dd519ba8b4210b7f1a7eaef1cf0b5052d3cf840ac40c0584efb46f",
+      "bytes": 100
+    },
+    "rules/extra/github.list": {
+      "sha256": "95e5b652b6340d21e0d5c74b1cae9eac75a5ba62f10efd6e22e03434661bf977",
+      "bytes": 529
+    },
+    "rules/extra/google-deepmind.list": {
+      "sha256": "658fa92d989fe9a93149b72c2fd73d134dc03a1db059267c315084cf7e9308f7",
+      "bytes": 1058
+    },
+    "rules/extra/google-play.list": {
+      "sha256": "aacc0124342812241acd529268ea819b10d2253ec52ef0aceb9218c653abe2d1",
+      "bytes": 943
+    },
+    "rules/extra/microsoft.list": {
+      "sha256": "aa86ea0668a4cb028fc926f6aa591f42a2a18a88e39cec2157df2e0e9bad06c4",
+      "bytes": 1391
+    },
+    "rules/extra/origin.list": {
+      "sha256": "27ee40b95e98e621d457299f0683ae9016be87850d739fa0c6e03ea8c1110628",
+      "bytes": 3025
+    },
+    "rules/extra/pinterest.list": {
+      "sha256": "eaf3a83b2ee53204f812e58b502e62c70cd0957414556329d54d1cc5d5c0adde",
+      "bytes": 877
+    },
+    "rules/extra/provenance.json": {
+      "sha256": "0e097205b9c4f8f0c0ac36d0b95b96f68f5aad480e9ae833a0f2f4a8106e5ec5",
+      "bytes": 6330
+    },
+    "rules/extra/push.list": {
+      "sha256": "345b9cfe2a0797b519743e0d36296d5ac53449d09a9b7774970c80bf93025cba",
+      "bytes": 510
+    },
+    "rules/extra/riot.list": {
+      "sha256": "e898a6b4305e3be035b6938a2dabc09125ebcb8b863f1f1c8b667405f7a52351",
+      "bytes": 1035
+    },
+    "rules/extra/ru-geoblock.list": {
+      "sha256": "f39195ac586c20888850489db42e57dd38b9af77b6bd0867fc5bd0139e26f24e",
+      "bytes": 13222
+    },
+    "rules/extra/ru-services.list": {
+      "sha256": "2ede7ec28b03d286d8cf8593f73a2f9452a24720e0d366ac942e24da5e791b52",
+      "bytes": 883
+    },
+    "rules/extra/ru-whitelist.list": {
+      "sha256": "4ff56f8eae3b49bb1e62b9fb7979437cd2790060107c5dcd9f14401cb7205af8",
+      "bytes": 6156
+    },
+    "rules/extra/steam.list": {
+      "sha256": "d7c28f9934ddf542c94627d54a29b2ae2b3bddc46234007ce87e3c021e7095cf",
+      "bytes": 971
+    },
+    "rules/extra/telegram-ips.cidr": {
+      "sha256": "a9f0ca7e8af6357baee9ebecf5b97f6136d59ced0cbc5345aa51dfa97bf0114a",
+      "bytes": 289
+    },
+    "rules/extra/telegram.list": {
+      "sha256": "7a3ea3bb39044ab9fbb3797d6fd85b54f1190fcab6f8438bded5c59ced77d37a",
+      "bytes": 439
+    },
+    "rules/extra/torrent-domains.list": {
+      "sha256": "2b137a9bdb8c08792ccbaa2cf176eec66ec0bebd6c48694ed0535928a309bf6c",
+      "bytes": 8871
+    },
+    "rules/extra/twitch-ads.list": {
+      "sha256": "03b60bfe8031fbea23124147f07aa5ec0898358cd49b60b1cd78894ba8c0cae1",
+      "bytes": 164
+    },
+    "rules/extra/twitch.list": {
+      "sha256": "902d0b89ed8b07f1b41c8fab045b1118286b581ee735e5dd48fe35f849e90b73",
+      "bytes": 1205
+    },
+    "rules/extra/win-spy.list": {
+      "sha256": "bbf077e958c5caa7ca88031db6ec2d8d08d87dcfe5164e5ea7d96115e99f0376",
+      "bytes": 11179
+    },
+    "rules/extra/youtube-global.list": {
+      "sha256": "f89a02efd0704586d9efdf602f621e42c70bf7e3d94c482eece51b834b784900",
+      "bytes": 2788
+    },
+    "release/clash/providers/github-patterns.yaml": {
+      "sha256": "33fe1dff8a94aeef0f619997b26fec6a32b444f2800fde7293acb917940b4009",
+      "bytes": 100
+    },
+    "release/clash/providers/ru-geoblock-patterns.yaml": {
+      "sha256": "cded87b927de21f73432efb719bb619ecc3eee597bc048a59fad9a44c66d28a3",
+      "bytes": 3851
+    },
+    "release/providers/github-patterns.txt": {
+      "sha256": "4dee30b33a68f047577309c7d1ba3a9561087220944bc41724be2b5d48c1e8ac",
+      "bytes": 82
+    },
+    "release/providers/ru-geoblock-patterns.txt": {
+      "sha256": "fde97f3a8b6c22eb443e93b020390b5ddcee3ec113cdfb305dc1e9967b64df98",
+      "bytes": 3163
+    },
+    "release/shadowrocket/providers/github-patterns.list": {
+      "sha256": "4dee30b33a68f047577309c7d1ba3a9561087220944bc41724be2b5d48c1e8ac",
+      "bytes": 82
+    },
+    "release/shadowrocket/providers/ru-geoblock-patterns.list": {
+      "sha256": "fde97f3a8b6c22eb443e93b020390b5ddcee3ec113cdfb305dc1e9967b64df98",
+      "bytes": 3163
+    },
+    "release/singbox/rules/github-patterns.json": {
+      "sha256": "ca3e7c905e1d82d6dd350a2c0ad6d5a5c99f01ac3f90366e214b291e765681f4",
+      "bytes": 117
+    },
+    "release/singbox/rules/github-patterns.srs": {
+      "sha256": "772f181825176756f8fcbb9d55fd757793e6a81e1ed6d0cf407c2dc0776e1e52",
+      "bytes": 91
+    },
+    "release/singbox/rules/ru-geoblock-patterns.json": {
+      "sha256": "87a2faefa461020f77f71c39aa254976772dce69db1276c89eaf99b962dead1a",
+      "bytes": 1824
+    },
+    "release/singbox/rules/ru-geoblock-patterns.srs": {
+      "sha256": "cb8f2acaafcd5241176f90cbd3cf68ab5298a9d463d8b535775fdbe697690fdb",
+      "bytes": 735
+    },
+    "rules/extra/github-patterns.list": {
+      "sha256": "bff10361e6918407ebca76c4ae983c0917f50f1a47585d15bcbfd11b9fb911a2",
+      "bytes": 147
+    },
+    "rules/extra/ru-geoblock-patterns.list": {
+      "sha256": "187210fe7ea0038f976d32ba1cc4c4ea4678830249aed3a08126b1cf3bc8e172",
+      "bytes": 3228
+    },
+    "policy/universal.json": {
+      "sha256": "2dc61cd93938cd4fb4b6e80a624f245a27468a68a2835be1fe8473f641718dad",
+      "bytes": 1494
     }
   }
 }

@@ -1,5 +1,6 @@
 {
   "source_commit": "82d104cde92b271f545e1f61a61b1acd079e0aa7",
+  "extra_categories_commit": "300324058785ffab06df8725e18969f835d73618",
   "format": "mihomo-mrs",
   "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
   "command": "mihomo convert-ruleset <domain|ipcidr> text <source> <target.mrs>",
@@ -96,8 +97,8 @@
     {
       "name": "direct-ips",
       "kind": "ipcidr",
-      "source": "rules/direct-ips.cidr",
-      "src_bytes": 410,
+      "source": "release/providers/direct-ips.txt",
+      "src_bytes": 355,
       "mrs_bytes": 236,
       "sha256": "65027bee3076ec49024935c0eb9e4b85a447687db384d4b8d2763b6c2566ec1f"
     },
@@ -108,6 +109,198 @@
       "src_bytes": 446898,
       "mrs_bytes": 119656,
       "sha256": "442fc9debeaa18f8f0afdbb1fd23f46964dc3eb8bbe3b79f403217369f507ffb"
+    },
+    {
+      "name": "ru-services",
+      "kind": "domain",
+      "source": "release/providers/ru-services.txt",
+      "src_bytes": 813,
+      "mrs_bytes": 601,
+      "sha256": "fa5f8a54201fc73a87afb11d6ba72570af7e641173e6f95893ddf39860eeca46"
+    },
+    {
+      "name": "ru-whitelist",
+      "kind": "domain",
+      "source": "release/providers/ru-whitelist.txt",
+      "src_bytes": 6086,
+      "mrs_bytes": 3537,
+      "sha256": "2fe4c9fd03ef6ba0a61eb7296ddd476941b3cd1fe3f720d22e65ec2085355339"
+    },
+    {
+      "name": "microsoft",
+      "kind": "domain",
+      "source": "release/providers/microsoft.txt",
+      "src_bytes": 1321,
+      "mrs_bytes": 782,
+      "sha256": "8f50644aaf50015e2c31faaa8aecc6e3a6661f582b5f58f7a1270cbd8f5d4082"
+    },
+    {
+      "name": "apple",
+      "kind": "domain",
+      "source": "release/providers/apple.txt",
+      "src_bytes": 1628,
+      "mrs_bytes": 893,
+      "sha256": "da0a538edc1f223ce3e7a3579a1bfa283635946dd980cc5399a0649f0e266477"
+    },
+    {
+      "name": "google-play",
+      "kind": "domain",
+      "source": "release/providers/google-play.txt",
+      "src_bytes": 873,
+      "mrs_bytes": 531,
+      "sha256": "d6b5ff4688423ae8b0fb59970347cb88cca74bf3f23054a6ab5ccc5287e9936c"
+    },
+    {
+      "name": "epicgames",
+      "kind": "domain",
+      "source": "release/providers/epicgames.txt",
+      "src_bytes": 450,
+      "mrs_bytes": 358,
+      "sha256": "b347a3b793dc1997935b483c8903e9ef4658220d3846756e03afa15f4c600440"
+    },
+    {
+      "name": "origin",
+      "kind": "domain",
+      "source": "release/providers/origin.txt",
+      "src_bytes": 2955,
+      "mrs_bytes": 1771,
+      "sha256": "1912b03536bc394b0c71368ffa10267e841f7f6ea1378b426b5e4f1fb6eb1a26"
+    },
+    {
+      "name": "riot",
+      "kind": "domain",
+      "source": "release/providers/riot.txt",
+      "src_bytes": 965,
+      "mrs_bytes": 669,
+      "sha256": "b7261fc009609dc80e55035454d6af17771348eafd9b3dcf263691e66212c2a0"
+    },
+    {
+      "name": "escapefromtarkov",
+      "kind": "domain",
+      "source": "release/providers/escapefromtarkov.txt",
+      "src_bytes": 70,
+      "mrs_bytes": 110,
+      "sha256": "899ea36051c3f05a6c4abeb4b98fefd5194f9abd59e7f110ce711af8b0eeac53"
+    },
+    {
+      "name": "steam",
+      "kind": "domain",
+      "source": "release/providers/steam.txt",
+      "src_bytes": 901,
+      "mrs_bytes": 644,
+      "sha256": "2447814ed71cb00556e88b646bc06574d2b01256455aaf85f49ce158c013aabd"
+    },
+    {
+      "name": "twitch",
+      "kind": "domain",
+      "source": "release/providers/twitch.txt",
+      "src_bytes": 1135,
+      "mrs_bytes": 605,
+      "sha256": "0b7ff18c42bcb0d19872182379a5a5685b21448e856102798468f1eea763cf8b"
+    },
+    {
+      "name": "pinterest",
+      "kind": "domain",
+      "source": "release/providers/pinterest.txt",
+      "src_bytes": 807,
+      "mrs_bytes": 544,
+      "sha256": "190fa32629796a31b56bd42b130ae5a07f05a987c915ec2d7e600757d0086f7d"
+    },
+    {
+      "name": "faceit",
+      "kind": "domain",
+      "source": "release/providers/faceit.txt",
+      "src_bytes": 30,
+      "mrs_bytes": 78,
+      "sha256": "af106f9f6c0238672ac14fa72e5681e31575c260868731ff0f3e6ffd80b7411d"
+    },
+    {
+      "name": "github",
+      "kind": "domain",
+      "source": "release/providers/github.txt",
+      "src_bytes": 459,
+      "mrs_bytes": 393,
+      "sha256": "fdfb28a7fda4ee6ea13b04a143bed8de8f583a029355929f7a38322406cec35c"
+    },
+    {
+      "name": "twitch-ads",
+      "kind": "domain",
+      "source": "release/providers/twitch-ads.txt",
+      "src_bytes": 94,
+      "mrs_bytes": 122,
+      "sha256": "1c774a43019c56371c9c6edd3a847c081d105169d4f5bbd95098581c6cfb427b"
+    },
+    {
+      "name": "telegram",
+      "kind": "domain",
+      "source": "release/providers/telegram.txt",
+      "src_bytes": 369,
+      "mrs_bytes": 333,
+      "sha256": "a8f9fb1b83af8a3e6f8f5274abf7ad4a1b3ce5e49966fedd23cd6402925f1e98"
+    },
+    {
+      "name": "win-spy",
+      "kind": "domain",
+      "source": "release/providers/win-spy.txt",
+      "src_bytes": 11109,
+      "mrs_bytes": 2954,
+      "sha256": "ef83021ce3a116a8c2bb30d259963f3061c7f4a71e17d3a4f5f90abbf3d11a24"
+    },
+    {
+      "name": "torrent-domains",
+      "kind": "domain",
+      "source": "release/providers/torrent-domains.txt",
+      "src_bytes": 8801,
+      "mrs_bytes": 5376,
+      "sha256": "b92db446e10fb7047af8159b0d560b0e2c08244a9cfedf092d458dfbf1775a34"
+    },
+    {
+      "name": "category-ads",
+      "kind": "domain",
+      "source": "release/providers/category-ads.txt",
+      "src_bytes": 30,
+      "mrs_bytes": 65,
+      "sha256": "0b604ab3f8630e21e304004a44d7ff742fc5aca40af1c52d901f2573479c3ab2"
+    },
+    {
+      "name": "ru-geoblock",
+      "kind": "domain",
+      "source": "release/providers/ru-geoblock.txt",
+      "src_bytes": 13152,
+      "mrs_bytes": 7011,
+      "sha256": "4eb578d38adf243635059517a24381ab0cdfa1e6ee56a9041a2c74d04547c077"
+    },
+    {
+      "name": "google-deepmind",
+      "kind": "domain",
+      "source": "release/providers/google-deepmind.txt",
+      "src_bytes": 988,
+      "mrs_bytes": 536,
+      "sha256": "de2c47343b156277bbb01a1698f4a17745dcdeeb1b7bcafb31e7c1581ab016d2"
+    },
+    {
+      "name": "push",
+      "kind": "domain",
+      "source": "release/providers/push.txt",
+      "src_bytes": 440,
+      "mrs_bytes": 258,
+      "sha256": "a37df3e7c1264cf5a5d2202f3ed751e7d4169b58fb4dab16ef516d624af44e7a"
+    },
+    {
+      "name": "youtube-global",
+      "kind": "domain",
+      "source": "release/providers/youtube-global.txt",
+      "src_bytes": 2718,
+      "mrs_bytes": 1332,
+      "sha256": "edf6856fda88a0bce1879febc71338ba2d3729a908943dbababc659f09c72233"
+    },
+    {
+      "name": "telegram-ips",
+      "kind": "ipcidr",
+      "source": "release/providers/telegram-ips.txt",
+      "src_bytes": 227,
+      "mrs_bytes": 136,
+      "sha256": "7f1c8e4cdb66c579a56f9c6214ac98d4a6f527ca4aa788a51a172fef29ecffc1"
     }
   ]
 }

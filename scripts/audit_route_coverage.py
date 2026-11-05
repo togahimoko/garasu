@@ -75,46 +75,45 @@ def yaml_route(domain: str, rules: list[str],
 
 
 def shadow_rules(root: Path) -> list[str]:
-    """Normalize remote Shadowrocket links for static domain policy parity."""
+    """Normalize all 35 separate remote Shadowrocket providers for static audit."""
     from scripts.sync_universal_routing import PROVIDERS_BASE, provider_sets, load_policy
-    p = load_policy(root)
-    expected = set(provider_sets(p))
-    content = (root / "release/shadowrocket/config.conf").read_text()
-    entries = [line.strip() for line in content.split("[Rule]", 1)[1].splitlines()
-               if line.strip() and not line.lstrip().startswith("#")]
-    rules, found = [], []
+    expected=provider_sets(load_policy(root))
+    entries=[row.strip() for row in
+             (root/"release/shadowrocket/config.conf").read_text().split("[Rule]",1)[1].splitlines()
+             if row.strip() and not row.lstrip().startswith("#")]
+    rules,found=[],[]
     for line in entries:
-        parts = line.split(",")
-        if parts[0] == "DOMAIN-SET":
-            host, target = parts[1], parts[2]
+        parts=line.split(",")
+        if parts[0]=="DOMAIN-SET":
+            host,action=parts[1],parts[2]
             if not host.startswith(PROVIDERS_BASE) or not host.endswith(".txt"):
-                raise ValueError("Unexpected remote Shadowrocket domain source: " + host)
-            name = host.removeprefix(PROVIDERS_BASE).removesuffix(".txt")
-            if name not in expected or name in ("rkn-ips", "proxy-ips", "ru-ips"):
-                raise ValueError("Unknown Shadowrocket domain source: " + name)
-            rules.append("RULE-SET," + name + "," +
-                         ("REJECT" if target == "REJECT" else "Garasu"))
-            found.append(name)
-        elif parts[0] == "RULE-SET":
-            if len(parts) != 3:
-                raise ValueError("Malformed remote Shadowrocket IP rule")
-            import re
-            hit = re.search(r"/main/rules/(rkn-ips|proxy-ips|ru-ips)\.list$",parts[1])
-            if not hit:
-                raise ValueError("Unexpected remote Shadowrocket IP source: "+parts[1])
-            name=hit.group(1)
+                raise ValueError("Unexpected Shadowrocket domain provider")
+            name=host.removeprefix(PROVIDERS_BASE).removesuffix(".txt")
+            if name not in expected or expected[name][0]!="domain":
+                raise ValueError("Invalid Shadowrocket domain category "+name)
             rules.append("RULE-SET,"+name+","+
-                         ("DIRECT" if parts[2]=="DIRECT" else "Garasu"))
+                         ("REJECT" if action=="REJECT" else
+                          "DIRECT" if action=="DIRECT" else "Garasu"))
+            found.append(name)
+        elif parts[0]=="RULE-SET":
+            import re
+            hit=re.search(r"/(?:rules|release/shadowrocket/providers)/(rkn-ips|proxy-ips|ru-ips|direct-ips|telegram-ips|ru-geoblock-patterns|github-patterns)\.list$",parts[1])
+            if not hit:raise ValueError("Unexpected remote Shadowrocket IP source: "+parts[1])
+            name=hit.group(1)
+            if name not in expected and name!="ru-ips":
+                raise ValueError("Unexpected Shadowrocket IP category "+name)
+            action=parts[2]
+            rules.append("RULE-SET,"+name+","+
+                         ("DIRECT" if action=="DIRECT" else "Garasu"))
             found.append(name)
         elif line.startswith("FINAL,"):
             rules.append("MATCH,Garasu")
         else:
             rules.append(line)
-    if set(found)!=expected or len(found)!=len(expected):
-        raise ValueError("Remote Shadowrocket provider set is incomplete or duplicated")
-    if (rules.index("RULE-SET,rkn-domains,Garasu") >=
-        rules.index("DOMAIN-SUFFIX,ru,DIRECT")):
-        raise ValueError("Shadowrocket RU DIRECT bypasses blocked set")
+    if set(found)!=set(expected) or len(found)!=len(expected):
+        raise ValueError("Shadowrocket missing/duplicated providers: "+repr(set(expected)-set(found)))
+    if rules.index("RULE-SET,rkn-domains,Garasu") >= rules.index("DOMAIN-SUFFIX,ru,DIRECT"):
+        raise ValueError("Shadowrocket RU DIRECT bypasses RKN")
     return rules
 
 

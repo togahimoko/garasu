@@ -147,9 +147,225 @@ rule-providers:
     path: ./rule-providers/garasu-proxy.mrs
     type: http
     proxy: DIRECT
+  ru-services:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ru-services.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-ru-services.mrs
+    type: http
+    proxy: DIRECT
+  ru-whitelist:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ru-whitelist.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-ru-whitelist.mrs
+    type: http
+    proxy: DIRECT
+  microsoft:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/microsoft.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-microsoft.mrs
+    type: http
+    proxy: DIRECT
+  apple:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/apple.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-apple.mrs
+    type: http
+    proxy: DIRECT
+  google-play:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/google-play.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-google-play.mrs
+    type: http
+    proxy: DIRECT
+  epicgames:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/epicgames.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-epicgames.mrs
+    type: http
+    proxy: DIRECT
+  origin:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/origin.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-origin.mrs
+    type: http
+    proxy: DIRECT
+  riot:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/riot.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-riot.mrs
+    type: http
+    proxy: DIRECT
+  escapefromtarkov:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/escapefromtarkov.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-escapefromtarkov.mrs
+    type: http
+    proxy: DIRECT
+  steam:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/steam.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-steam.mrs
+    type: http
+    proxy: DIRECT
+  twitch:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/twitch.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-twitch.mrs
+    type: http
+    proxy: DIRECT
+  pinterest:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/pinterest.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-pinterest.mrs
+    type: http
+    proxy: DIRECT
+  faceit:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/faceit.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-faceit.mrs
+    type: http
+    proxy: DIRECT
+  github:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/github.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-github.mrs
+    type: http
+    proxy: DIRECT
+  twitch-ads:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/twitch-ads.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-twitch-ads.mrs
+    type: http
+    proxy: DIRECT
+  telegram:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/telegram.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-telegram.mrs
+    type: http
+    proxy: DIRECT
+  win-spy:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/win-spy.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-win-spy.mrs
+    type: http
+    proxy: DIRECT
+  torrent-domains:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/torrent-domains.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-torrent-domains.mrs
+    type: http
+    proxy: DIRECT
+  category-ads:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/category-ads.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-category-ads.mrs
+    type: http
+    proxy: DIRECT
+  ru-geoblock:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/ru-geoblock.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-ru-geoblock.mrs
+    type: http
+    proxy: DIRECT
+  google-deepmind:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/google-deepmind.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-google-deepmind.mrs
+    type: http
+    proxy: DIRECT
+  push:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/push.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-push.mrs
+    type: http
+    proxy: DIRECT
+  youtube-global:
+    behavior: domain
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/youtube-global.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-youtube-global.mrs
+    type: http
+    proxy: DIRECT
+  direct-ips:
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/direct-ips.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-direct-ips.mrs
+    type: http
+    proxy: DIRECT
+  telegram-ips:
+    behavior: ipcidr
+    format: mrs
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/telegram-ips.mrs
+    interval: 21600
+    path: ./rule-providers/garasu-telegram-ips.mrs
+    type: http
+    proxy: DIRECT
+  ru-geoblock-patterns:
+    behavior: classical
+    format: yaml
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/ru-geoblock-patterns.yaml
+    interval: 21600
+    path: ./rule-providers/garasu-ru-geoblock-patterns.yaml
+    type: http
+    proxy: DIRECT
+  github-patterns:
+    behavior: classical
+    format: yaml
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/github-patterns.yaml
+    interval: 21600
+    path: ./rule-providers/garasu-github-patterns.yaml
+    type: http
+    proxy: DIRECT
 
 rules:
-  # GARASU SPLIT: remote RKN before RU, foreign -> VPN.
+  # GARASU V2: broad lists are remote providers, never embedded.
   - DOMAIN-SUFFIX,localhost,DIRECT
   - DOMAIN-SUFFIX,local,DIRECT
   - DOMAIN-SUFFIX,lan,DIRECT
@@ -165,14 +381,45 @@ rules:
   - IP-CIDR6,fc00::/7,DIRECT,no-resolve
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
   - RULE-SET,ads,REJECT
+  - RULE-SET,category-ads,REJECT
+  - RULE-SET,win-spy,REJECT
   - RULE-SET,rkn-domains,Garasu
+  - RULE-SET,rkn-ips,Garasu,no-resolve
+  - RULE-SET,proxy-ips,Garasu,no-resolve
   - RULE-SET,youtube,Garasu
   - RULE-SET,discord,Garasu
   - RULE-SET,ai,Garasu
   - RULE-SET,crypto,Garasu
   - RULE-SET,proxy,Garasu
-  - RULE-SET,rkn-ips,Garasu,no-resolve
-  - RULE-SET,proxy-ips,Garasu,no-resolve
+  - RULE-SET,ru-geoblock,Garasu
+  - RULE-SET,ru-geoblock-patterns,Garasu
+  - RULE-SET,youtube-global,Garasu
+  - RULE-SET,google-deepmind,Garasu
+  - RULE-SET,github,Garasu
+  - RULE-SET,github-patterns,Garasu
+  - RULE-SET,telegram,Garasu
+  - RULE-SET,twitch-ads,Garasu
+  - RULE-SET,epicgames,DIRECT
+  - RULE-SET,origin,DIRECT
+  - RULE-SET,riot,DIRECT
+  - RULE-SET,escapefromtarkov,DIRECT
+  - RULE-SET,steam,DIRECT
+  - RULE-SET,faceit,DIRECT
+  - RULE-SET,telegram-ips,Garasu,no-resolve
+  - RULE-SET,torrent-domains,DIRECT
+  - RULE-SET,microsoft,DIRECT
+  - RULE-SET,apple,DIRECT
+  - RULE-SET,push,DIRECT
+  - RULE-SET,google-play,Garasu
+  - RULE-SET,twitch,DIRECT
+  - RULE-SET,pinterest,DIRECT
+  - RULE-SET,ru-whitelist,DIRECT
+  - RULE-SET,ru-services,DIRECT
+  - RULE-SET,direct-ips,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,apple.com,DIRECT
+  - DOMAIN-SUFFIX,microsoft.com,DIRECT
+  - DOMAIN-SUFFIX,icloud.com,DIRECT
+  - DOMAIN-SUFFIX,outlook.com,DIRECT
   - DOMAIN-SUFFIX,2gis.ru,DIRECT
   - DOMAIN-SUFFIX,alfabank.ru,DIRECT
   - DOMAIN-SUFFIX,avito.ru,DIRECT

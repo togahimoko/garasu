@@ -29,7 +29,7 @@ class PanelTemplateContract(unittest.TestCase):
         for template_type, path in paths.items():
             with self.subTest(template=template_type):
                 self.assertIn(path, self.generated)
-                self.assertLess((ROOT / path).stat().st_size, 12000)
+                self.assertLess((ROOT / path).stat().st_size, 24000)
 
     def test_classic_clash_has_automatic_route_and_only_remote_yaml_lists(self):
         config = yaml.safe_load((ROOT / "release/clash/config.yaml").read_text())

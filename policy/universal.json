@@ -4,14 +4,57 @@
   "profiles": 1,
   "fallback": "PROXY",
   "routing_policy": "LAN DIRECT, ads REJECT, blocked RU and bypass PROXY, Russian domains and IP DIRECT, foreign PROXY",
-  "russian_tlds": ["ru", "su", "xn--p1ai", "xn--p1acf", "moscow", "xn--80asehdb", "xn--c1avg", "xn--80aswg", "xn--80adxhks", "xn--d1acj3b"],
-  "ad_exempt_domains": ["xapi.ozon.ru", "advert-api.wildberries.ru", "advert-media-api.wildberries.ru", "analytics.wildberries.ru"],
-  "private_domains": ["localhost", "local", "lan", "home.arpa", "arpa"],
-  "private_ipv4": ["127.0.0.0/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "100.64.0.0/10", "169.254.0.0/16"],
-  "private_ipv6": ["::1/128", "fc00::/7", "fe80::/10"],
+  "russian_tlds": [
+    "ru",
+    "su",
+    "xn--p1ai",
+    "xn--p1acf",
+    "moscow",
+    "xn--80asehdb",
+    "xn--c1avg",
+    "xn--80aswg",
+    "xn--80adxhks",
+    "xn--d1acj3b"
+  ],
+  "ad_exempt_domains": [
+    "xapi.ozon.ru",
+    "advert-api.wildberries.ru",
+    "advert-media-api.wildberries.ru",
+    "analytics.wildberries.ru"
+  ],
+  "private_domains": [
+    "localhost",
+    "local",
+    "lan",
+    "home.arpa",
+    "arpa"
+  ],
+  "private_ipv4": [
+    "127.0.0.0/8",
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16",
+    "100.64.0.0/10",
+    "169.254.0.0/16"
+  ],
+  "private_ipv6": [
+    "::1/128",
+    "fc00::/7",
+    "fe80::/10"
+  ],
   "ads_domain_set": "ads",
-  "blocked_domain_sets": ["rkn-domains", "youtube", "discord", "ai", "crypto", "proxy"],
-  "blocked_ip_sets": ["rkn-ips", "proxy-ips"],
+  "blocked_domain_sets": [
+    "rkn-domains",
+    "youtube",
+    "discord",
+    "ai",
+    "crypto",
+    "proxy"
+  ],
+  "blocked_ip_sets": [
+    "rkn-ips",
+    "proxy-ips"
+  ],
   "critical_ru_direct_domains": [
     "2gis.ru",
     "alfabank.ru",
@@ -30,5 +73,11 @@
     "wildberries.ru",
     "ya.ru",
     "yandex.ru"
+  ],
+  "system_direct_domains": [
+    "apple.com",
+    "microsoft.com",
+    "icloud.com",
+    "outlook.com"
   ]
 }

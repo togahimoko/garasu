@@ -14,7 +14,7 @@ Upstream: `82d104cde92b271f545e1f61a61b1acd079e0aa7`.
 | proxy | 154 | PROXY | 0 | 0 | 0 | 0 | 0 |
 | ads | 1217 | REJECT | 0 | 0 | 0 | 0 | 0 |
 | games | 117 | DIRECT | 116 | 116 | 116 | 116 | 116 |
-| direct | 3284 | DIRECT | 3110 | 3110 | 3110 | 3110 | 3110 |
+| direct | 3284 | DIRECT | 3106 | 3106 | 3106 | 3106 | 3106 |
 
 ## Наборы, загружаемые, но не используемые для маршрутизации
 
@@ -26,7 +26,7 @@ Upstream: `82d104cde92b271f545e1f61a61b1acd079e0aa7`.
 
 ## Примеры расхождений в Mihomo
 
-### direct — 3110 расхождений
+### direct — 3106 расхождений
 - `100beatscheap.com`: PROXY (MATCH)
 - `12diasdepresentesdeitunes.com`: PROXY (MATCH)
 - `12diasderegalosdeitunes.cl`: PROXY (MATCH)

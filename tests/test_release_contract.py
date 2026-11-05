@@ -64,12 +64,16 @@ class NativeReleaseContract(unittest.TestCase):
                         rules.index("RULE-SET,ru-ips,DIRECT,no-resolve"))
         self.assertEqual(rules[-1], "MATCH,Garasu")
         providers = self.mihomo["rule-providers"]
-        self.assertEqual(len(providers), 10)
-        self.assertTrue(all(p["type"] == "http" and p["format"] == "mrs"
-                            and "payload" not in p for p in providers.values()))
-        self.assertTrue(all(p["url"].startswith(
-            "https://raw.githubusercontent.com/togahimoko/garasu/main/release/mihomo/.mrs/")
+        self.assertEqual(len(providers), 37)
+        self.assertTrue(all(p["type"]=="http" and "payload" not in p
                             for p in providers.values()))
+        for name,p in providers.items():
+            if p["behavior"]=="classical":
+                self.assertEqual(p["format"],"yaml")
+                self.assertTrue(p["url"].endswith("/release/clash/providers/"+name+".yaml"))
+            else:
+                self.assertEqual(p["format"],"mrs")
+                self.assertTrue(p["url"].endswith("/release/mihomo/.mrs/"+name+".mrs"))
         self.assertEqual(self.mihomo["dns"]["proxy-server-nameserver"],
                          ["system"])
 
@@ -161,7 +165,8 @@ class NativeReleaseContract(unittest.TestCase):
         self.assertLess(len(value.encode("ascii")), 3500)
         profile = json.loads(base64.b64decode(value.split("/onadd/", 1)[1]))
         self.assertEqual(profile, target)
-        self.assertEqual(profile["BlockSites"], ["geosite:garasu-ads"])
+        self.assertEqual(profile["BlockSites"],
+                         ["geosite:garasu-ads","geosite:category-ads","geosite:win-spy"])
         self.assertGreater(int(target["LastUpdated"]), 1793761499)
 
     def test_production_srr_has_no_missing_named_templates(self):

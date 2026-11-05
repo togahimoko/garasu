@@ -88,9 +88,171 @@ rule-providers:
     url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/proxy.yaml
     path: ./rule-providers/garasu-proxy.yaml
     interval: 21600
+  ru-services:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/ru-services.yaml
+    path: ./rule-providers/garasu-ru-services.yaml
+    interval: 21600
+  ru-whitelist:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/ru-whitelist.yaml
+    path: ./rule-providers/garasu-ru-whitelist.yaml
+    interval: 21600
+  microsoft:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/microsoft.yaml
+    path: ./rule-providers/garasu-microsoft.yaml
+    interval: 21600
+  apple:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/apple.yaml
+    path: ./rule-providers/garasu-apple.yaml
+    interval: 21600
+  google-play:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/google-play.yaml
+    path: ./rule-providers/garasu-google-play.yaml
+    interval: 21600
+  epicgames:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/epicgames.yaml
+    path: ./rule-providers/garasu-epicgames.yaml
+    interval: 21600
+  origin:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/origin.yaml
+    path: ./rule-providers/garasu-origin.yaml
+    interval: 21600
+  riot:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/riot.yaml
+    path: ./rule-providers/garasu-riot.yaml
+    interval: 21600
+  escapefromtarkov:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/escapefromtarkov.yaml
+    path: ./rule-providers/garasu-escapefromtarkov.yaml
+    interval: 21600
+  steam:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/steam.yaml
+    path: ./rule-providers/garasu-steam.yaml
+    interval: 21600
+  twitch:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/twitch.yaml
+    path: ./rule-providers/garasu-twitch.yaml
+    interval: 21600
+  pinterest:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/pinterest.yaml
+    path: ./rule-providers/garasu-pinterest.yaml
+    interval: 21600
+  faceit:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/faceit.yaml
+    path: ./rule-providers/garasu-faceit.yaml
+    interval: 21600
+  github:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/github.yaml
+    path: ./rule-providers/garasu-github.yaml
+    interval: 21600
+  twitch-ads:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/twitch-ads.yaml
+    path: ./rule-providers/garasu-twitch-ads.yaml
+    interval: 21600
+  telegram:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/telegram.yaml
+    path: ./rule-providers/garasu-telegram.yaml
+    interval: 21600
+  win-spy:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/win-spy.yaml
+    path: ./rule-providers/garasu-win-spy.yaml
+    interval: 21600
+  torrent-domains:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/torrent-domains.yaml
+    path: ./rule-providers/garasu-torrent-domains.yaml
+    interval: 21600
+  category-ads:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/category-ads.yaml
+    path: ./rule-providers/garasu-category-ads.yaml
+    interval: 21600
+  ru-geoblock:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/ru-geoblock.yaml
+    path: ./rule-providers/garasu-ru-geoblock.yaml
+    interval: 21600
+  google-deepmind:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/google-deepmind.yaml
+    path: ./rule-providers/garasu-google-deepmind.yaml
+    interval: 21600
+  push:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/push.yaml
+    path: ./rule-providers/garasu-push.yaml
+    interval: 21600
+  youtube-global:
+    type: http
+    behavior: domain
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/youtube-global.yaml
+    path: ./rule-providers/garasu-youtube-global.yaml
+    interval: 21600
+  direct-ips:
+    type: http
+    behavior: ipcidr
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/direct-ips.yaml
+    path: ./rule-providers/garasu-direct-ips.yaml
+    interval: 21600
+  telegram-ips:
+    type: http
+    behavior: ipcidr
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/telegram-ips.yaml
+    path: ./rule-providers/garasu-telegram-ips.yaml
+    interval: 21600
+  ru-geoblock-patterns:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/ru-geoblock-patterns.yaml
+    path: ./rule-providers/garasu-ru-geoblock-patterns.yaml
+    interval: 21600
+  github-patterns:
+    type: http
+    behavior: classical
+    url: https://raw.githubusercontent.com/togahimoko/garasu/main/release/clash/providers/github-patterns.yaml
+    path: ./rule-providers/garasu-github-patterns.yaml
+    interval: 21600
 
 rules:
-  # GARASU SPLIT: remote RKN before RU, foreign -> VPN.
+  # GARASU V2: broad lists are remote providers, never embedded.
   - DOMAIN-SUFFIX,localhost,DIRECT
   - DOMAIN-SUFFIX,local,DIRECT
   - DOMAIN-SUFFIX,lan,DIRECT
@@ -106,14 +268,45 @@ rules:
   - IP-CIDR6,fc00::/7,DIRECT,no-resolve
   - IP-CIDR6,fe80::/10,DIRECT,no-resolve
   - RULE-SET,ads,REJECT
+  - RULE-SET,category-ads,REJECT
+  - RULE-SET,win-spy,REJECT
   - RULE-SET,rkn-domains,Garasu
+  - RULE-SET,rkn-ips,Garasu,no-resolve
+  - RULE-SET,proxy-ips,Garasu,no-resolve
   - RULE-SET,youtube,Garasu
   - RULE-SET,discord,Garasu
   - RULE-SET,ai,Garasu
   - RULE-SET,crypto,Garasu
   - RULE-SET,proxy,Garasu
-  - RULE-SET,rkn-ips,Garasu,no-resolve
-  - RULE-SET,proxy-ips,Garasu,no-resolve
+  - RULE-SET,ru-geoblock,Garasu
+  - RULE-SET,ru-geoblock-patterns,Garasu
+  - RULE-SET,youtube-global,Garasu
+  - RULE-SET,google-deepmind,Garasu
+  - RULE-SET,github,Garasu
+  - RULE-SET,github-patterns,Garasu
+  - RULE-SET,telegram,Garasu
+  - RULE-SET,twitch-ads,Garasu
+  - RULE-SET,epicgames,DIRECT
+  - RULE-SET,origin,DIRECT
+  - RULE-SET,riot,DIRECT
+  - RULE-SET,escapefromtarkov,DIRECT
+  - RULE-SET,steam,DIRECT
+  - RULE-SET,faceit,DIRECT
+  - RULE-SET,telegram-ips,Garasu,no-resolve
+  - RULE-SET,torrent-domains,DIRECT
+  - RULE-SET,microsoft,DIRECT
+  - RULE-SET,apple,DIRECT
+  - RULE-SET,push,DIRECT
+  - RULE-SET,google-play,Garasu
+  - RULE-SET,twitch,DIRECT
+  - RULE-SET,pinterest,DIRECT
+  - RULE-SET,ru-whitelist,DIRECT
+  - RULE-SET,ru-services,DIRECT
+  - RULE-SET,direct-ips,DIRECT,no-resolve
+  - DOMAIN-SUFFIX,apple.com,DIRECT
+  - DOMAIN-SUFFIX,microsoft.com,DIRECT
+  - DOMAIN-SUFFIX,icloud.com,DIRECT
+  - DOMAIN-SUFFIX,outlook.com,DIRECT
   - DOMAIN-SUFFIX,2gis.ru,DIRECT
   - DOMAIN-SUFFIX,alfabank.ru,DIRECT
   - DOMAIN-SUFFIX,avito.ru,DIRECT

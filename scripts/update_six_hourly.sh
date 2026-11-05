@@ -22,6 +22,8 @@ cd "$WORK_DIR/garasu"
 
 # Refresh source rules/GeoSite/GeoIP as one validated upstream snapshot.
 "$PYTHON" scripts/refresh.py
+# MIT upstream extra categories + official Telegram CIDRs, one pinned snapshot.
+"$PYTHON" scripts/refresh_extra_categories.py --refresh
 # Rebuild all format-specific remote sources and compact routing templates.
 "$PYTHON" scripts/sync_universal_routing.py --write
 "$PYTHON" scripts/build_binary_assets.py --mihomo-core "$MIHOMO" --singbox-core "$SINGBOX" --write

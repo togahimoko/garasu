@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import patch
 
-import probe_mihomo_node as nodeprobe
+from scripts import probe_mihomo_node as nodeprobe
 
 
 class NodeProbeTests(unittest.TestCase):

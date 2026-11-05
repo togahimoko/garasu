@@ -109,17 +109,27 @@ def parse_upstream_commit_date(blob, revision):
     return str(int(parsed.timestamp()))
 
 
+def download_https(url, timeout=45, limit=90_000_000):
+    """Use curl TLS transport; urllib on macOS CLT Python 3.9 fails on raw GitHub."""
+    if not (url.startswith("https://raw.githubusercontent.com/DigneZzZ/routing/")
+            or url.startswith("https://github.com/DigneZzZ/routing/commit/")):
+        raise ValueError("Unapproved source URL")
+    cmd = ["curl", "--fail", "--silent", "--show-error", "--location",
+           "--proto", "=https", "--proto-redir", "=https",
+           "--max-redirs", "3", "--retry", "2", "--connect-timeout", "12",
+           "--max-time", str(timeout), "--max-filesize", str(limit), url]
+    result = subprocess.run(cmd, capture_output=True, timeout=timeout + 10, check=True)
+    if not result.stdout or len(result.stdout) > limit:
+        raise ValueError("Empty or oversized source")
+    return result.stdout
+
+
 def upstream_commit_date(revision):
     """Read immutable commit metadata without using GitHub's API endpoint."""
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("Invalid upstream revision")
     url = "https://github.com/DigneZzZ/routing/commit/" + revision + ".patch"
-    request = urllib.request.Request(url, headers={"User-Agent": "Garasu-Routing/1.0"})
-    with urllib.request.urlopen(request, timeout=20) as response:
-        if response.status != 200 or response.url != url:
-            raise ValueError("Upstream commit patch lookup failed")
-        header = response.read(8192)
-    return parse_upstream_commit_date(header, revision)
+    return parse_upstream_commit_date(download_https(url, timeout=30, limit=20_000_000)[:8192], revision)
 
 
 def fetch(path, revision):
@@ -127,15 +137,8 @@ def fetch(path, revision):
     error = None
     for retry in range(3):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Garasu-Routing/1.0"})
-            with urllib.request.urlopen(req, timeout=45) as response:
-                if response.status != 200:
-                    raise ValueError("unexpected HTTP status")
-                data = response.read(90000001)
-            if not data or len(data) > 90000000:
-                raise ValueError("empty or oversized source")
-            return data
-        except (OSError, ValueError) as exc:
+            return download_https(url)
+        except (OSError, ValueError, subprocess.SubprocessError) as exc:
             error = exc
             if retry < 2:
                 time.sleep(2 ** retry)
@@ -760,3 +763,5 @@ def run():
 
 if __name__ == "__main__":
     run()
+
+[executed on device: MacBook-Air-Toga.local (fa6523e4-5a4e-400c-9421-cf9f5f760f70)]

@@ -15,19 +15,19 @@
     },
     "microsoft": {
       "behavior": "domain",
-      "action": "DIRECT",
+      "action": "Garasu",
       "source": "rules/extra/microsoft.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "apple": {
       "behavior": "domain",
-      "action": "DIRECT",
+      "action": "Garasu",
       "source": "rules/extra/apple.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "google-play": {
       "behavior": "domain",
-      "action": "DIRECT",
+      "action": "Garasu",
       "source": "rules/extra/google-play.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
@@ -63,13 +63,13 @@
     },
     "twitch": {
       "behavior": "domain",
-      "action": "DIRECT",
+      "action": "Garasu",
       "source": "rules/extra/twitch.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
     "pinterest": {
       "behavior": "domain",
-      "action": "DIRECT",
+      "action": "Garasu",
       "source": "rules/extra/pinterest.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
@@ -105,7 +105,7 @@
     },
     "torrent-domains": {
       "behavior": "domain",
-      "action": "DIRECT",
+      "action": "Garasu",
       "source": "rules/extra/torrent-domains.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },
@@ -129,7 +129,7 @@
     },
     "push": {
       "behavior": "domain",
-      "action": "DIRECT",
+      "action": "Garasu",
       "source": "rules/extra/push.list",
       "upstream": "hydraponique/roscomvpn-geosite"
     },

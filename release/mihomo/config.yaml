@@ -406,13 +406,13 @@ rules:
   - RULE-SET,steam,Garasu
   - RULE-SET,faceit,Garasu
   - RULE-SET,telegram-ips,Garasu,no-resolve
-  - RULE-SET,torrent-domains,DIRECT
-  - RULE-SET,microsoft,DIRECT
-  - RULE-SET,apple,DIRECT
-  - RULE-SET,google-play,DIRECT
-  - RULE-SET,twitch,DIRECT
-  - RULE-SET,pinterest,DIRECT
-  - RULE-SET,push,DIRECT
+  - RULE-SET,torrent-domains,Garasu
+  - RULE-SET,microsoft,Garasu
+  - RULE-SET,apple,Garasu
+  - RULE-SET,google-play,Garasu
+  - RULE-SET,twitch,Garasu
+  - RULE-SET,pinterest,Garasu
+  - RULE-SET,push,Garasu
   - RULE-SET,ru-whitelist,DIRECT
   - RULE-SET,ru-services,DIRECT
   - RULE-SET,direct-ips,DIRECT,no-resolve

@@ -269,43 +269,43 @@
         "rule_set": [
           "garasu-torrent-domains"
         ],
-        "outbound": "direct"
+        "outbound": "→ Remnawave"
       },
       {
         "rule_set": [
           "garasu-microsoft"
         ],
-        "outbound": "direct"
+        "outbound": "→ Remnawave"
       },
       {
         "rule_set": [
           "garasu-apple"
         ],
-        "outbound": "direct"
+        "outbound": "→ Remnawave"
       },
       {
         "rule_set": [
           "garasu-google-play"
         ],
-        "outbound": "direct"
+        "outbound": "→ Remnawave"
       },
       {
         "rule_set": [
           "garasu-twitch"
         ],
-        "outbound": "direct"
+        "outbound": "→ Remnawave"
       },
       {
         "rule_set": [
           "garasu-pinterest"
         ],
-        "outbound": "direct"
+        "outbound": "→ Remnawave"
       },
       {
         "rule_set": [
           "garasu-push"
         ],
-        "outbound": "direct"
+        "outbound": "→ Remnawave"
       },
       {
         "rule_set": [

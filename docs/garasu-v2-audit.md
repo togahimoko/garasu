@@ -11,6 +11,7 @@
 - Сохраняются категории отдельных продуктов и RU-исключений, а не только общая RU-проверка: Telegram (+IP), GitHub, Microsoft, Apple, Steam, Twitch, Epic, Origin, Riot, Faceit, Google Play, Torrent, реклама, телеметрия и др.
 - Источники GeoSite взяты из MIT-лицензированного `hydraponique/roscomvpn-geosite` на **конкретном SHA**, лицензионный текст помещён в `docs/licenses/`.
 - Из direct-whitelist исключены сервисы проверки внешнего IP, иначе они показывали бы домашний IP вместо VPN.
+- Семь зарубежных категорий (Microsoft, Apple, Google Play, Twitch, Pinterest, торрент-домены, Push) больше не идут DIRECT: направлены в автоматическую группу Garasu во всех пяти настольных/мобильных маршрутизаторах. Российские ru-services/ru-whitelist остаются DIRECT.
 - URL провайдеров не зависят от VPN-группы при первом запуске. В Mihomo `proxy: DIRECT`, в sing-box отдельный direct HTTP client.
 - Сохранены пять типов ответов и правило для отдельных приложений в одном наборе `release/remnawave/srr.json`.
 

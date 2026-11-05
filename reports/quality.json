@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "product": "Garasu MAX",
-  "snapshot_sha256": "695c55cca6faecaacff5e1e383a6f38ec3154bd18ab9be0bb9150f6b3eac1ac4",
+  "snapshot_sha256": "22d8b1f49b94f7bf5249a4ae36f47fed9fdb1b104de1aec1bfd08e9835fc8313",
   "manifest_asset_count": 281,
   "domain_counts": {
     "rkn-domains": 75306,

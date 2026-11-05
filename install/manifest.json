@@ -390,15 +390,15 @@
     },
     "clients/shadowrocket.conf": {
       "source": "garasu:managed-config:shadowrocket",
-      "sha256": "a3015977ef77720abf7116568f63b466f704c3c818220b7da94b7ea60b3d1a22",
-      "bytes": 6201
+      "sha256": "36d78a215eb8fda755e8cc6308415f37fb8fd83f69394db42013db97ac1fb0f7",
+      "bytes": 6194
     },
     "docs/licenses/roscomvpn-geosite-MIT.txt": {
       "sha256": "b9d84a22870d3f21c91a4c6e410c9cc51d00902f5233ad0c84011479244bf7d2",
       "bytes": 1067
     },
     "policy/extra_categories.json": {
-      "sha256": "bccc9cd403da87cbd76d833eb56db931620ff605c18d7d18371100c48ca2bfde",
+      "sha256": "b989e7f6dffb01ff140c91fa4bd8fe685ff3801e8603d5bdeab097d2ef1e4d26",
       "bytes": 5370
     },
     "release/clash/providers/ads.yaml": {

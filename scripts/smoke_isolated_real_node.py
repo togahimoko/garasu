@@ -49,7 +49,7 @@ def freeport():
         return sock.getsockname()[1]
 
 
-def smoke(core:Path,source:Path):
+def smoke(core:Path,source:Path, node_index:int|None=None):
     source_data=yaml.safe_load(source.read_text())
     nodes=source_data.get("proxies")
     if not isinstance(nodes,list) or not nodes:
@@ -57,6 +57,10 @@ def smoke(core:Path,source:Path):
     nodes=[dict(x) for x in nodes if isinstance(x,dict) and x.get("type")]
     if not nodes:
         raise ValueError("No usable nodes")
+    if node_index is not None:
+        if node_index < 0 or node_index >= len(nodes):
+            raise ValueError("Selected node index out of range")
+        nodes=[nodes[node_index]]
     profile=yaml.safe_load((ROOT/"release/mihomo/config.yaml").read_text())
     with tempfile.TemporaryDirectory(prefix="garasu-v2-isolated-") as location:
         tmp=Path(location)
@@ -150,5 +154,6 @@ if __name__=="__main__":
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--core",type=Path,required=True)
     ap.add_argument("--source",type=Path,required=True)
+    ap.add_argument("--node-index",type=int,default=None)
     args=ap.parse_args()
-    raise SystemExit(smoke(args.core,args.source))
+    raise SystemExit(smoke(args.core,args.source,args.node_index))

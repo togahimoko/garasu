@@ -27,6 +27,9 @@ class DNSBootstrapContract(unittest.TestCase):
         self.assertIs(dns["prefer-h3"], False)
         self.assertEqual(dns["proxy-server-nameserver"], ["tcp://77.88.8.8:53", "tcp://77.88.8.1:53"])
         self.assertEqual(dns["direct-nameserver"], ["system"])
+        self.assertTrue(dns["direct-nameserver-follow-policy"])
+        self.assertEqual(dns["nameserver-policy"]["raw.githubusercontent.com"],
+                         ["tcp://77.88.8.8:53", "tcp://77.88.8.1:53"])
         self.assertEqual(dns["default-nameserver"], ["77.88.8.8", "77.88.8.1"])
         self.assertNotIn("dns.google", str(dns))
         self.assertNotIn("dns.cloudflare.com", str(dns))

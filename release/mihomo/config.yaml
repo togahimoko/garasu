@@ -36,7 +36,14 @@ dns:
   proxy-server-nameserver:
     - tcp://77.88.8.8:53
     - tcp://77.88.8.1:53
-  # DIRECT destinations should resolve using the local network resolver.
+  # Remote rule sets must download before the VPN has connected.
+  # GitHub Raw uses independent TCP DNS; LAN and other DIRECT targets retain
+  # the system resolver so local devices keep working.
+  nameserver-policy:
+    'raw.githubusercontent.com':
+      - tcp://77.88.8.8:53
+      - tcp://77.88.8.1:53
+  direct-nameserver-follow-policy: true
   direct-nameserver:
     - system
   fake-ip-filter:

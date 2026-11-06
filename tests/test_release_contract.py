@@ -68,6 +68,8 @@ class NativeReleaseContract(unittest.TestCase):
         self.assertTrue(all(p["type"]=="http" and "payload" not in p
                             for p in providers.values()))
         for name,p in providers.items():
+            # The initial provider fetch must not require any VPN connection.
+            self.assertEqual(p["proxy"], "DIRECT", name)
             if p["behavior"]=="classical":
                 self.assertEqual(p["format"],"yaml")
                 self.assertTrue(p["url"].endswith("/release/clash/providers/"+name+".yaml"))

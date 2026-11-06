@@ -18,6 +18,7 @@ profile:
   store-fake-ip: true
 dns:
   enable: true
+  prefer-h3: false
   ipv6: false
   enhanced-mode: fake-ip
   default-nameserver:

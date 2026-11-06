@@ -7,13 +7,15 @@ mode: rule
 log-level: warning
 allow-lan: false
 ipv6: false
+# Stash sends DNS upstream directly (unlike Mihomo #proxy).
+# Never make starting the tunnel depend on overseas DoH in blocked networks.
 dns:
   default-nameserver:
-    - 1.1.1.1
-    - 8.8.8.8
+    - system
+  proxy-server-nameserver:
+    - system
   nameserver:
-    - https://dns.google/dns-query
-    - https://cloudflare-dns.com/dns-query
+    - system
 proxies: # LEAVE THIS LINE!
 proxy-groups:
   - name: Garasu

@@ -380,18 +380,18 @@
     },
     "clients/incy.json": {
       "source": "garasu:profile-template:incy",
-      "sha256": "f8b12f86caa5e654454e066e566a98e4d160cd98645c5b879fa0702c9340855e",
-      "bytes": 2794
+      "sha256": "7d85c0135409ee6d082549b87b8ffe2caf82ea8f45fefd973dd32102fbe6b8c3",
+      "bytes": 2705
     },
     "clients/happ.json": {
       "source": "garasu:profile-template:happ",
-      "sha256": "f8b12f86caa5e654454e066e566a98e4d160cd98645c5b879fa0702c9340855e",
-      "bytes": 2794
+      "sha256": "7d85c0135409ee6d082549b87b8ffe2caf82ea8f45fefd973dd32102fbe6b8c3",
+      "bytes": 2705
     },
     "clients/shadowrocket.conf": {
       "source": "garasu:managed-config:shadowrocket",
-      "sha256": "a501947614f08aa77738fc093c1bda26a0544d799440d096b2060da2c4720bdc",
-      "bytes": 6337
+      "sha256": "d640ee38afabf3d3603eb4a10751d2bd66d390e2212f9e123906aa3146162911",
+      "bytes": 6456
     },
     "docs/licenses/roscomvpn-geosite-MIT.txt": {
       "sha256": "b9d84a22870d3f21c91a4c6e410c9cc51d00902f5233ad0c84011479244bf7d2",

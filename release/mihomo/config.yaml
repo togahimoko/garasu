@@ -23,9 +23,12 @@ dns:
   default-nameserver:
     - 1.1.1.1
     - 8.8.8.8
+  # DoH only through Garasu: direct DoH/DoT may be blocked on RU ISPs.
+  # Using literal IPs avoids DNS bootstrap recursion for the DoH endpoints.
+  prefer-h3: false
   nameserver:
-    - https://dns.google/dns-query
-    - https://cloudflare-dns.com/dns-query
+    - https://1.1.1.1/dns-query#Garasu
+    - https://8.8.8.8/dns-query#Garasu
   # Resolve Remnawave-provided node endpoints without depending on proxy DoH bootstrap.
   # Bootstrap uses the system resolver; verify on actual client networks.
   proxy-server-nameserver:

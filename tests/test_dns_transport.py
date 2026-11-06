@@ -25,11 +25,16 @@ class DNSBootstrapContract(unittest.TestCase):
         config = yaml.safe_load((ROOT / "release/mihomo/config.yaml").read_text())
         dns = config["dns"]
         self.assertIs(dns["prefer-h3"], False)
-        self.assertEqual(dns["proxy-server-nameserver"], ["system"])
+        self.assertEqual(dns["proxy-server-nameserver"], ["tcp://77.88.8.8:53", "tcp://77.88.8.1:53"])
         self.assertEqual(dns["direct-nameserver"], ["system"])
+        self.assertEqual(dns["default-nameserver"], ["77.88.8.8", "77.88.8.1"])
+        self.assertNotIn("dns.google", str(dns))
+        self.assertNotIn("dns.cloudflare.com", str(dns))
+        self.assertNotIn("8.8.8.8", str(dns))
+        self.assertNotIn("1.1.1.1", str(dns))
         self.assertEqual(
             dns["nameserver"],
-            ["https://1.1.1.1/dns-query#Garasu", "https://8.8.8.8/dns-query#Garasu"],
+            ["https://9.9.9.9/dns-query#Garasu", "https://149.112.112.112/dns-query#Garasu"],
         )
         group = next(p for p in config["proxy-groups"] if p["name"] == "Garasu")
         self.assertEqual(group["type"], "url-test")

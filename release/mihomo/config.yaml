@@ -20,19 +20,22 @@ dns:
   enable: true
   ipv6: false
   enhanced-mode: fake-ip
+  # Node bootstrap uses public IP resolvers reachable by TCP without
+  # depending on the VPN. This applies equally to Reality and all CDN nodes.
   default-nameserver:
-    - 1.1.1.1
-    - 8.8.8.8
-  # DoH only through Garasu: direct DoH/DoT may be blocked on RU ISPs.
-  # Using literal IPs avoids DNS bootstrap recursion for the DoH endpoints.
+    - 77.88.8.8
+    - 77.88.8.1
   prefer-h3: false
+  # Foreign lookups use Quad9 HTTPS *inside* the selected Garasu tunnel.
+  # IP literals prevent resolver-to-resolver recursion.
   nameserver:
-    - https://1.1.1.1/dns-query#Garasu
-    - https://8.8.8.8/dns-query#Garasu
-  # Resolve Remnawave-provided node endpoints without depending on proxy DoH bootstrap.
-  # Bootstrap uses the system resolver; verify on actual client networks.
+    - https://9.9.9.9/dns-query#Garasu
+    - https://149.112.112.112/dns-query#Garasu
+  # Never use system here: another active VPN can return fake 198.18.x.x
+  # and GEO-CDN names must be resolved by an ISP-local resolver.
   proxy-server-nameserver:
-    - system
+    - tcp://77.88.8.8:53
+    - tcp://77.88.8.1:53
   # DIRECT destinations should resolve using the local network resolver.
   direct-nameserver:
     - system

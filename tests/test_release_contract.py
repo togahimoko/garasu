@@ -75,7 +75,7 @@ class NativeReleaseContract(unittest.TestCase):
                 self.assertEqual(p["format"],"mrs")
                 self.assertTrue(p["url"].endswith("/release/mihomo/.mrs/"+name+".mrs"))
         self.assertEqual(self.mihomo["dns"]["proxy-server-nameserver"],
-                         ["system"])
+                         ["tcp://77.88.8.8:53", "tcp://77.88.8.1:53"])
 
     def test_no_embedded_personal_nodes(self):
         for path in (RELEASE / "mihomo/config.yaml",
